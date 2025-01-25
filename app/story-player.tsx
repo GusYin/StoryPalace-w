@@ -44,7 +44,7 @@ export default function StoryPlayer({
             className="absolute inset-0 rounded-full"
             style={{
               background: "linear-gradient(125deg, #EEE7E4 0%, #F9F6F5 100%)",
-              boxShadow: "0px 4px 24px -1px rgba(0, 0, 0, 0.08)",
+              boxShadow: "0px 8px 0px rgba(174, 150, 142, 0.5)",
             }}
           />
           {/* Inner circle */}

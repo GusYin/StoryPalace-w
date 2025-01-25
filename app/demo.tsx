@@ -36,29 +36,9 @@ export default function StoryPlayerDemo() {
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 p-8">
+    <div className="flex justify-center items-center min-h-screen bg-[#FDF8F7]">
       <StoryPlayer
         title="The Enchanted Forest"
-        duration={duration}
-        currentTime={currentTime}
-        isPlaying={isPlaying}
-        onPlay={handlePlay}
-        onPause={handlePause}
-        onNext={handleNext}
-        onPrevious={handlePrevious}
-      />
-      <StoryPlayer
-        title="The Enchanted Forest"
-        duration={duration}
-        currentTime={currentTime}
-        isPlaying={isPlaying}
-        onPlay={handlePlay}
-        onPause={handlePause}
-        onNext={handleNext}
-        onPrevious={handlePrevious}
-      />
-      <StoryPlayer
-        title="The Case Of The Mischievous Pixies"
         duration={duration}
         currentTime={currentTime}
         isPlaying={isPlaying}
