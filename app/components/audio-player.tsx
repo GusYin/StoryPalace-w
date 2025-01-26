@@ -157,8 +157,8 @@ const RotationKnob = ({
     <KnobContainer>
       <canvas
         ref={canvasRef}
-        width={244}
-        height={244}
+        width={276}
+        height={276}
         onMouseDown={handleMouseDown}
         onMouseMove={isDragging ? calculateAngle : undefined}
         onMouseUp={() => setIsDragging(false)}
@@ -251,8 +251,8 @@ const Title = styled.h1`
 
 const KnobContainer = styled.div`
   position: relative;
-  width: 244px;
-  height: 244px;
+  width: 276px; // Changed from 244 to 276
+  height: 276px; // Changed from 244 to 276
   margin: 2rem 0;
 
   canvas {
