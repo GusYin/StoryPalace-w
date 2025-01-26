@@ -44,73 +44,41 @@ const RotationKnob = ({
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    // Draw outer circle
     const centerX = canvas.width / 2;
     const centerY = canvas.height / 2;
-    const outerRadius = 122; // 244px diameter
-    const innerRadius = 112; // 224px diameter
+    const outerRadius = 122; // 244px / 2
 
-    // Convert clock positions to canvas coordinates
-    const clockPosition = (hours: number, radius: number) => {
-      const angle = ((360 - hours * 30 + 90) * Math.PI) / 180; // Convert to math angles
-      return {
-        x: centerX + radius * Math.cos(angle),
-        y: centerY - radius * Math.sin(angle), // Flip Y-axis for canvas
-      };
-    };
+    // Outer circle shadow effects
+    ctx.save();
+    ctx.shadowColor = "rgba(174, 150, 142, 0.5)"; // #AE968E with 50% opacity
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 8;
+    ctx.shadowBlur = 8;
 
-    // Draw outer circle with gradient
+    // Outer circle gradient
     const outerGradient = ctx.createLinearGradient(
-      clockPosition(5, outerRadius).x,
-      clockPosition(5, outerRadius).y,
-      clockPosition(11, outerRadius).x,
-      clockPosition(11, outerRadius).y
+      centerX + outerRadius * Math.cos((210 * Math.PI) / 180),
+      centerY + outerRadius * Math.sin((210 * Math.PI) / 180),
+      centerX + outerRadius * Math.cos((30 * Math.PI) / 180),
+      centerY + outerRadius * Math.sin((30 * Math.PI) / 180)
     );
     outerGradient.addColorStop(0, "#EEE7E4");
     outerGradient.addColorStop(1, "#F9F6F5");
 
-    // Draw outer circle with multiple shadows
-    ctx.save();
-
-    // First shadow (new large blur)
-    ctx.shadowColor = "rgba(174, 150, 142, 0.5)"; // #AE968E with 50% opacity
-    ctx.shadowOffsetX = 0;
-    ctx.shadowOffsetY = 8;
-    ctx.shadowBlur = 15;
+    // Draw outer circle
     ctx.beginPath();
     ctx.arc(centerX, centerY, outerRadius - 1, 0, Math.PI * 2);
-    ctx.fill(); // Casts shadow only (transparent fill)
-    ctx.restore();
-
-    // Second shadow (existing medium blur)
-    ctx.shadowColor = "rgba(255, 255, 255, 0.5)";
-    ctx.shadowOffsetX = 3;
-    ctx.shadowOffsetY = 3;
-    ctx.shadowBlur = 8; // Original shadow
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, outerRadius - 1, 0, Math.PI * 2);
-    //ctx.fillStyle = outerGradient; // Actual fill with gradient
-    ctx.fill();
-
-    ctx.restore();
-
-    // Third shadow (ambient)
-    ctx.save();
-    ctx.shadowColor = "rgba(0, 0, 0, 0.25)";
-    ctx.shadowOffsetX = 0;
-    ctx.shadowOffsetY = 31;
-    ctx.shadowBlur = 60;
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, outerRadius - 1, 0, Math.PI * 2);
-    //ctx.fillStyle = "transparent";
+    ctx.fillStyle = outerGradient;
     ctx.fill();
     ctx.restore();
 
-    // Outer circle stroke gradient
+    // Draw outer circle stroke (gradient)
     const strokeGradient = ctx.createLinearGradient(
-      clockPosition(5, outerRadius).x,
-      clockPosition(5, outerRadius).y,
-      clockPosition(11, outerRadius).x,
-      clockPosition(11, outerRadius).y
+      centerX + outerRadius * Math.cos((210 * Math.PI) / 180),
+      centerY + outerRadius * Math.sin((210 * Math.PI) / 180),
+      centerX + outerRadius * Math.cos((30 * Math.PI) / 180),
+      centerY + outerRadius * Math.sin((30 * Math.PI) / 180)
     );
     strokeGradient.addColorStop(0, "#FFFFFF");
     strokeGradient.addColorStop(1, "#CDC3C0");
@@ -121,12 +89,13 @@ const RotationKnob = ({
     ctx.lineWidth = 1;
     ctx.stroke();
 
-    // Draw inner circle with gradient
+    // Draw inner circle (224px diameter)
+    const innerRadius = 112; // 224px / 2
     const innerGradient = ctx.createLinearGradient(
-      clockPosition(5, innerRadius).x,
-      clockPosition(5, innerRadius).y,
-      clockPosition(11, innerRadius).x,
-      clockPosition(11, innerRadius).y
+      centerX + innerRadius * Math.cos((210 * Math.PI) / 180),
+      centerY + innerRadius * Math.sin((210 * Math.PI) / 180),
+      centerX + innerRadius * Math.cos((30 * Math.PI) / 180),
+      centerY + innerRadius * Math.sin((30 * Math.PI) / 180)
     );
     innerGradient.addColorStop(0, "#FCFBFA");
     innerGradient.addColorStop(1, "#E7DFDD");
@@ -136,7 +105,7 @@ const RotationKnob = ({
     ctx.fillStyle = innerGradient;
     ctx.fill();
 
-    // Inner circle stroke
+    // Draw inner circle stroke
     ctx.beginPath();
     ctx.arc(centerX, centerY, innerRadius, 0, Math.PI * 2);
     ctx.strokeStyle = "rgba(255, 255, 255, 0.2)";
@@ -144,7 +113,7 @@ const RotationKnob = ({
     ctx.stroke();
 
     // Draw indicator hand
-    const indicatorAngle = ((angle - 90) * Math.PI) / 180;
+    const indicatorAngle = ((angle - 90) * Math.PI) / 180; // Convert to radians and offset
     ctx.save();
     ctx.translate(centerX, centerY);
     ctx.rotate(indicatorAngle);
@@ -280,11 +249,6 @@ const KnobContainer = styled.div`
   width: 244px;
   height: 244px;
   margin: 2rem 0;
-
-  canvas {
-    width: 100%;
-    height: 100%;
-  }
 `;
 
 const Controls = styled.div`
@@ -307,24 +271,6 @@ const ControlButton = styled.button`
   &:hover {
     opacity: 0.8;
   }
-`;
-
-// Add navigation styling
-const Nav = styled.nav`
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  display: flex;
-  gap: 1rem;
-`;
-
-const NavButton = styled.button`
-  background: #004d3d;
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  cursor: pointer;
 `;
 
 export default AudioPlayer;
