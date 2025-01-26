@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Howl } from "howler";
-import styled from "styled-components";
+import { styled } from "styled-components";
 
 // Story data model
 interface Story {
@@ -41,8 +41,99 @@ const RotationKnob = ({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    // Drawing implementation similar to SwiftUI version
-    // ... (complex canvas drawing code for gradients, shadows, etc)
+    // Clear canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    const outerRadius = 122; // 244px diameter
+    const innerRadius = 112; // 224px diameter
+
+    // Convert clock positions to canvas coordinates
+    const clockPosition = (hours: number, radius: number) => {
+      const angle = ((360 - hours * 30 + 90) * Math.PI) / 180; // Convert to math angles
+      return {
+        x: centerX + radius * Math.cos(angle),
+        y: centerY - radius * Math.sin(angle), // Flip Y-axis for canvas
+      };
+    };
+
+    // Draw outer circle with gradient
+    const outerGradient = ctx.createLinearGradient(
+      clockPosition(5, outerRadius).x,
+      clockPosition(5, outerRadius).y,
+      clockPosition(11, outerRadius).x,
+      clockPosition(11, outerRadius).y
+    );
+    outerGradient.addColorStop(0, "#EEE7E4");
+    outerGradient.addColorStop(1, "#F9F6F5");
+
+    // Outer circle shadows
+    ctx.save();
+    ctx.shadowColor = "rgba(174, 150, 142, 0.5)";
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 8;
+    ctx.shadowBlur = 8;
+
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, outerRadius - 1, 0, Math.PI * 2);
+    ctx.fillStyle = outerGradient;
+    ctx.fill();
+    ctx.restore();
+
+    // Outer circle stroke gradient
+    const strokeGradient = ctx.createLinearGradient(
+      clockPosition(5, outerRadius).x,
+      clockPosition(5, outerRadius).y,
+      clockPosition(11, outerRadius).x,
+      clockPosition(11, outerRadius).y
+    );
+    strokeGradient.addColorStop(0, "#FFFFFF");
+    strokeGradient.addColorStop(1, "#CDC3C0");
+
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, outerRadius - 1, 0, Math.PI * 2);
+    ctx.strokeStyle = strokeGradient;
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Draw inner circle with gradient
+    const innerGradient = ctx.createLinearGradient(
+      clockPosition(5, innerRadius).x,
+      clockPosition(5, innerRadius).y,
+      clockPosition(11, innerRadius).x,
+      clockPosition(11, innerRadius).y
+    );
+    innerGradient.addColorStop(0, "#FCFBFA");
+    innerGradient.addColorStop(1, "#E7DFDD");
+
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, innerRadius, 0, Math.PI * 2);
+    ctx.fillStyle = innerGradient;
+    ctx.fill();
+
+    // Inner circle stroke
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, innerRadius, 0, Math.PI * 2);
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.2)";
+    ctx.lineWidth = 0.2;
+    ctx.stroke();
+
+    // Draw indicator hand
+    const indicatorAngle = ((angle - 90) * Math.PI) / 180;
+    ctx.save();
+    ctx.translate(centerX, centerY);
+    ctx.rotate(indicatorAngle);
+
+    ctx.fillStyle = "#004D3D";
+    ctx.shadowColor = "rgba(0, 0, 0, 0.25)";
+    ctx.shadowBlur = 4;
+    ctx.shadowOffsetY = 4;
+
+    ctx.beginPath();
+    ctx.roundRect(-3.125, -innerRadius - 5, 6.25, 29.28, 5);
+    ctx.fill();
+    ctx.restore();
   };
 
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -79,7 +170,7 @@ const RotationKnob = ({
   );
 };
 
-const AudioPlayerApp = () => {
+const AudioPlayer = () => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [rotationAngle, setRotationAngle] = useState(0);
@@ -165,6 +256,11 @@ const KnobContainer = styled.div`
   width: 244px;
   height: 244px;
   margin: 2rem 0;
+
+  canvas {
+    width: 100%;
+    height: 100%;
+  }
 `;
 
 const Controls = styled.div`
@@ -189,4 +285,22 @@ const ControlButton = styled.button`
   }
 `;
 
-export default AudioPlayerApp;
+// Add navigation styling
+const Nav = styled.nav`
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  display: flex;
+  gap: 1rem;
+`;
+
+const NavButton = styled.button`
+  background: #004d3d;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+`;
+
+export default AudioPlayer;

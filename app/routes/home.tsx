@@ -1,5 +1,7 @@
 import type { Route } from "./+types/home";
-import { Welcome } from "../welcome/welcome";
+import { Fragment } from "react";
+import { Outlet } from "react-router";
+import AudioPlayer from "~/components/audio-player";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -9,5 +11,12 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function Home() {
-  return <Welcome />;
+  return (
+    <Fragment>
+      <main className="max-w-screen-lg mx-auto my-4">
+        <Outlet />
+      </main>
+      <AudioPlayer />
+    </Fragment>
+  );
 }
