@@ -89,6 +89,9 @@ const RotationKnob = ({
     ctx.restore();
 
     // Draw outer circle stroke (gradient)
+    // Draw outer circle stroke (gradient) INSIDE
+    const strokeRadius = outerRadius - 1 - ctx.lineWidth / 2; // Move inward by half the stroke width
+
     const strokeGradient = ctx.createLinearGradient(
       centerX + outerRadius * Math.cos(angle5oclock),
       centerY + outerRadius * Math.sin(angle5oclock),
@@ -99,7 +102,7 @@ const RotationKnob = ({
     strokeGradient.addColorStop(1, "#CDC3C0");
 
     ctx.beginPath();
-    ctx.arc(centerX, centerY, outerRadius - 1, 0, Math.PI * 2);
+    ctx.arc(centerX, centerY, strokeRadius, 0, Math.PI * 2);
     ctx.strokeStyle = strokeGradient;
     ctx.lineWidth = 1;
     ctx.stroke();
