@@ -51,10 +51,20 @@ const RotationKnob = ({
 
     // Outer circle shadow effects
     ctx.save();
+    ctx.shadowColor = "rgba(255, 255, 255, 0.5)"; // #FFFFFF with 50% opacity
+    ctx.shadowOffsetX = 3;
+    ctx.shadowOffsetY = 3;
+    ctx.shadowBlur = 8;
+
     ctx.shadowColor = "rgba(174, 150, 142, 0.5)"; // #AE968E with 50% opacity
     ctx.shadowOffsetX = 0;
     ctx.shadowOffsetY = 8;
     ctx.shadowBlur = 8;
+
+    ctx.shadowColor = "rgba(0, 0, 0, 0.25)"; // #000000 with 25% opacity
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 31;
+    ctx.shadowBlur = 60;
 
     // Outer circle gradient
 
@@ -157,8 +167,8 @@ const RotationKnob = ({
     <KnobContainer>
       <canvas
         ref={canvasRef}
-        width={276}
-        height={276}
+        width={426}
+        height={426}
         onMouseDown={handleMouseDown}
         onMouseMove={isDragging ? calculateAngle : undefined}
         onMouseUp={() => setIsDragging(false)}
@@ -251,8 +261,8 @@ const Title = styled.h1`
 
 const KnobContainer = styled.div`
   position: relative;
-  width: 276px; // Changed from 244 to 276
-  height: 276px; // Changed from 244 to 276
+  width: 426px;
+  height: 426px;
   margin: 2rem 0;
 
   canvas {
