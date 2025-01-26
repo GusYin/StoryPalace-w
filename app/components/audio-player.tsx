@@ -37,6 +37,20 @@ const RotationKnob = ({
   const step = 360 / storiesCount;
 
   useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    // Set up proper device pixel ratio scaling
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const devicePixelRatio = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+
+    canvas.width = rect.width * devicePixelRatio;
+    canvas.height = rect.height * devicePixelRatio;
+
+    ctx.scale(devicePixelRatio, devicePixelRatio);
     drawKnob();
   }, [angle]);
 
@@ -53,13 +67,22 @@ const RotationKnob = ({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    // Get proper dimensions
+    const rect = canvas.getBoundingClientRect();
+    const centerX = Math.round(rect.width / 2);
+    const centerY = Math.round(rect.height / 2);
+    const outerRadius = 122; // 244px / 2
+
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Draw outer circle
-    const centerX = canvas.width / 2;
-    const centerY = canvas.height / 2;
-    const outerRadius = 122; // 244px / 2
+    // Draw outer circle with crisp edges
+    ctx.save();
+
+    // Use integer values for coordinates
+    const intCenterX = Math.round(centerX);
+    const intCenterY = Math.round(centerY);
+    const intRadius = Math.round(outerRadius);
 
     // Outer circle shadow effects
     ctx.save();
@@ -85,22 +108,21 @@ const RotationKnob = ({
     const angle11oclock = 240 * (Math.PI / 180); // 11 o'clock in radians
 
     const outerGradient = ctx.createLinearGradient(
-      centerX + outerRadius * Math.cos(angle5oclock),
-      centerY + outerRadius * Math.sin(angle5oclock),
-      centerX + outerRadius * Math.cos(angle11oclock),
-      centerY + outerRadius * Math.sin(angle11oclock)
+      intCenterX + intRadius * Math.cos(angle5oclock),
+      intCenterY + intRadius * Math.sin(angle5oclock),
+      intCenterX + intRadius * Math.cos(angle11oclock),
+      intCenterY + intRadius * Math.sin(angle11oclock)
     );
     outerGradient.addColorStop(0, "#EEE7E4");
     outerGradient.addColorStop(1, "#F9F6F5");
 
     // Draw outer circle
     ctx.beginPath();
-    ctx.arc(centerX, centerY, outerRadius - 1, 0, Math.PI * 2);
+    ctx.arc(intCenterX, intCenterY, intRadius - 1, 0, Math.PI * 2);
     ctx.fillStyle = outerGradient;
     ctx.fill();
     ctx.restore();
 
-    // Draw outer circle stroke (gradient)
     // Draw outer circle stroke (gradient) INSIDE
     const strokeRadius = outerRadius - 1 - ctx.lineWidth / 2; // Move inward by half the stroke width
 
