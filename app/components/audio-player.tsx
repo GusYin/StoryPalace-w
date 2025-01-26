@@ -29,6 +29,8 @@ const RotationKnob = ({
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const dragStartAngle = useRef(0);
+  const dragStartRotation = useRef(0);
 
   useEffect(() => {
     drawKnob();
@@ -147,9 +149,43 @@ const RotationKnob = ({
     ctx.restore();
   };
 
+  // Add mouse move handler
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging || !canvasRef.current) return;
+
+    const rect = canvasRef.current.getBoundingClientRect();
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+
+    // Calculate current angle
+    const currentAngle =
+      (Math.atan2(mouseY - centerY, mouseX - centerX) * 180) / Math.PI;
+
+    // Calculate angle difference from drag start
+    const angleDelta = currentAngle - dragStartAngle.current;
+
+    // Apply delta to original rotation
+    const newAngle = dragStartRotation.current + angleDelta;
+    onRotate(newAngle);
+  };
+
   const handleMouseDown = (e: React.MouseEvent) => {
+    if (!canvasRef.current) return;
+
+    const rect = canvasRef.current.getBoundingClientRect();
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+
+    // Store initial values
+    dragStartAngle.current =
+      (Math.atan2(mouseY - centerY, mouseX - centerX) * 180) / Math.PI;
+    dragStartRotation.current = angle;
+
     setIsDragging(true);
-    calculateAngle(e);
   };
 
   const calculateAngle = (e: React.MouseEvent) => {
@@ -173,7 +209,7 @@ const RotationKnob = ({
         width={426}
         height={426}
         onMouseDown={handleMouseDown}
-        onMouseMove={isDragging ? calculateAngle : undefined}
+        onMouseMove={handleMouseMove}
         onMouseUp={() => setIsDragging(false)}
         onMouseLeave={() => setIsDragging(false)}
       />
