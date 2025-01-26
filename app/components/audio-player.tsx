@@ -249,6 +249,11 @@ const KnobContainer = styled.div`
   width: 244px;
   height: 244px;
   margin: 2rem 0;
+
+  canvas {
+    width: 100%;
+    height: 100%;
+  }
 `;
 
 const Controls = styled.div`
