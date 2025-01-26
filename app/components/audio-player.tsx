@@ -82,13 +82,13 @@ const RotationKnob = ({
     ctx.restore();
 
     // Second shadow (existing medium blur)
-    ctx.shadowColor = "rgba(174, 150, 142, 0.5)";
+    ctx.shadowColor = "rgba(255, 255, 255, 0.5)";
     ctx.shadowOffsetX = 3;
     ctx.shadowOffsetY = 3;
     ctx.shadowBlur = 8; // Original shadow
     ctx.beginPath();
     ctx.arc(centerX, centerY, outerRadius - 1, 0, Math.PI * 2);
-    ctx.fillStyle = outerGradient; // Actual fill with gradient
+    //ctx.fillStyle = outerGradient; // Actual fill with gradient
     ctx.fill();
 
     ctx.restore();
@@ -101,7 +101,7 @@ const RotationKnob = ({
     ctx.shadowBlur = 60;
     ctx.beginPath();
     ctx.arc(centerX, centerY, outerRadius - 1, 0, Math.PI * 2);
-    ctx.fillStyle = "transparent";
+    //ctx.fillStyle = "transparent";
     ctx.fill();
     ctx.restore();
 
