@@ -266,7 +266,7 @@ const KnobContainer = styled.div`
   position: relative;
   width: 426px;
   height: 426px;
-  margin: 2rem 0;
+  margin: 2rem 0 0 0; // Removed bottom margin
 
   canvas {
     width: 100%;
@@ -277,7 +277,9 @@ const KnobContainer = styled.div`
 const Controls = styled.div`
   display: flex;
   gap: 2rem;
-  margin-top: 103px;
+  margin-top: calc(
+    103px - (426px - 244px) / 2
+  ); // Compensate for circle position
 `;
 
 const ControlButton = styled.button`
