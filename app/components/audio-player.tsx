@@ -68,16 +68,36 @@ const RotationKnob = ({
     outerGradient.addColorStop(0, "#EEE7E4");
     outerGradient.addColorStop(1, "#F9F6F5");
 
-    // Outer circle shadows
+    // Shadow 1: Close beige shadow
     ctx.save();
     ctx.shadowColor = "rgba(174, 150, 142, 0.5)";
     ctx.shadowOffsetX = 0;
     ctx.shadowOffsetY = 8;
-    ctx.shadowBlur = 8;
-
+    ctx.shadowBlur = 15;
     ctx.beginPath();
     ctx.arc(centerX, centerY, outerRadius - 1, 0, Math.PI * 2);
-    ctx.fillStyle = outerGradient;
+    ctx.fill();
+    ctx.restore();
+
+    // Shadow 2: Ambient black shadow
+    ctx.save();
+    ctx.shadowColor = "rgba(0, 0, 0, 0.25)";
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 31;
+    ctx.shadowBlur = 60;
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, outerRadius - 1, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+
+    // Shadow 3: White highlight shadow
+    ctx.save();
+    ctx.shadowColor = "rgba(255, 255, 255, 0.5)"; // #FFFFFF 50% opacity
+    ctx.shadowOffsetX = 3;
+    ctx.shadowOffsetY = 3;
+    ctx.shadowBlur = 8;
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, outerRadius - 1, 0, Math.PI * 2);
     ctx.fill();
     ctx.restore();
 
