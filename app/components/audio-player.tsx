@@ -257,7 +257,7 @@ const Title = styled.h1`
   color: #004d3d;
   font-family: "Dosis", sans-serif;
   font-size: 2rem;
-  margin-bottom: 103px;
+  margin-bottom: calc(116px - (426px - 244px) / 2); // 116px - container padding
   text-align: center;
   max-width: 600px;
 `;
@@ -266,7 +266,7 @@ const KnobContainer = styled.div`
   position: relative;
   width: 426px;
   height: 426px;
-  margin: 2rem 0 0 0; // Removed bottom margin
+  mmargin: 0 0 2rem 0; // Only bottom margin remains
 
   canvas {
     width: 100%;
