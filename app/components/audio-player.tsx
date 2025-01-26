@@ -57,11 +57,16 @@ const RotationKnob = ({
     ctx.shadowBlur = 8;
 
     // Outer circle gradient
+
+    // Calculate gradient points for 5 o'clock -> 11 o'clock
+    const angle5oclock = 60 * (Math.PI / 180); // 5 o'clock in radians
+    const angle11oclock = 240 * (Math.PI / 180); // 11 o'clock in radians
+
     const outerGradient = ctx.createLinearGradient(
-      centerX + outerRadius * Math.cos((210 * Math.PI) / 180),
-      centerY + outerRadius * Math.sin((210 * Math.PI) / 180),
-      centerX + outerRadius * Math.cos((30 * Math.PI) / 180),
-      centerY + outerRadius * Math.sin((30 * Math.PI) / 180)
+      centerX + outerRadius * Math.cos(angle5oclock),
+      centerY + outerRadius * Math.sin(angle5oclock),
+      centerX + outerRadius * Math.cos(angle11oclock),
+      centerY + outerRadius * Math.sin(angle11oclock)
     );
     outerGradient.addColorStop(0, "#EEE7E4");
     outerGradient.addColorStop(1, "#F9F6F5");
@@ -75,10 +80,10 @@ const RotationKnob = ({
 
     // Draw outer circle stroke (gradient)
     const strokeGradient = ctx.createLinearGradient(
-      centerX + outerRadius * Math.cos((210 * Math.PI) / 180),
-      centerY + outerRadius * Math.sin((210 * Math.PI) / 180),
-      centerX + outerRadius * Math.cos((30 * Math.PI) / 180),
-      centerY + outerRadius * Math.sin((30 * Math.PI) / 180)
+      centerX + outerRadius * Math.cos(angle5oclock),
+      centerY + outerRadius * Math.sin(angle5oclock),
+      centerX + outerRadius * Math.cos(angle11oclock),
+      centerY + outerRadius * Math.sin(angle11oclock)
     );
     strokeGradient.addColorStop(0, "#FFFFFF");
     strokeGradient.addColorStop(1, "#CDC3C0");
@@ -92,10 +97,10 @@ const RotationKnob = ({
     // Draw inner circle (224px diameter)
     const innerRadius = 112; // 224px / 2
     const innerGradient = ctx.createLinearGradient(
-      centerX + innerRadius * Math.cos((210 * Math.PI) / 180),
-      centerY + innerRadius * Math.sin((210 * Math.PI) / 180),
-      centerX + innerRadius * Math.cos((30 * Math.PI) / 180),
-      centerY + innerRadius * Math.sin((30 * Math.PI) / 180)
+      centerX + innerRadius * Math.cos(angle5oclock),
+      centerY + innerRadius * Math.sin(angle5oclock),
+      centerX + innerRadius * Math.cos(angle11oclock),
+      centerY + innerRadius * Math.sin(angle11oclock)
     );
     innerGradient.addColorStop(0, "#FCFBFA");
     innerGradient.addColorStop(1, "#E7DFDD");
