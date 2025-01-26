@@ -23,18 +23,28 @@ const stories: Story[] = [
 const RotationKnob = ({
   angle,
   onRotate,
+  storiesCount,
 }: {
   angle: number;
   onRotate: (angle: number) => void;
+  storiesCount: number;
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const dragStartAngle = useRef(0);
   const dragStartRotation = useRef(0);
+  const currentAngle = useRef(angle);
+  const step = 360 / storiesCount;
 
   useEffect(() => {
     drawKnob();
   }, [angle]);
+
+  useEffect(() => {
+    if (!isDragging) {
+      currentAngle.current = angle;
+    }
+  }, [angle, isDragging]);
 
   const drawKnob = () => {
     const canvas = canvasRef.current;
@@ -159,16 +169,12 @@ const RotationKnob = ({
     const mouseX = e.clientX - rect.left;
     const mouseY = e.clientY - rect.top;
 
-    // Calculate current angle
-    const currentAngle =
+    const rawAngle =
       (Math.atan2(mouseY - centerY, mouseX - centerX) * 180) / Math.PI;
+    const angleDelta = rawAngle - dragStartAngle.current;
 
-    // Calculate angle difference from drag start
-    const angleDelta = currentAngle - dragStartAngle.current;
-
-    // Apply delta to original rotation
-    const newAngle = dragStartRotation.current + angleDelta;
-    onRotate(newAngle);
+    const unsnappedAngle = dragStartRotation.current + angleDelta;
+    onRotate(unsnappedAngle);
   };
 
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -180,12 +186,19 @@ const RotationKnob = ({
     const mouseX = e.clientX - rect.left;
     const mouseY = e.clientY - rect.top;
 
-    // Store initial values
     dragStartAngle.current =
       (Math.atan2(mouseY - centerY, mouseX - centerX) * 180) / Math.PI;
     dragStartRotation.current = angle;
-
     setIsDragging(true);
+  };
+
+  const handleMouseUp = () => {
+    if (!isDragging) return;
+
+    // Snap to nearest step using current angle prop
+    const snappedAngle = Math.round(angle / step) * step;
+    onRotate(snappedAngle);
+    setIsDragging(false);
   };
 
   const calculateAngle = (e: React.MouseEvent) => {
@@ -210,8 +223,8 @@ const RotationKnob = ({
         height={426}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
-        onMouseUp={() => setIsDragging(false)}
-        onMouseLeave={() => setIsDragging(false)}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
       />
     </KnobContainer>
   );
@@ -249,7 +262,11 @@ const AudioPlayer = () => {
     <AppContainer>
       <Title>{stories[selectedIndex].title}</Title>
 
-      <RotationKnob angle={rotationAngle} onRotate={setRotationAngle} />
+      <RotationKnob
+        angle={rotationAngle}
+        onRotate={setRotationAngle}
+        storiesCount={stories.length}
+      />
 
       <Controls>
         <ControlButton
