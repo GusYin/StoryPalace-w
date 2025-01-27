@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { Howl } from "howler";
 import { styled } from "styled-components";
+import { SkipNextIcon } from "./skip-next-icon";
+import { SkipPreviousIcon } from "./skip-previous-icon";
 
 // Story data model
 interface Story {
@@ -297,8 +299,9 @@ const AudioPlayer = () => {
               (prev) => (prev - 1 + stories.length) % stories.length
             )
           }
+          aria-label="Previous story"
         >
-          <i className="material-icons">skip_previous</i>
+          <SkipPreviousIcon />
         </ControlButton>
 
         <ControlButton onClick={isPlaying ? pauseAudio : playAudio}>
@@ -309,8 +312,9 @@ const AudioPlayer = () => {
           onClick={() =>
             setSelectedIndex((prev) => (prev + 1) % stories.length)
           }
+          aria-label="Next story"
         >
-          <i className="material-icons">skip_next</i>
+          <SkipNextIcon />
         </ControlButton>
       </Controls>
     </AppContainer>
@@ -370,6 +374,17 @@ const ControlButton = styled.button`
 
   &:hover {
     opacity: 0.8;
+  }
+  svg {
+    width: 40px; // Control size through CSS
+    height: 40px;
+    vertical-align: middle;
+
+    /* Optional hover effects */
+    transition: transform 0.2s;
+    &:hover {
+      transform: scale(1.1);
+    }
   }
 `;
 
