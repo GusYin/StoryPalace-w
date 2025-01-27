@@ -3,6 +3,8 @@ import { Howl } from "howler";
 import { styled } from "styled-components";
 import { SkipNextIcon } from "./skip-next-icon";
 import { SkipPreviousIcon } from "./skip-previous-icon";
+import { PauseIcon } from "./pause-icon";
+import { PlayIcon } from "./play-icon";
 
 // Story data model
 interface Story {
@@ -305,7 +307,7 @@ const AudioPlayer = () => {
         </ControlButton>
 
         <ControlButton onClick={isPlaying ? pauseAudio : playAudio}>
-          <i className="material-icons">{isPlaying ? "pause" : "play_arrow"}</i>
+          {isPlaying ? <PlayIcon /> : <PauseIcon />}
         </ControlButton>
 
         <ControlButton
