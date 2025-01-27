@@ -4,7 +4,7 @@ export const SkipPreviousIcon = () => (
     height="24px"
     viewBox="0 -960 960 960"
     width="24px"
-    fill="#5f6368"
+    fill="#004D3D"
   >
     <path d="M220-240v-480h80v480h-80Zm520 0L380-480l360-240v480Zm-80-240Zm0 90v-180l-136 90 136 90Z" />
   </svg>
