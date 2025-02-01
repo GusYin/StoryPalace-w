@@ -20,7 +20,7 @@ export default function Home() {
           <img
             src={intrica}
             alt="Ambient background"
-            className="w-full h-full object-cover opacity-20"
+            className="w-full h-full object-cover opacity-30"
           />
         </div>
 
