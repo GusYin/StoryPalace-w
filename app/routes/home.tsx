@@ -1,5 +1,5 @@
 import type { Route } from "./+types/home";
-import { Fragment } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { Outlet, Link } from "react-router";
 import AudioPlayer from "~/components/audio-player";
 import intrica from "../images/intrica.webp";
@@ -12,20 +12,82 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function Home() {
+  const beamRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      requestAnimationFrame(() => {
+        if (!beamRef.current || !containerRef.current) return;
+
+        // Get container position
+        const rect = containerRef.current.getBoundingClientRect();
+
+        // Calculate relative mouse position
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        // Set CSS custom properties for mask position
+        beamRef.current.style.setProperty("--mouse-x", `${x}px`);
+        beamRef.current.style.setProperty("--mouse-y", `${y}px`);
+      });
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, []);
+
+  const useIsMobile = () => {
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+      const checkMobile = () => {
+        return /Mobi|Android/i.test(window.navigator.userAgent);
+      };
+
+      setIsMobile(checkMobile());
+    }, []);
+
+    return isMobile;
+  };
+  const isMobile = useIsMobile();
+
   return (
     <Fragment>
       <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white font-body">
         {/* Ambient Background Image Container */}
-        <div className="absolute inset-0 z-0">
+        <div ref={containerRef} className="absolute inset-0 z-0">
           <img
             src={intrica}
             alt="Ambient background"
-            className="w-full h-full object-cover opacity-30"
+            className="w-full h-full object-cover"
           />
+
+          {/* Mouse-following Beam */}
+          {!isMobile && (
+            <div
+              ref={beamRef}
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                background: "rgba(0, 0, 0, 0.85)",
+                maskImage: `radial-gradient(
+        circle 200px at var(--mouse-x) var(--mouse-y),
+        transparent 0%,
+        black 100%
+      )`,
+                WebkitMaskImage: `radial-gradient(
+        circle 200px at var(--mouse-x) var(--mouse-y),
+        transparent 0%,
+        black 100%
+      )`,
+                transition: "mask-position 0.3s, -webkit-mask-position 0.3s",
+              }}
+            />
+          )}
         </div>
 
         {/* Animated Gradient Overlay */}
-        <div className="animated-gradient absolute inset-0 z-1 opacity-50" />
+        {/* <div className="animated-gradient absolute inset-0 z-1 opacity-50" /> */}
 
         {/* Content Container */}
         <div className="relative z-10">
