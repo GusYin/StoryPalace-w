@@ -71,23 +71,20 @@ export default function Home() {
               style={{
                 background: "rgba(0, 0, 0, 0.85)",
                 maskImage: `radial-gradient(
-        circle 200px at var(--mouse-x) var(--mouse-y),
-        transparent 0%,
-        black 100%
-      )`,
+                  circle 200px at var(--mouse-x) var(--mouse-y),
+                  transparent 0%,
+                  black 100%
+                )`,
                 WebkitMaskImage: `radial-gradient(
-        circle 200px at var(--mouse-x) var(--mouse-y),
-        transparent 0%,
-        black 100%
-      )`,
+                  circle 200px at var(--mouse-x) var(--mouse-y),
+                  transparent 0%,
+                  black 100%
+                )`,
                 transition: "mask-position 0.3s, -webkit-mask-position 0.3s",
               }}
             />
           )}
         </div>
-
-        {/* Animated Gradient Overlay */}
-        {/* <div className="animated-gradient absolute inset-0 z-1 opacity-50" /> */}
 
         {/* Content Container */}
         <div className="relative z-10">
