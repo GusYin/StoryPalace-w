@@ -69,9 +69,11 @@ export default function Home() {
               ref={beamRef}
               className="absolute inset-0 pointer-events-none"
               style={{
-                background: "rgba(0, 0, 0, 0.85)",
+                //rgba(0, 0, 0, 0.85): Overlay darkness (0 = transparent, 1 = fully black)
+                background: "rgba(0, 0, 0, 0.80)",
+                //circle 200px in the radial gradient: Spotlight size
                 maskImage: `radial-gradient(
-                  circle 200px at var(--mouse-x) var(--mouse-y),
+                  circle 200px at var(--mouse-x) var(--mouse-y), 
                   transparent 0%,
                   black 100%
                 )`,
@@ -80,6 +82,7 @@ export default function Home() {
                   transparent 0%,
                   black 100%
                 )`,
+                //transition timing: Movement smoothness
                 transition: "mask-position 0.3s, -webkit-mask-position 0.3s",
               }}
             />
