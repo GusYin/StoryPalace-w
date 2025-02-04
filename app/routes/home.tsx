@@ -1,8 +1,9 @@
 import type { Route } from "./+types/home";
-import { Fragment, useEffect, useRef, useState } from "react";
-import { Outlet, Link } from "react-router";
+import { Fragment, useEffect, useRef } from "react";
+import { Link } from "react-router";
 import AudioPlayer from "~/components/audio-player";
 import intrica from "../images/intrica.webp";
+import { useIsMobile } from "~/lib/utils";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -37,19 +38,6 @@ export default function Home() {
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
-  const useIsMobile = () => {
-    const [isMobile, setIsMobile] = useState(false);
-
-    useEffect(() => {
-      const checkMobile = () => {
-        return /Mobi|Android/i.test(window.navigator.userAgent);
-      };
-
-      setIsMobile(checkMobile());
-    }, []);
-
-    return isMobile;
-  };
   const isMobile = useIsMobile();
 
   return (
