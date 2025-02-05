@@ -1,17 +1,27 @@
-import type { ReactNode } from "react";
-import { redirect } from "react-router";
-import { useAuth } from "~/firebase/auth-context";
+import { useEffect, type ReactNode } from "react";
+import { Outlet, redirect } from "react-router";
+import { AuthProvider } from "~/firebase/auth-context";
+import { auth } from "~/firebase/firebase";
 
 type ProtectedRouteProps = {
   children: ReactNode;
 };
 
 export default function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { currentUser } = useAuth();
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (!user) {
+        redirect("/home");
+      }
+    });
 
-  if (!currentUser) {
-    return redirect("/home");
-  }
+    return () => unsubscribe();
+  }, []);
 
-  return <>{children}</>;
+  return (
+    <AuthProvider>
+      <Outlet />
+      {children}
+    </AuthProvider>
+  );
 }

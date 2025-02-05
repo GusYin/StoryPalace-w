@@ -7,12 +7,13 @@ import {
 
 export default [
   index("routes/home.tsx"),
+
+  route("register", "routes/register.tsx"),
   route("about", "routes/about.tsx"),
   route("stories-showcase", "routes/stories-showcase.tsx"),
   route("voxbox-showcase", "routes/voxbox-showcase.tsx"),
   layout("components/protected-route.tsx", [
-    route("sign-in", "routes/sign-in.tsx"),
-    route("register", "routes/register.tsx"),
-    route("dashboard", "routes/dashboard.tsx"),
+    index("routes/dashboard.tsx"),
+    route("login", "routes/login.tsx"),
   ]),
 ] satisfies RouteConfig;

@@ -108,7 +108,7 @@ export default function Home() {
 
             <div className="flex items-center space-x-4">
               <Link
-                to="/sign-in"
+                to="/login"
                 className="px-4 py-2 rounded-lg hover:bg-gray-700 transition font-medium"
               >
                 Sign In
