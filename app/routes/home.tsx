@@ -1,14 +1,13 @@
 import type { Route } from "./+types/home";
 import { Fragment, useEffect, useRef } from "react";
 import { Link } from "react-router";
-import AudioPlayer from "~/components/audio-player";
 import intrica from "../images/intrica.webp";
 import { useIsMobile } from "~/lib/utils";
 
 export function meta({}: Route.MetaArgs) {
   return [
-    { title: "New React Router App" },
-    { name: "description", content: "Welcome to React Router!" },
+    { title: "Story Palace" },
+    { name: "description", content: "A magical place!" },
   ];
 }
 
@@ -87,29 +86,29 @@ export default function Home() {
               </Link>
               <div className="hidden md:flex space-x-6">
                 <Link
-                  to="/features"
+                  to="/voxbox-showcase"
                   className="hover:text-purple-400 transition font-medium"
                 >
-                  Features
+                  VoxBox
                 </Link>
                 <Link
-                  to="/stories"
+                  to="/stories-showcase"
                   className="hover:text-purple-400 transition font-medium"
                 >
                   Stories
                 </Link>
                 <Link
-                  to="/resources"
+                  to="/about"
                   className="hover:text-purple-400 transition font-medium"
                 >
-                  Resources
+                  About
                 </Link>
               </div>
             </div>
 
             <div className="flex items-center space-x-4">
               <Link
-                to="/signin"
+                to="/sign-in"
                 className="px-4 py-2 rounded-lg hover:bg-gray-700 transition font-medium"
               >
                 Sign In
