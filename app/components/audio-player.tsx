@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import { Howl } from "howler";
 import { styled } from "styled-components";
-import { SkipNextIcon } from "./skip-next-icon";
-import { SkipPreviousIcon } from "./skip-previous-icon";
-import { PauseIcon } from "./pause-icon";
-import { PlayIcon } from "./play-icon";
+import { SkipNextIcon } from "./icons/skip-next-icon";
+import { SkipPreviousIcon } from "./icons/skip-previous-icon";
+import { PauseIcon } from "./icons/pause-icon";
+import { PlayIcon } from "./icons/play-icon";
 
 // Story data model
 interface Story {
