@@ -1,6 +1,5 @@
 import { useEffect, type ReactNode } from "react";
-import { Outlet, redirect } from "react-router";
-import { AuthProvider } from "~/firebase/auth-context";
+import { Outlet, useNavigate } from "react-router";
 import { auth } from "~/firebase/firebase";
 
 type ProtectedRouteProps = {
@@ -8,10 +7,11 @@ type ProtectedRouteProps = {
 };
 
 export default function ProtectedRoute({ children }: ProtectedRouteProps) {
+  const navigate = useNavigate();
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (!user) {
-        redirect("/home");
+        navigate("/");
       }
     });
 
@@ -19,9 +19,9 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   }, []);
 
   return (
-    <AuthProvider>
+    <>
       <Outlet />
       {children}
-    </AuthProvider>
+    </>
   );
 }

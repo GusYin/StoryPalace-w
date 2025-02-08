@@ -1,13 +1,12 @@
 import { useState, type FormEvent } from "react";
-import { useAuth } from "~/firebase/auth-context";
 import { useNavigate } from "react-router";
+import { signInWithEmailAndPw } from "~/firebase/firebase";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { login } = useAuth();
   const navigate = useNavigate();
 
   async function handleSubmit(e: FormEvent) {
@@ -16,7 +15,7 @@ export default function Login() {
     setError("");
 
     try {
-      await login(email, password);
+      await signInWithEmailAndPw(email, password);
       navigate("/dashboard");
     } catch (err) {
       setError("Invalid email or password. Please try again.");

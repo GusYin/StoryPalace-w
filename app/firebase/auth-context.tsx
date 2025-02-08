@@ -1,9 +1,4 @@
-import {
-  type User,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut,
-} from "firebase/auth";
+import { type User, signOut } from "firebase/auth";
 import {
   createContext,
   useContext,
@@ -15,8 +10,6 @@ import { auth } from "./firebase";
 
 interface AuthContextType {
   currentUser: User | null;
-  login: (email: string, password: string) => Promise<void>;
-  signup: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -49,23 +42,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
     return unsubscribe;
   }, []);
 
-  async function login(email: string, password: string) {
-    signInWithEmailAndPassword(auth, email, password);
-  }
-
-  async function signup(email: string, password: string) {
-    createUserWithEmailAndPassword(auth, email, password);
-  }
-
   async function logout() {
     await signOut(auth);
   }
 
   const value: AuthContextType = {
     currentUser,
-    login,
     logout,
-    signup,
   };
 
   return (

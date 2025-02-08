@@ -27,35 +27,14 @@ const app = initializeApp(firebaseConfig);
 const analytics = isSupported().then((yes) => (yes ? getAnalytics(app) : null));
 export const auth = getAuth(app);
 
-export const createUserWithEmailAndPw = (
-  auth: Auth,
+export const createUserWithEmailAndPw = async (
   email: string,
-  password: string
-) =>
-  createUserWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
-      // Signed up
-      const user = userCredential.user;
-      // ...
-    })
-    .catch((error) => {
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      // ..
-    });
+  password: string,
+  fbAuth: Auth = auth
+) => createUserWithEmailAndPassword(fbAuth, email, password);
 
-export const signInWithEmailAndPw = (
-  auth: Auth,
+export const signInWithEmailAndPw = async (
   email: string,
-  password: string
-) =>
-  signInWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
-      // Signed in
-      const user = userCredential.user;
-      // ...
-    })
-    .catch((error) => {
-      const errorCode = error.code;
-      const errorMessage = error.message;
-    });
+  password: string,
+  fbAuth: Auth = auth
+) => signInWithEmailAndPassword(fbAuth, email, password);
