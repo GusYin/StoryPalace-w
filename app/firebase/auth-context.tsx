@@ -1,15 +1,8 @@
 import {
-  FacebookAuthProvider,
-  GithubAuthProvider,
-  GoogleAuthProvider,
-  OAuthProvider,
-  TwitterAuthProvider,
   type User,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  signInWithPopup,
   signOut,
-  type AuthErrorCodes,
 } from "firebase/auth";
 import {
   createContext,
@@ -19,14 +12,10 @@ import {
   type ReactNode,
 } from "react";
 import { auth } from "./firebase";
-import { useNavigate } from "react-router";
 
 interface AuthContextType {
   currentUser: User | null;
   login: (email: string, password: string) => Promise<void>;
-  loginVia: (
-    via: "google" | "facebook" | "github" | "twitter" | "microsoft" | "apple"
-  ) => Promise<void>;
   signup: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
 }
@@ -50,7 +39,6 @@ type AuthProviderProps = {
 export function AuthProvider({ children }: AuthProviderProps) {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -61,55 +49,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
     return unsubscribe;
   }, []);
 
-  async function loginVia(
-    via: "google" | "facebook" | "github" | "twitter" | "microsoft" | "apple"
-  ) {
-    try {
-      let provider;
-      switch (via) {
-        case "google":
-          provider = new GoogleAuthProvider();
-          break;
-        case "facebook":
-          provider = new FacebookAuthProvider();
-          break;
-        // Add cases for other providers as needed
-        case "github":
-          provider = new GithubAuthProvider();
-          break;
-        case "twitter":
-          provider = new TwitterAuthProvider();
-          break;
-        case "microsoft":
-          provider = new OAuthProvider("microsoft.com");
-          break;
-        case "apple":
-          provider = new OAuthProvider("apple.com");
-          break;
-        default:
-          throw new Error("Unsupported provider");
-      }
-      await signInWithPopup(auth, provider);
-      navigate("/dashboard");
-    } catch (err) {
-      console.error("Login error:", err);
-      throw new Error("Failed to login. Please try again.");
-    }
-  }
-
   async function login(email: string, password: string) {
-    const result = await signInWithEmailAndPassword(
-      auth,
-      email,
-      password
-    ).catch((error) => {
-      const errorCode = error.code as keyof typeof AuthErrorCodes;
-      const errorMessage = error.message;
-    });
+    signInWithEmailAndPassword(auth, email, password);
   }
 
   async function signup(email: string, password: string) {
-    return await createUserWithEmailAndPassword(auth, email, password);
+    createUserWithEmailAndPassword(auth, email, password);
   }
 
   async function logout() {
@@ -119,7 +64,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const value: AuthContextType = {
     currentUser,
     login,
-    loginVia,
     logout,
     signup,
   };

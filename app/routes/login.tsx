@@ -56,7 +56,7 @@ export default function Login() {
                 id="password"
                 name="password"
                 type="password"
-                placeholder="Password"
+                placeholder="Enter your password"
                 autoComplete="current-password"
                 required
                 value={password}
@@ -93,7 +93,7 @@ export default function Login() {
               href="/signup"
               className="font-medium text-blue-600 hover:text-blue-500"
             >
-              Sign up
+              Create an account
             </a>
           </p>
         </div>
