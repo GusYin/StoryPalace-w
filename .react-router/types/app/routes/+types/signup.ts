@@ -1,17 +1,17 @@
 // React Router generated types for route:
-// routes/register.tsx
+// routes/signup.tsx
 
 import type * as T from "react-router/route-module"
 
 import type { Info as Parent0 } from "../../+types/root.js"
 
-type Module = typeof import("../register.js")
+type Module = typeof import("../signup.js")
 
 export type Info = {
   parents: [Parent0],
-  id: "routes/register"
-  file: "routes/register.tsx"
-  path: "register"
+  id: "routes/signup"
+  file: "routes/signup.tsx"
+  path: "signup"
   params: {} & { [key: string]: string | undefined }
   module: Module
   loaderData: T.CreateLoaderData<Module>
