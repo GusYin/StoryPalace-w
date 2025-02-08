@@ -9,6 +9,7 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
   signOut,
+  type AuthErrorCodes,
 } from "firebase/auth";
 import {
   createContext,
@@ -97,11 +98,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }
 
   async function login(email: string, password: string) {
-    await signInWithEmailAndPassword(auth, email, password);
+    const result = await signInWithEmailAndPassword(
+      auth,
+      email,
+      password
+    ).catch((error) => {
+      const errorCode = error.code as keyof typeof AuthErrorCodes;
+      const errorMessage = error.message;
+    });
   }
 
   async function signup(email: string, password: string) {
-    await createUserWithEmailAndPassword(auth, email, password);
+    return await createUserWithEmailAndPassword(auth, email, password);
   }
 
   async function logout() {
