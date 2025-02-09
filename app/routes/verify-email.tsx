@@ -1,9 +1,17 @@
-import React, { useState, type FormEvent } from "react";
+import React, { useEffect, useState, type FormEvent } from "react";
+import { useNavigate } from "react-router";
 import { StoryPalaceLogo } from "~/components/icons/story-palace-logo";
-import { verifyEmail } from "~/firebase/firebase";
+import { auth, verifyEmail } from "~/firebase/firebase";
 
 const VerifyEmailPage = () => {
   const [isResending, setResending] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    !auth.currentUser && navigate("/login");
+
+    auth.currentUser?.emailVerified && navigate("/dashboard");
+  }, []);
 
   async function resendVerifyEmail(e: FormEvent) {
     e.preventDefault();
