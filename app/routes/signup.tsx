@@ -17,8 +17,13 @@ const SignUpPage = () => {
     setError("");
 
     try {
-      await createUserWithEmailAndPw(email, password);
-      navigate("/dashboard");
+      const user = await createUserWithEmailAndPw(email, password);
+
+      if (user.user.emailVerified) {
+        navigate("/dashboard");
+      } else {
+        navigate("/verify-email");
+      }
     } catch (err) {
       setError("Invalid email or password. Please try again.");
     } finally {

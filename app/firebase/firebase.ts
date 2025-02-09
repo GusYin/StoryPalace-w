@@ -3,6 +3,7 @@ import { initializeApp } from "firebase/app";
 import {
   createUserWithEmailAndPassword,
   getAuth,
+  sendEmailVerification,
   signInWithEmailAndPassword,
   updateProfile,
   type Auth,
@@ -34,16 +35,25 @@ export const createUserWithEmailAndPw = async (
   username?: string,
   fbAuth: Auth = auth
 ) => {
-  await createUserWithEmailAndPassword(fbAuth, email, password);
+  const user = await createUserWithEmailAndPassword(fbAuth, email, password);
 
-  fbAuth.currentUser &&
-    updateProfile(fbAuth.currentUser, {
-      displayName: username,
-    })
-      .then(() => {})
-      .catch((err) => {
-        console.error(err);
+  // swallow errors because we don't want to block the user from signing up
+  try {
+    fbAuth.currentUser &&
+      updateProfile(fbAuth.currentUser, {
+        displayName: username,
       });
+
+    fbAuth.currentUser && sendEmailVerification(fbAuth.currentUser);
+  } catch (err) {
+    console.error(err);
+  }
+
+  return user;
+};
+
+export const verifyEmail = async (fbAuth: Auth = auth) => {
+  auth.currentUser && sendEmailVerification(auth.currentUser);
 };
 
 export const signInWithEmailAndPw = async (
