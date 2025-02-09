@@ -1,4 +1,4 @@
-import React, { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useNavigate } from "react-router";
 import { StoryPalaceLogo } from "~/components/icons/story-palace-logo";
 import { auth, verifyEmail } from "~/firebase/firebase";
