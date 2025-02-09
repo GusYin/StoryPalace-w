@@ -4,6 +4,7 @@ import {
   createUserWithEmailAndPassword,
   getAuth,
   signInWithEmailAndPassword,
+  updateProfile,
   type Auth,
 } from "firebase/auth";
 import { getAnalytics, isSupported } from "firebase/analytics";
@@ -30,8 +31,20 @@ export const auth = getAuth(app);
 export const createUserWithEmailAndPw = async (
   email: string,
   password: string,
+  username?: string,
   fbAuth: Auth = auth
-) => createUserWithEmailAndPassword(fbAuth, email, password);
+) => {
+  await createUserWithEmailAndPassword(fbAuth, email, password);
+
+  fbAuth.currentUser &&
+    updateProfile(fbAuth.currentUser, {
+      displayName: username,
+    })
+      .then(() => {})
+      .catch((err) => {
+        console.error(err);
+      });
+};
 
 export const signInWithEmailAndPw = async (
   email: string,

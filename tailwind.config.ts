@@ -25,6 +25,7 @@ export default {
         sm: "calc(var(--radius) - 4px)",
       },
       colors: {
+        "custom-teal": "#06846f",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         card: {
