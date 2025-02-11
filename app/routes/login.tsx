@@ -16,8 +16,10 @@ export default function Login() {
     setError("");
 
     try {
-      await signInWithEmailAndPw(email, password);
-      navigate("/dashboard");
+      const user = await signInWithEmailAndPw(email, password);
+
+      if (user.user.emailVerified) navigate("/dashboard");
+      else navigate("/verify-email");
     } catch (err) {
       setError("Invalid email or password. Please try again.");
     } finally {
