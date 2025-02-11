@@ -117,7 +117,10 @@ export default function Login() {
       <div className="text-center text-sm space-y-4">
         <p className="text-gray-600">
           Can't log in?{" "}
-          <a href="#" className="font-medium text-blue-600 hover:text-blue-500">
+          <a
+            href="/reset-password"
+            className="font-medium text-blue-600 hover:text-blue-500"
+          >
             Reset your password
           </a>
         </p>

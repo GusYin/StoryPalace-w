@@ -5,6 +5,7 @@ import {
   getAuth,
   sendEmailVerification,
   signInWithEmailAndPassword,
+  sendPasswordResetEmail,
   updateProfile,
   type Auth,
 } from "firebase/auth";
@@ -32,19 +33,18 @@ export const auth = getAuth(app);
 export const createUserWithEmailAndPw = async (
   email: string,
   password: string,
-  username?: string,
-  fbAuth: Auth = auth
+  username?: string
 ) => {
-  const user = await createUserWithEmailAndPassword(fbAuth, email, password);
+  const user = await createUserWithEmailAndPassword(auth, email, password);
 
   // swallow errors because we don't want to block the user from signing up
   try {
-    fbAuth.currentUser &&
-      updateProfile(fbAuth.currentUser, {
+    auth.currentUser &&
+      updateProfile(auth.currentUser, {
         displayName: username,
       });
 
-    fbAuth.currentUser && sendEmailVerification(fbAuth.currentUser);
+    auth.currentUser && sendEmailVerification(auth.currentUser);
   } catch (err) {
     console.error(err);
   }
@@ -56,8 +56,8 @@ export const verifyEmail = async (fbAuth: Auth = auth) => {
   auth.currentUser && sendEmailVerification(auth.currentUser);
 };
 
-export const signInWithEmailAndPw = async (
-  email: string,
-  password: string,
-  fbAuth: Auth = auth
-) => signInWithEmailAndPassword(fbAuth, email, password);
+export const signInWithEmailAndPw = async (email: string, password: string) =>
+  signInWithEmailAndPassword(auth, email, password);
+
+export const sendPasswordResetLinkToEmail = async (email: string) =>
+  sendPasswordResetEmail(auth, email);
