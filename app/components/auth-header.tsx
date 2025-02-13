@@ -23,7 +23,7 @@ const AuthHeader = () => {
         </button>
 
         {/* Centered Navigation Buttons */}
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex space-x-4">
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex space-x-8">
           <button className="hover:text-blue-600">Library</button>
           <button className="hover:text-blue-600">Story Player</button>
         </div>
