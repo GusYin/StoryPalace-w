@@ -6,6 +6,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
+        dosis: ["Dosis", "sans-serif"],
         sans: [
           'Inter"',
           "ui-sans-serif",
@@ -26,6 +27,7 @@ export default {
       },
       colors: {
         "custom-teal": "#06846f",
+        "grey-bg-lucile": "#F1F8F7",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         card: {

@@ -7,6 +7,7 @@ import {
   signInWithEmailAndPassword,
   sendPasswordResetEmail,
   updateProfile,
+  signOut,
   type Auth,
 } from "firebase/auth";
 import { getAnalytics, isSupported } from "firebase/analytics";
@@ -61,3 +62,5 @@ export const signInWithEmailAndPw = async (email: string, password: string) =>
 
 export const sendPasswordResetLinkToEmail = async (email: string) =>
   sendPasswordResetEmail(auth, email);
+
+export const logout = async () => await signOut(auth);

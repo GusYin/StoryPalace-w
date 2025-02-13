@@ -1,5 +1,6 @@
 export const StoryPalaceLogo = () => (
   <svg
+    className="w-35 h-35"
     width="250"
     height="35"
     viewBox="0 0 250 35"
