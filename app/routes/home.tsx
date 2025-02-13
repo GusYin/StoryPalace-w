@@ -3,6 +3,7 @@ import { Fragment, useEffect, useRef } from "react";
 import { Link } from "react-router";
 import intrica from "../images/intrica.webp";
 import { useIsMobile } from "~/lib/utils";
+import { getAuth } from "firebase/auth";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -14,6 +15,26 @@ export function meta({}: Route.MetaArgs) {
 export default function Home() {
   const beamRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  const doGetStarted = () => {
+    const user = getAuth().currentUser;
+
+    if (user) {
+      if (user.emailVerified) {
+        return "/dashboard";
+      } else return "/verify-email";
+    } else return "/signup";
+  };
+
+  const doLogin = () => {
+    const user = getAuth().currentUser;
+
+    if (user) {
+      if (user.emailVerified) {
+        return "/dashboard";
+      } else return "/verify-email";
+    } else return "/login";
+  };
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -108,13 +129,13 @@ export default function Home() {
 
             <div className="flex items-center space-x-4">
               <Link
-                to="/login"
+                to={doLogin()}
                 className="px-4 py-2 rounded-lg hover:bg-gray-700 transition font-medium"
               >
                 Sign In
               </Link>
               <Link
-                to="/signup"
+                to={doGetStarted()}
                 className="px-6 py-2 bg-purple-600 rounded-lg hover:bg-purple-700 transition font-medium"
               >
                 Get Started
