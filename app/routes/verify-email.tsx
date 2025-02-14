@@ -10,7 +10,7 @@ const VerifyEmailPage = () => {
   useEffect(() => {
     !auth.currentUser && navigate("/login");
 
-    auth.currentUser?.emailVerified && navigate("/dashboard");
+    auth.currentUser?.emailVerified && navigate("/my-account");
   }, []);
 
   async function resendVerifyEmail(e: FormEvent) {

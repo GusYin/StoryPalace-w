@@ -1,8 +1,7 @@
 import React from "react";
 import AuthHeader from "~/components/auth-header";
-import { StoryPalaceLogo } from "~/components/icons/story-palace-logo";
 
-const Dashboard: React.FC = () => {
+const MyAccount: React.FC = () => {
   return (
     <div className="min-h-screen  bg-white">
       <AuthHeader />
@@ -10,4 +9,4 @@ const Dashboard: React.FC = () => {
   );
 };
 
-export default Dashboard;
+export default MyAccount;

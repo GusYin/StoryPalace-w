@@ -15,6 +15,6 @@ export default [
   route("verify-email", "routes/verify-email.tsx"),
   route("reset-password", "routes/reset-password.tsx"),
   layout("components/protected-route.tsx", [
-    route("dashboard", "routes/dashboard.tsx"),
+    route("my-account", "routes/my-account.tsx"),
   ]),
 ] satisfies RouteConfig;

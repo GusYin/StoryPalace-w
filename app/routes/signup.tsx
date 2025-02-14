@@ -21,7 +21,7 @@ const SignUpPage = () => {
       const user = await createUserWithEmailAndPw(email, password);
 
       if (user.user.emailVerified) {
-        navigate("/dashboard");
+        navigate("/my-account");
       } else {
         navigate("/verify-email");
       }

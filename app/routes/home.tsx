@@ -3,7 +3,7 @@ import { Fragment, useEffect, useRef } from "react";
 import { Link } from "react-router";
 import intrica from "../images/intrica.webp";
 import { useIsMobile } from "~/lib/utils";
-import { getAuth } from "firebase/auth";
+import { auth } from "~/firebase/firebase";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -17,21 +17,21 @@ export default function Home() {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const doGetStarted = () => {
-    const user = getAuth().currentUser;
+    const user = auth.currentUser;
 
     if (user) {
       if (user.emailVerified) {
-        return "/dashboard";
+        return "/my-account";
       } else return "/verify-email";
     } else return "/signup";
   };
 
   const doLogin = () => {
-    const user = getAuth().currentUser;
+    const user = auth.currentUser;
 
     if (user) {
       if (user.emailVerified) {
-        return "/dashboard";
+        return "/my-account";
       } else return "/verify-email";
     } else return "/login";
   };

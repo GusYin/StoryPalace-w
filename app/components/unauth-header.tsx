@@ -9,7 +9,7 @@ const UnauthHeader = () => {
     const user = getAuth().currentUser;
 
     if (user) {
-      if (user.emailVerified) navigate("/dashboard");
+      if (user.emailVerified) navigate("/my-account");
       else navigate("/verify-email");
     }
 
@@ -20,7 +20,7 @@ const UnauthHeader = () => {
     const user = getAuth().currentUser;
 
     if (user) {
-      if (user.emailVerified) navigate("/dashboard");
+      if (user.emailVerified) navigate("/my-account");
       else navigate("/verify-email");
     } else navigate("/login");
   };

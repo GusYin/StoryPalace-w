@@ -1,6 +1,5 @@
 import { useState, type FormEvent } from "react";
 import { useNavigate } from "react-router";
-import { StoryPalaceLogo } from "~/components/icons/story-palace-logo";
 import UnauthHeader from "~/components/unauth-header";
 import { signInWithEmailAndPw } from "~/firebase/firebase";
 
@@ -19,7 +18,7 @@ export default function Login() {
     try {
       const user = await signInWithEmailAndPw(email, password);
 
-      if (user.user.emailVerified) navigate("/dashboard");
+      if (user.user.emailVerified) navigate("/my-account");
       else navigate("/verify-email");
     } catch (err) {
       setError("Invalid email or password. Please try again.");
