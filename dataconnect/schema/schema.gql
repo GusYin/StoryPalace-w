@@ -11,27 +11,32 @@
 #   #  movies_via_Review: [Movie!]!
 # }
 
-# # Movie is keyed by a randomly generated UUID.
-# type Movie @table {
-#   # If you do not pass a 'key' to `@table`, Data Connect automatically adds the following 'id' column.
-#   # Feel free to uncomment and customize it.
-#   #  id: UUID! @default(expr: "uuidV4()")
-#   title: String!
-#   imageUrl: String!
-#   genre: String
-# }
+# # Story is keyed by a randomly generated UUID.
+type Story @table {
+  # If you do not pass a 'key' to `@table`, Data Connect
+  # automatically adds the following 'id' column.
+  # Feel free to uncomment and customize it.
+  id: UUID! @default(expr: "uuidV4()")
+  title: String!
+  imageUrl: String
+  genre: String
+}
 
-# # MovieMetadata is a metadata attached to a Movie.
-# # Movie <-> MovieMetadata is a one-to-one relationship
-# type MovieMetadata @table {
-#   # @unique ensures each Movie can only one MovieMetadata.
-#   movie: Movie! @unique
-#   # The movie field adds the following foreign key field. Feel free to uncomment and customize it.
-#   #  movieId: UUID!
-#   rating: Float
-#   releaseYear: Int
-#   description: String
-# }
+# # SotryMetadata is a metadata attached to a Movie.
+# # Story <-> SotryMetadata is a one-to-one relationship
+type SotryMetadata @table {
+  # This time, we omit adding a primary key because
+  # you can rely on Data Connect to manage it.
+
+  # @unique indicates a 1-1 relationship
+  story: Story! @unique
+  # The story field adds the following foreign key field.
+  # Feel free to uncomment and customize it.
+  # storyId: UUID!
+  rating: Float
+  releaseYear: Int
+  description: String
+}
 
 # # Reviews is a join table between User and Movie.
 # # It has a composite primary keys `userUid` and `movieId`.
