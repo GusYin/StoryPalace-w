@@ -2,6 +2,7 @@
 dataconnect/.dataconnect
 dataconnect-generated
 dataconnect-debug.log
+emulator-data
 
 .env*
 

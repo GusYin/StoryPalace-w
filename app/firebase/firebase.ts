@@ -11,7 +11,8 @@ import {
   type Auth,
 } from "firebase/auth";
 import { getAnalytics, isSupported } from "firebase/analytics";
-import { db } from "./fs-emulator-connect";
+import { getFunctions, connectFunctionsEmulator } from "firebase/functions";
+import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -31,6 +32,19 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const analytics = isSupported().then((yes) => (yes ? getAnalytics(app) : null));
+
+// Initialize Firebase clound functions
+export const functions = getFunctions(app);
+if (process.env.NODE_ENV === "development") {
+  connectFunctionsEmulator(functions, "localhost", 5001);
+}
+
+// Initialize Firebase Firestore
+export const db = getFirestore();
+if (process.env.NODE_ENV === "development") {
+  connectFirestoreEmulator(db, "127.0.0.1", 8080);
+}
+
 export const auth = getAuth(app);
 
 export const createUserWithEmailAndPw = async (
