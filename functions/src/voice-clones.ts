@@ -1,18 +1,15 @@
 import * as functions from "firebase-functions/v2";
 import * as admin from "firebase-admin";
-import { Timestamp } from "firebase-admin/firestore";
+import { getStorage } from "firebase-admin/storage";
+import { throwIfUnauthenticated, useFirestoreEmulatorIfLocal } from "./util";
+import { createHash } from "crypto";
 
 admin.initializeApp();
 const db = admin.firestore();
+const storage = getStorage();
 
 // Connect to Firestore Emulator in development
-if (process.env.FUNCTIONS_EMULATOR) {
-  db.settings({
-    host: "localhost:8080",
-    ssl: false,
-  });
-  console.log("Connected to Firestore Emulator at localhost:8080");
-}
+useFirestoreEmulatorIfLocal(db);
 
 // Interface definitions
 interface VoiceClone {
@@ -25,6 +22,17 @@ interface VoiceClone {
 interface TTSQuota {
   totalMinutesUsed: number;
   lastReset: FirebaseFirestore.Timestamp;
+}
+
+// New interface for TTS audio metadata
+interface TTSAudio {
+  userId: string;
+  textHash: string;
+  voiceId: string;
+  storagePath: string;
+  url: string;
+  duration: number;
+  createdAt: admin.firestore.Timestamp;
 }
 
 // ElevenLabs API Client (Mock implementation - replace with actual SDK)
@@ -40,11 +48,10 @@ class ElevenLabsClient {
     // Implementation using ElevenLabs API
   }
 
-  async generateTTS(text: string, voiceId: string): Promise<string> {
-    // Implementation using ElevenLabs API
-    return `https://storage.example.com/audio/${Math.random().toString(
-      36
-    )}.mp3`;
+  async generateTTS(text: string, voiceId: string): Promise<Buffer> {
+    // Implementation using ElevenLabs API that returns audio buffer
+    // Mock implementation - replace with actual API call
+    return Buffer.from(`mock-audio-for-${text.substring(0, 10)}`);
   }
 }
 
@@ -102,8 +109,9 @@ export const createVoiceClone = functions.https.onCall(async (request) => {
 });
 
 // TTS Quota Management
+// Modified generateTTS function with caching
 export const generateTTS = functions.https.onCall(async (request) => {
-  const TTS_MONTHLY_QUOTA_MINUTES = 100; // Minutes
+  const TTS_MONTHLY_QUOTA_MINUTES = 100;
   const CHARACTERS_PER_5_MINUTE = 1500;
 
   if (!request.auth?.uid) {
@@ -113,48 +121,95 @@ export const generateTTS = functions.https.onCall(async (request) => {
     );
   }
 
+  const userId = request.auth.uid;
   const text = request.data.text;
   const voiceId = request.data.voiceId;
 
-  // Calculate text duration (e.g., estimatedMinutes = text.length / 1500,
-  // assuming 1500 chars ≈ 5 minutes).
+  // Create unique hash for the text/voice combination
+  const textHash = createHash("sha256")
+    .update(text + voiceId)
+    .digest("hex");
+
   const estimatedMinutes = text.length / CHARACTERS_PER_5_MINUTE;
+  const ttsAudioRef = db.collection("ttsAudio");
   const quotaRef = db.collection("ttsQuota").doc("monthlyUsage");
 
-  try {
-    await db.runTransaction(async (transaction) => {
-      const quotaDoc = await transaction.get(quotaRef);
-      const quotaData = quotaDoc.data() as TTSQuota | undefined;
+  // Check for existing audio first
+  const existingAudio = await ttsAudioRef
+    .where("textHash", "==", textHash)
+    .where("voiceId", "==", voiceId)
+    .where("userId", "==", userId)
+    .limit(1)
+    .get();
 
-      const currentUsage = quotaData?.totalMinutesUsed || 0;
-      const newTotal = currentUsage + estimatedMinutes;
+  if (!existingAudio.empty) {
+    const audioData = existingAudio.docs[0].data() as TTSAudio;
+    return { audioUrl: audioData.url };
+  }
 
-      if (newTotal > TTS_MONTHLY_QUOTA_MINUTES) {
-        throw new functions.https.HttpsError(
-          "resource-exhausted",
-          "Monthly TTS limit reached"
-        );
-      }
+  // Proceed with new generation
+  return db.runTransaction(async (transaction) => {
+    // Check quota
+    const quotaDoc = await transaction.get(quotaRef);
+    const quotaData = quotaDoc.data() as TTSQuota | undefined;
+    const currentUsage = quotaData?.totalMinutesUsed || 0;
+    const newTotal = currentUsage + estimatedMinutes;
 
-      transaction.set(
-        quotaRef,
-        {
-          totalMinutesUsed: newTotal,
-          lastReset:
-            quotaData?.lastReset ||
-            admin.firestore.FieldValue.serverTimestamp(),
-        } as TTSQuota,
-        { merge: true }
+    if (newTotal > TTS_MONTHLY_QUOTA_MINUTES) {
+      throw new functions.https.HttpsError(
+        "resource-exhausted",
+        "Monthly TTS limit reached"
       );
+    }
+
+    // Generate audio
+    const audioBuffer = await elevenLabs.generateTTS(text, voiceId);
+
+    // Upload to storage
+    const filePath = `tts/${userId}/${textHash}-${voiceId}.mp3`;
+    const file = storage.bucket().file(filePath);
+
+    await file.save(audioBuffer, {
+      metadata: {
+        contentType: "audio/mpeg",
+        metadata: {
+          userId,
+          voiceId,
+          originalTextHash: textHash,
+        },
+      },
     });
 
-    // Generate TTS audio
-    const audioUrl = await elevenLabs.generateTTS(text, voiceId);
-    return { audioUrl };
-  } catch (error) {
-    if (error instanceof functions.https.HttpsError) throw error;
-    throw new functions.https.HttpsError("internal", "TTS generation failed");
-  }
+    // Get public URL
+    const [url] = await file.getSignedUrl({
+      action: "read",
+      expires: "03-09-2491", // Far future date
+    });
+
+    // Create audio document
+    const audioDoc: TTSAudio = {
+      userId,
+      textHash,
+      voiceId,
+      storagePath: filePath,
+      url,
+      duration: estimatedMinutes * 60, // Convert to seconds
+      createdAt: admin.firestore.Timestamp.now(),
+    };
+
+    transaction.set(ttsAudioRef.doc(), audioDoc);
+    transaction.set(
+      quotaRef,
+      {
+        totalMinutesUsed: newTotal,
+        lastReset:
+          quotaData?.lastReset || admin.firestore.FieldValue.serverTimestamp(),
+      },
+      { merge: true }
+    );
+
+    return { audioUrl: url };
+  });
 });
 
 // Scheduled monthly quota reset

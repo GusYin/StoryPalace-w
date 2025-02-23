@@ -21,19 +21,14 @@ import { logger } from "firebase-functions/v2";
 import * as functions from "firebase-functions";
 import { initializeApp } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
+import { useFirestoreEmulatorIfLocal } from "./util";
 
 // Initialize Firebase Admin SDK
 initializeApp();
 const db = getFirestore();
 
 // Connect to Firestore Emulator in development
-if (process.env.FUNCTIONS_EMULATOR) {
-  db.settings({
-    host: "localhost:8080",
-    ssl: false,
-  });
-  console.log("Connected to Firestore Emulator at localhost:8080");
-}
+useFirestoreEmulatorIfLocal(db);
 
 // Placeholder function to create a voice in ElevenLabs
 async function createVoiceInElevenLabs(userId: string): Promise<string> {
