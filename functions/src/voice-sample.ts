@@ -104,9 +104,11 @@ export const getVoiceSamples = functions.https.onCall(async (request) => {
     .orderBy("createdAt", "desc")
     .get();
 
-  return snapshot.docs.map((doc) => ({
+  const samples = snapshot.docs.map((doc) => ({
     id: doc.id,
     ...doc.data(),
     createdAt: doc.data().createdAt.toDate().toISOString(),
   }));
+
+  return samples;
 });

@@ -1,7 +1,7 @@
 import * as functions from "firebase-functions/v2";
 import * as admin from "firebase-admin";
 import { getStorage } from "firebase-admin/storage";
-import { throwIfUnauthenticated, useFirestoreEmulatorIfLocal } from "./util";
+import { useFirestoreEmulatorIfLocal } from "./util";
 import { createHash } from "crypto";
 
 admin.initializeApp();
