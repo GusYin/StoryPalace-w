@@ -179,9 +179,9 @@ const VoiceUploadPage = () => {
             {/* Drag & Drop Zone */}
             <div
               ref={dropRef}
-              className={`border-2 border-dashed ${
+              className={`bg-[#F1F8F7] border border-dashed border-[#829793] ${
                 isDragging ? "border-blue-500 bg-blue-50" : "border-gray-300"
-              } rounded-xl p-8 text-center mb-6 transition-colors`}
+              } rounded-2xl p-8 text-center mb-6 transition-colors`}
               onDragEnter={handleDragIn}
               onDragLeave={handleDragOut}
               onDragOver={handleDrag}
