@@ -160,13 +160,22 @@ const VoiceUploadPage = () => {
   return (
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-md p-8">
+        {/* Centered Title */}
+        <div className="text-center mb-8 flex flex-col items-center">
+          {" "}
+          {/* Added flex and items-center */}
+          <h1 className="text-3xl font-bold text-gray-800">Add a voice</h1>
+          <div className="text-[#F1F8F7] text-[40px] font-fraunces font-semibold flex-shrink-0 w-14 h-14 bg-custom-teal text-white rounded-full flex items-center justify-center mt-4">
+            {" "}
+            {/* added mt-4 for spacing */}2
+          </div>
+          <p className="text-gray-600 mt-2">Upload a recording of your voice</p>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Left Column */}
           <div className="md:col-span-2">
-            <h1 className="text-2xl font-bold text-gray-800 mb-6">
-              Add a voice
-            </h1>
-
+            {/* Drag & Drop Zone */}
             <div
               ref={dropRef}
               className={`border-2 border-dashed ${
@@ -191,9 +200,6 @@ const VoiceUploadPage = () => {
                     d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"
                   />
                 </svg>
-                <p className="text-gray-600 font-medium">
-                  Upload a recording of your voice
-                </p>
                 <p className="text-sm text-gray-500">
                   Click to upload a file or drag and drop
                 </p>
@@ -283,25 +289,10 @@ const VoiceUploadPage = () => {
             <h3 className="text-lg font-semibold text-gray-800 mb-4">
               Tips for quality recording:
             </h3>
-            <ul className="space-y-4">
-              <li className="flex items-start gap-3">
-                <div className="flex-shrink-0 w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center">
-                  1
-                </div>
-                <span className="text-gray-700">One speaker only</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <div className="flex-shrink-0 w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center">
-                  2
-                </div>
-                <span className="text-gray-700">Between 1 to 5 minutes</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <div className="flex-shrink-0 w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center">
-                  3
-                </div>
-                <span className="text-gray-700">No background noise</span>
-              </li>
+            <ul className="space-y-4 list-disc pl-6">
+              <li className="text-gray-700">One speaker only</li>
+              <li className="text-gray-700">Between 1 to 5 minutes</li>
+              <li className="text-gray-700">No background noise</li>
             </ul>
           </div>
         </div>

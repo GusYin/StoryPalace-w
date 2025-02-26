@@ -7,6 +7,7 @@ export default {
     extend: {
       fontFamily: {
         dosis: ["Dosis", "sans-serif"],
+        fraunces: ["Fraunces", "sans-serif"],
         sans: [
           'Inter"',
           "ui-sans-serif",
