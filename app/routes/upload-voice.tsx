@@ -162,12 +162,9 @@ const VoiceUploadPage = () => {
       <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-md p-8">
         {/* Centered Title */}
         <div className="text-center mb-8 flex flex-col items-center">
-          {" "}
-          {/* Added flex and items-center */}
           <h1 className="text-3xl font-bold text-gray-800">Add a voice</h1>
-          <div className="text-[#F1F8F7] text-[40px] font-fraunces font-semibold flex-shrink-0 w-14 h-14 bg-custom-teal text-white rounded-full flex items-center justify-center mt-4">
-            {" "}
-            {/* added mt-4 for spacing */}2
+          <div className="text-[#F1F8F7] text-[40px] font-fraunces font-semibold flex-shrink-0 w-14 h-14 bg-custom-teal text-white rounded-full flex items-center justify-center mt-[70px]">
+            2
           </div>
           <p className="text-gray-600 mt-2">Upload a recording of your voice</p>
         </div>
