@@ -1,7 +1,6 @@
-import React, { useState, useRef, useEffect } from "react";
-import { getFunctions, httpsCallable } from "firebase/functions";
-
-const functions = getFunctions();
+import React, { useState, useRef } from "react";
+import { httpsCallable } from "firebase/functions";
+import { functions } from "~/firebase/firebase";
 
 interface VoiceUploadUrlRequest {
   contentType: string;
@@ -173,7 +172,7 @@ const VoiceUploadPage = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-[69px]">
           {/* Left Column */}
           <div className="md:col-span-2">
             {/* Drag & Drop Zone */}
@@ -181,13 +180,13 @@ const VoiceUploadPage = () => {
               ref={dropRef}
               className={`bg-[#F1F8F7] border border-dashed border-[#829793] ${
                 isDragging ? "border-blue-500 bg-blue-50" : "border-gray-300"
-              } rounded-2xl p-8 text-center mb-6 transition-colors`}
+              } rounded-2xl p-5 text-center mb-6 transition-colors`}
               onDragEnter={handleDragIn}
               onDragLeave={handleDragOut}
               onDragOver={handleDrag}
               onDrop={handleDrop}
             >
-              <div className="space-y-4">
+              <div className="space-y-3">
                 <label htmlFor="file-upload" className="cursor-pointer">
                   <svg
                     className="mx-auto h-8 w-8"
