@@ -157,17 +157,15 @@ const VoiceUploadPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="font-dosis min-h-screen bg-gray-50 p-8">
       <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-md p-8">
         {/* Centered Title */}
         <div className="text-center mb-8 flex flex-col items-center">
-          <h1 className="font-dosis text-xl font-bold text-gray-800">
-            Add a voice
-          </h1>
+          <h1 className="text-xl font-bold text-gray-800">Add a voice</h1>
           <div className="text-[#F1F8F7] text-[40px] font-fraunces font-semibold flex-shrink-0 w-14 h-14 bg-custom-teal text-white rounded-full flex items-center justify-center mt-[70px]">
             2
           </div>
-          <p className="font-dosis text-3xl font-medium text-gray-600 mt-6">
+          <p className="text-3xl font-medium text-gray-600 mt-6">
             Upload a recording of your voice
           </p>
         </div>
@@ -203,7 +201,7 @@ const VoiceUploadPage = () => {
                   </svg>
                 </label>
 
-                <p className="text-sm text-gray-500">
+                <p className="font-medium text-black">
                   Click to upload a file or drag and drop
                 </p>
                 <input
