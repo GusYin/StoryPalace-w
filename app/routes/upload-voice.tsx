@@ -19,6 +19,9 @@ const VoiceUploadPage = () => {
   const [timer, setTimer] = useState(0);
   const [recordingTime, setRecordingTime] = useState(0);
 
+  const [microphones, setMicrophones] = useState<MediaDeviceInfo[] | []>([]);
+  const [selectedMic, setSelectedMic] = useState<string>("");
+
   const [recording, setRecording] = useState(false);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [samples, setSamples] = useState<any[]>([]);
@@ -28,6 +31,28 @@ const VoiceUploadPage = () => {
   const mediaRecorder = useRef<MediaRecorder | null>(null);
   const audioChunks = useRef<Blob[]>([]);
   const dropRef = useRef<HTMLDivElement>(null);
+
+  // Get available microphones when component mounts
+  useEffect(() => {
+    async function getMicrophones() {
+      try {
+        // Request permission and get devices
+        await navigator.mediaDevices.getUserMedia({ audio: true });
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const audioInputs = devices.filter(
+          (device) => device.kind === "audioinput"
+        );
+        setMicrophones(audioInputs);
+        // Set default microphone if any exist
+        if (audioInputs.length > 0) {
+          setSelectedMic(audioInputs[0].deviceId);
+        }
+      } catch (error) {
+        console.error("Error getting microphones:", error);
+      }
+    }
+    getMicrophones();
+  }, []);
 
   // Timer effect
   useEffect(() => {
@@ -216,7 +241,26 @@ const VoiceUploadPage = () => {
                   >
                     ← Back
                   </button>
-                  <div className="text-sm font-medium">Default - AirPods</div>
+                  <div className="text-sm text-gray-500">
+                    {microphones.length > 0 ? (
+                      <select
+                        value={selectedMic}
+                        onChange={(e) => setSelectedMic(e.target.value)}
+                        className="border rounded-xl p-1"
+                      >
+                        {microphones.map((mic) => (
+                          <option key={mic.deviceId} value={mic.deviceId}>
+                            {mic.label ||
+                              `Microphone ${mic.deviceId.slice(0, 5)}...`}
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      <span className="inline-block bg-red-100 text-red-800 px-2 py-1 rounded-md">
+                        No microphones detected
+                      </span>
+                    )}
+                  </div>
                 </div>
 
                 <div className="text-2xl font-medium text-gray-800 mb-4">
@@ -341,7 +385,7 @@ const VoiceUploadPage = () => {
           )}
 
           {error && (
-            <div className="p-4 bg-red-50 text-red-700 rounded-lg mb-4">
+            <div className="p-4 bg-red-50 text-red-700 rounded-lg mt-4 mb-4">
               {error}
             </div>
           )}
