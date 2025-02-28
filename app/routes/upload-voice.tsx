@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import { httpsCallable } from "firebase/functions";
 import { functions } from "~/firebase/firebase";
+import { DeleteIcon } from "~/components/icons/delete-icon";
+import { UploadIcon } from "~/components/icons/upload-icon";
 
 interface VoiceUploadUrlRequest {
   contentType: string;
@@ -88,6 +90,8 @@ const VoiceUploadPage = () => {
 
   const startRecording = async () => {
     try {
+      setRecordingTime(0);
+
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       mediaRecorder.current = new MediaRecorder(stream);
 
@@ -178,7 +182,7 @@ const VoiceUploadPage = () => {
       <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-md p-8">
         {/* Centered Title */}
         <div className="text-center mb-8 flex flex-col items-center">
-          <h1 className="text-xl font-bold text-gray-800">Add a voice</h1>
+          <h1 className="text-xl font-bold text-black">Add a voice</h1>
           <div className="text-[#F1F8F7] text-[40px] font-fraunces font-semibold flex-shrink-0 w-14 h-14 bg-custom-teal text-white rounded-full flex items-center justify-center mt-[70px]">
             2
           </div>
@@ -202,19 +206,17 @@ const VoiceUploadPage = () => {
             {showRecordingUI ? (
               // Recording UI
               <div className="space-y-4">
-                <div className="flex items-center justify-between mb-4">
+                <div className="text-black flex items-center justify-between mb-4">
                   <button
                     onClick={() => {
                       if (recording) stopRecording();
                       setShowRecordingUI(false);
                     }}
-                    className="text-gray-600 hover:text-gray-800"
+                    className="hover:text-gray-800"
                   >
                     ← Back
                   </button>
-                  <div className="text-sm font-medium text-gray-700">
-                    Default - AirPods
-                  </div>
+                  <div className="text-sm font-medium">Default - AirPods</div>
                 </div>
 
                 <div className="text-2xl font-medium text-gray-800 mb-4">
@@ -227,10 +229,10 @@ const VoiceUploadPage = () => {
 
                 <button
                   onClick={recording ? stopRecording : startRecording}
-                  className={`px-8 py-3 rounded-lg font-medium text-white ${
+                  className={`rounded-3xl bg-custom-teal px-8 py-3 font-medium text-white ${
                     recording
                       ? "bg-red-600 hover:bg-red-700"
-                      : "bg-blue-600 hover:bg-blue-700"
+                      : "hover:bg-green-700"
                   } transition-colors`}
                 >
                   {recording ? "⏹ Stop Recording" : "⏺ Start Recording"}
@@ -267,6 +269,7 @@ const VoiceUploadPage = () => {
                   id="file-upload"
                 />
 
+                {/* or */}
                 <div className="relative my-4">
                   <div className="relative flex justify-center">
                     <span className="inline-block rounded-full w-10 h-7 flex items-center justify-center bg-gray-200 text-black">
@@ -275,6 +278,7 @@ const VoiceUploadPage = () => {
                   </div>
                 </div>
 
+                {/* Record audio button */}
                 <div className="relative flex justify-center">
                   <button
                     onClick={() => setShowRecordingUI(true)}
@@ -296,26 +300,26 @@ const VoiceUploadPage = () => {
             )}
           </div>
 
-          {/* Moved recording preview section */}
-          {audioBlob && !showRecordingUI && (
-            <div className="space-y-4 mb-8">
+          {/* Recording preview section */}
+          {audioBlob && (
+            <div className="space-y-4 mt-3">
               <audio
                 controls
                 src={URL.createObjectURL(audioBlob)}
                 className="w-full"
               />
-              <div className="flex gap-4">
+              <div className="flex">
                 <button
                   onClick={handleRecordUpload}
-                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                  className="hover:bg-custom-teal px-4 py-2 text-white rounded-3xl hover:bg-green-700 transition-colors"
                 >
-                  Upload Recording
+                  <UploadIcon />
                 </button>
                 <button
                   onClick={() => setAudioBlob(null)}
-                  className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
+                  className="flex items-center px-4 py-2 rounded-3xl hover:bg-gray-100 transition-colors"
                 >
-                  Discard
+                  <DeleteIcon />
                 </button>
               </div>
             </div>
