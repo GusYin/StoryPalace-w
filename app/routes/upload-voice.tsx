@@ -182,7 +182,7 @@ const VoiceUploadPage = () => {
           <div className="text-[#F1F8F7] text-[40px] font-fraunces font-semibold flex-shrink-0 w-14 h-14 bg-custom-teal text-white rounded-full flex items-center justify-center mt-[70px]">
             2
           </div>
-          <p className="text-3xl font-medium text-gray-600 mt-6">
+          <p className="text-3xl font-medium text-black mt-6">
             Upload a recording of your voice
           </p>
         </div>
@@ -353,12 +353,12 @@ const VoiceUploadPage = () => {
           </div>
 
           {/* Tips */}
-          <div className="mt-6 rounded-xl text-center">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">
+          <div className="tracking-wider mt-6 rounded-xl text-center text-black">
+            <h3 className="leading-8 text-xl font-medium mb-2">
               Tips for quality recording:
             </h3>
-            <ul className="space-y-4 inline-block text-left p-0">
-              <li className="text-gray-700 flex items-center">
+            <ul className="text-small font-medium space-y-0 inline-block text-left p-0">
+              <li className="flex items-center">
                 <span className="inline-block w-1.5 h-1.5 rounded-full bg-gray-700 mr-2"></span>
                 One speaker only
               </li>
