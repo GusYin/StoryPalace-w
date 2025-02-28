@@ -410,11 +410,11 @@ const VoiceUploadPage = () => {
                 <span className="inline-block w-1.5 h-1.5 rounded-full bg-gray-700 mr-2"></span>
                 One speaker only
               </li>
-              <li className="text-gray-700 flex items-center">
+              <li className="flex items-center">
                 <span className="inline-block w-1.5 h-1.5 rounded-full bg-gray-700 mr-2"></span>
                 Between 1 to 5 minutes
               </li>
-              <li className="text-gray-700 flex items-center">
+              <li className="flex items-center">
                 <span className="inline-block w-1.5 h-1.5 rounded-full bg-gray-700 mr-2"></span>
                 No background noise
               </li>
