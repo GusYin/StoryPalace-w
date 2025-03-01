@@ -33,6 +33,32 @@ const VoiceUploadPage = () => {
   const audioChunks = useRef<Blob[]>([]);
   const dropRef = useRef<HTMLDivElement>(null);
 
+  // Get initial devices
+  useEffect(() => {
+    navigator.mediaDevices.enumerateDevices().then((devices) => {
+      const mics = devices.filter((d) => d.kind === "audioinput");
+      setMicrophones(mics);
+      if (mics.length > 0) setSelectedMic(mics[0].deviceId);
+    });
+  }, []);
+
+  // Listen for device changes
+  useEffect(() => {
+    const handler = () => {
+      navigator.mediaDevices.enumerateDevices().then((devices) => {
+        const mics = devices.filter((d) => d.kind === "audioinput");
+        setMicrophones(mics);
+        if (!mics.some((m) => m.deviceId === selectedMic)) {
+          setSelectedMic(mics[0]?.deviceId || "");
+        }
+      });
+    };
+
+    navigator.mediaDevices.addEventListener("devicechange", handler);
+    return () =>
+      navigator.mediaDevices.removeEventListener("devicechange", handler);
+  }, [selectedMic]);
+
   // Generate object URL when audioBlob changes and revoke it when component unmounts
   useEffect(() => {
     if (audioBlob) {
@@ -44,28 +70,6 @@ const VoiceUploadPage = () => {
       setRecordingTime(0);
     }
   }, [audioBlob]);
-
-  // Get available microphones when component mounts
-  useEffect(() => {
-    async function getMicrophones() {
-      try {
-        // Request permission and get devices
-        await navigator.mediaDevices.getUserMedia({ audio: true });
-        const devices = await navigator.mediaDevices.enumerateDevices();
-        const audioInputs = devices.filter(
-          (device) => device.kind === "audioinput"
-        );
-        setMicrophones(audioInputs);
-        // Set default microphone if any exist
-        if (audioInputs.length > 0) {
-          setSelectedMic(audioInputs[0].deviceId);
-        }
-      } catch (error) {
-        console.error("Error getting microphones:", error);
-      }
-    }
-    getMicrophones();
-  }, []);
 
   // Timer effect for recording duration
   useEffect(() => {
@@ -129,7 +133,12 @@ const VoiceUploadPage = () => {
     try {
       setRecordingTime(0);
 
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      // Use selected microphone constraints
+      const constraints = {
+        audio: { deviceId: selectedMic ? { exact: selectedMic } : undefined },
+      };
+
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
       mediaRecorder.current = new MediaRecorder(stream);
 
       mediaRecorder.current.ondataavailable = (e) => {
@@ -283,16 +292,19 @@ const VoiceUploadPage = () => {
                   <span className="text-gray-500"> / 00:30</span>
                 </div>
 
-                <button
-                  onClick={recording ? stopRecording : startRecording}
-                  className={`rounded-3xl bg-custom-teal px-8 py-3 font-medium text-white ${
-                    recording
-                      ? "bg-red-600 hover:bg-red-700"
-                      : "hover:bg-green-700"
-                  } transition-colors`}
-                >
-                  {recording ? "⏹ Stop Recording" : "⏺ Start Recording"}
-                </button>
+                {selectedMic && (
+                  <button
+                    onClick={recording ? stopRecording : startRecording}
+                    className={`rounded-3xl bg-custom-teal px-8 py-3 font-medium text-white ${
+                      recording
+                        ? "bg-red-600 hover:bg-red-700"
+                        : "hover:bg-green-700"
+                    } transition-colors`}
+                    disabled={microphones.length === 0}
+                  >
+                    {recording ? "⏹ Stop Recording" : "⏺ Start Recording"}
+                  </button>
+                )}
               </div>
             ) : (
               // Upload UI
