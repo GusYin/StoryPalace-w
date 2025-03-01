@@ -6,6 +6,8 @@ import { UploadIcon } from "~/components/icons/upload-icon";
 import { UploadIconLg } from "~/components/icons/upload-icon-lg";
 import { MicrophoneIcon } from "~/components/icons/microphone-icon";
 import localforage from "localforage";
+import { PauseIcon } from "~/components/icons/pause-icon";
+import { PlayIcon } from "~/components/icons/play-icon";
 
 interface VoiceUploadUrlRequest {
   contentType: string;
@@ -45,6 +47,29 @@ const VoiceUploadPage = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const dropRef = useRef<HTMLDivElement>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [currentlyPlaying, setCurrentlyPlaying] = useState<string | null>(null);
+
+  const handlePlayPause = (id: string, url: string) => {
+    if (currentlyPlaying === id) {
+      // Pause current audio
+      audioRef.current?.pause();
+      setCurrentlyPlaying(null);
+    } else {
+      // Pause any currently playing audio
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+
+      // Create new audio element and play
+      const newAudio = new Audio(url);
+      newAudio.play();
+      newAudio.addEventListener("ended", () => setCurrentlyPlaying(null));
+
+      audioRef.current = newAudio;
+      setCurrentlyPlaying(id);
+    }
+  };
 
   // Load files from storage on mount
   useEffect(() => {
@@ -457,7 +482,7 @@ const VoiceUploadPage = () => {
             )}
           </div>
 
-          {/* Uploaded files preview */}
+          {/* Uploaded files preview with play buttons */}
           {uploadedFiles.length > 0 && (
             <div className="space-y-4 mt-3">
               {uploadedFiles.map((fileInfo) => (
@@ -466,6 +491,16 @@ const VoiceUploadPage = () => {
                   className="flex justify-between items-center p-3 bg-gray-100 rounded-lg"
                 >
                   <div className="flex items-center gap-3">
+                    <button
+                      onClick={() => handlePlayPause(fileInfo.id, fileInfo.url)}
+                      className="text-custom-teal hover:text-green-700"
+                    >
+                      {currentlyPlaying === fileInfo.id ? (
+                        <PauseIcon />
+                      ) : (
+                        <PlayIcon />
+                      )}
+                    </button>
                     <span className="text-gray-700">{fileInfo.name}</span>
                     <span className="text-gray-500 text-sm">
                       {formatDuration(fileInfo.duration)}
