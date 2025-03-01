@@ -18,21 +18,32 @@ interface VoiceUploadUrlResponse {
 
 const VoiceUploadPage = () => {
   const [showRecordingUI, setShowRecordingUI] = useState(false);
-  const [timer, setTimer] = useState(0);
   const [recordingTime, setRecordingTime] = useState(0);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
 
   const [microphones, setMicrophones] = useState<MediaDeviceInfo[] | []>([]);
   const [selectedMic, setSelectedMic] = useState<string>("");
 
   const [recording, setRecording] = useState(false);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
-  const [samples, setSamples] = useState<any[]>([]);
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const mediaRecorder = useRef<MediaRecorder | null>(null);
   const audioChunks = useRef<Blob[]>([]);
   const dropRef = useRef<HTMLDivElement>(null);
+
+  // Generate object URL when audioBlob changes and revoke it when component unmounts
+  useEffect(() => {
+    if (audioBlob) {
+      const url = URL.createObjectURL(audioBlob);
+      setAudioUrl(url);
+      return () => URL.revokeObjectURL(url);
+    } else {
+      setAudioUrl(null);
+      setRecordingTime(0);
+    }
+  }, [audioBlob]);
 
   // Get available microphones when component mounts
   useEffect(() => {
@@ -56,7 +67,7 @@ const VoiceUploadPage = () => {
     getMicrophones();
   }, []);
 
-  // Timer effect
+  // Timer effect for recording duration
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (recording) {
@@ -72,8 +83,7 @@ const VoiceUploadPage = () => {
   const fetchSamples = async () => {
     try {
       const getSamples = httpsCallable(functions, "getVoiceSamples");
-      const result = await getSamples({});
-      setSamples(result.data as any[]);
+      await getSamples({});
     } catch (err) {
       setError("Failed to fetch voice samples");
     }
@@ -327,26 +337,27 @@ const VoiceUploadPage = () => {
           </div>
 
           {/* Recording preview section */}
-          {audioBlob && (
+          {audioBlob && audioUrl && (
             <div className="space-y-4 mt-3">
-              <audio
-                controls
-                src={URL.createObjectURL(audioBlob)}
-                className="w-full"
-              />
-              <div className="flex">
-                <button
-                  onClick={handleRecordUpload}
-                  className="hover:bg-custom-teal px-4 py-2 text-white rounded-3xl hover:bg-green-700 transition-colors"
-                >
-                  <UploadIcon />
-                </button>
-                <button
-                  onClick={() => setAudioBlob(null)}
-                  className="flex items-center px-4 py-2 rounded-3xl hover:bg-gray-100 transition-colors"
-                >
-                  <DeleteIcon />
-                </button>
+              <audio controls src={audioUrl} className="w-full" />
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">
+                  Duration: {recordingTime} seconds
+                </span>
+                <div className="flex">
+                  <button
+                    onClick={handleRecordUpload}
+                    className="hover:bg-custom-teal px-4 py-2 text-white rounded-3xl hover:bg-green-700 transition-colors"
+                  >
+                    <UploadIcon />
+                  </button>
+                  <button
+                    onClick={() => setAudioBlob(null)}
+                    className="flex items-center px-4 py-2 rounded-3xl hover:bg-gray-100 transition-colors"
+                  >
+                    <DeleteIcon />
+                  </button>
+                </div>
               </div>
             </div>
           )}
