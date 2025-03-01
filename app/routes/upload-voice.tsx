@@ -5,6 +5,7 @@ import { DeleteIcon } from "~/components/icons/delete-icon";
 import { UploadIcon } from "~/components/icons/upload-icon";
 import { UploadIconLg } from "~/components/icons/upload-icon-lg";
 import { MicrophoneIcon } from "~/components/icons/microphone-icon";
+import localforage from "localforage";
 
 interface VoiceUploadUrlRequest {
   contentType: string;
@@ -14,6 +15,16 @@ interface VoiceUploadUrlResponse {
   uploadUrl: string;
   filePath: string;
   expires: string;
+}
+
+const STORAGE_KEY = "voiceUploads";
+
+interface UploadedFile {
+  id: string;
+  name: string;
+  duration: number;
+  data: Blob;
+  url: string;
 }
 
 const VoiceUploadPage = () => {
@@ -28,10 +39,155 @@ const VoiceUploadPage = () => {
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [isDragging, setIsDragging] = useState(false);
   const mediaRecorder = useRef<MediaRecorder | null>(null);
   const audioChunks = useRef<Blob[]>([]);
+
+  const [isDragging, setIsDragging] = useState(false);
+  const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const dropRef = useRef<HTMLDivElement>(null);
+
+  // Load files from storage on mount
+  useEffect(() => {
+    localforage.getItem<UploadedFile[]>(STORAGE_KEY).then((storedFiles) => {
+      if (storedFiles) {
+        // Regenerate URLs for preview
+        const filesWithUrls = storedFiles.map((file) => ({
+          ...file,
+          url: URL.createObjectURL(file.data),
+        }));
+        setUploadedFiles(filesWithUrls);
+      }
+    });
+  }, []);
+
+  // Save files to storage when they change
+  useEffect(() => {
+    const filesToStore = uploadedFiles.map(({ id, name, duration, data }) => ({
+      id,
+      name,
+      duration,
+      data,
+    }));
+    localforage.setItem(STORAGE_KEY, filesToStore);
+  }, [uploadedFiles]);
+
+  const formatDuration = (durationInSeconds: number) => {
+    const minutes = Math.floor(durationInSeconds / 60);
+    const seconds = Math.floor(durationInSeconds % 60);
+    return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(
+      2,
+      "0"
+    )}`;
+  };
+
+  const getAudioDuration = (url: string): Promise<number> => {
+    return new Promise((resolve, reject) => {
+      const audio = new Audio();
+      audio.src = url;
+      audio.onloadedmetadata = () => resolve(audio.duration);
+      audio.onerror = () => reject(new Error("Could not load audio file"));
+    });
+  };
+
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+
+    const files = Array.from(e.dataTransfer.files).filter(
+      (file) => file.type.startsWith("audio/") && file.size <= 10 * 1024 * 1024
+    );
+
+    if (files.length === 0) {
+      setError("Please upload audio files (max 10MB each)");
+      return;
+    }
+
+    try {
+      const processedFiles = await Promise.all(
+        files.map(async (file) => {
+          const url = URL.createObjectURL(file);
+          const duration = await getAudioDuration(url);
+          return {
+            id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            name: file.name,
+            duration,
+            data: file,
+            url,
+          };
+        })
+      );
+      setUploadedFiles((prev) => [...prev, ...processedFiles]);
+    } catch (err) {
+      setError("Failed to process audio files");
+    }
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []).filter(
+      (file) => file.type.startsWith("audio/") && file.size <= 10 * 1024 * 1024
+    );
+
+    if (files.length === 0) {
+      setError("Please upload audio files (max 10MB each)");
+      return;
+    }
+
+    try {
+      const processedFiles = await Promise.all(
+        files.map(async (file) => {
+          const url = URL.createObjectURL(file);
+          const duration = await getAudioDuration(url);
+          return {
+            id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            name: file.name,
+            duration,
+            data: file,
+            url,
+          };
+        })
+      );
+      setUploadedFiles((prev) => [...prev, ...processedFiles]);
+    } catch (err) {
+      setError("Failed to process audio files");
+    }
+  };
+
+  const removeFile = (id: string) => {
+    setUploadedFiles((prev) => {
+      const newFiles = prev.filter((file) => file.id !== id);
+      const removedFile = prev.find((file) => file.id === id);
+      if (removedFile) URL.revokeObjectURL(removedFile.url);
+      return newFiles;
+    });
+  };
+
+  // Cleanup object URLs
+  useEffect(() => {
+    return () => {
+      uploadedFiles.forEach((file) => URL.revokeObjectURL(file.url));
+    };
+  }, [uploadedFiles]);
+
+  // Drag and drop handlers
+  const handleDrag = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDragIn = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.dataTransfer.items?.length > 0) {
+      setIsDragging(true);
+    }
+  };
+
+  const handleDragOut = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
 
   // Get initial devices
   useEffect(() => {
@@ -90,42 +246,6 @@ const VoiceUploadPage = () => {
       await getSamples({});
     } catch (err) {
       setError("Failed to fetch voice samples");
-    }
-  };
-
-  // Drag and drop handlers
-  const handleDrag = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-  };
-
-  const handleDragIn = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
-      setIsDragging(true);
-    }
-  };
-
-  const handleDragOut = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(false);
-  };
-
-  const handleDrop = async (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(false);
-
-    const files = e.dataTransfer.files;
-    if (files.length > 0) {
-      const file = files[0];
-      if (file.type.startsWith("audio/")) {
-        await uploadFile(file);
-      } else {
-        setError("Please upload an audio file");
-      }
     }
   };
 
@@ -193,17 +313,6 @@ const VoiceUploadPage = () => {
       setUploadProgress(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Upload failed");
-    }
-  };
-
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    try {
-      await uploadFile(file);
-    } catch (err) {
-      setError("File upload failed");
     }
   };
 
@@ -347,6 +456,34 @@ const VoiceUploadPage = () => {
               </div>
             )}
           </div>
+
+          {/* Uploaded files preview */}
+          {uploadedFiles.length > 0 && (
+            <div className="space-y-4 mt-3">
+              {uploadedFiles.map((fileInfo) => (
+                <div
+                  key={fileInfo.id}
+                  className="flex justify-between items-center p-3 bg-gray-100 rounded-lg"
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="text-gray-700">{fileInfo.name}</span>
+                    <span className="text-gray-500 text-sm">
+                      {formatDuration(fileInfo.duration)}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => removeFile(fileInfo.id)}
+                    className="text-red-600 hover:text-red-800"
+                  >
+                    <DeleteIcon />
+                  </button>
+                </div>
+              ))}
+              <p className="text-center text-gray-600 mt-4">
+                Continue to add recordings for a better clone
+              </p>
+            </div>
+          )}
 
           {/* Recording preview section */}
           {audioBlob && audioUrl && (
