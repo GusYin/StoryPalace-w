@@ -466,7 +466,7 @@ const VoiceUploadPage = () => {
               ))}
               <p className="text-center text-gray-600 mt-4">
                 We need at least 10 seconds of total recordings for a better
-                clone
+                experience
               </p>
             </div>
           )}
