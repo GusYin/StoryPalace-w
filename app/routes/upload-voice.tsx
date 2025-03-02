@@ -1,23 +1,10 @@
 import React, { useState, useRef, useEffect } from "react";
-import { httpsCallable } from "firebase/functions";
-import { functions } from "~/firebase/firebase";
 import { DeleteIcon } from "~/components/icons/delete-icon";
-import { UploadIcon } from "~/components/icons/upload-icon";
 import { UploadIconLg } from "~/components/icons/upload-icon-lg";
 import { MicrophoneIcon } from "~/components/icons/microphone-icon";
 import localforage from "localforage";
 import { PauseIcon } from "~/components/icons/pause-icon";
 import { PlayIcon } from "~/components/icons/play-icon";
-
-interface VoiceUploadUrlRequest {
-  contentType: string;
-}
-
-interface VoiceUploadUrlResponse {
-  uploadUrl: string;
-  filePath: string;
-  expires: string;
-}
 
 const STORAGE_KEY = "voiceUploads";
 
@@ -265,15 +252,6 @@ const VoiceUploadPage = () => {
     };
   }, [recording]);
 
-  const fetchSamples = async () => {
-    try {
-      const getSamples = httpsCallable(functions, "getVoiceSamples");
-      await getSamples({});
-    } catch (err) {
-      setError("Failed to fetch voice samples");
-    }
-  };
-
   const startRecording = async () => {
     try {
       setRecordingTime(0);
@@ -308,52 +286,6 @@ const VoiceUploadPage = () => {
       mediaRecorder.current.stop();
       setRecording(false);
       mediaRecorder.current.stream.getTracks().forEach((track) => track.stop());
-    }
-  };
-
-  const uploadFile = async (file: File) => {
-    try {
-      const generateUrl = httpsCallable<
-        VoiceUploadUrlRequest,
-        VoiceUploadUrlResponse
-      >(functions, "generateVoiceUploadUrl");
-
-      const {
-        data: { uploadUrl },
-      } = await generateUrl({
-        contentType: file.type,
-      });
-
-      const response = await fetch(uploadUrl, {
-        method: "PUT",
-        body: file,
-        headers: {
-          "Content-Type": file.type,
-        },
-      });
-
-      if (!response.ok) throw new Error("Upload failed");
-
-      await fetchSamples();
-      setUploadProgress(null);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Upload failed");
-    }
-  };
-
-  const handleRecordUpload = async () => {
-    if (!audioBlob) return;
-
-    const file = new File([audioBlob], "recording.wav", {
-      type: "audio/wav",
-      lastModified: Date.now(),
-    });
-
-    try {
-      await uploadFile(file);
-      setAudioBlob(null);
-    } catch (err) {
-      setError("Recording upload failed");
     }
   };
 
@@ -529,12 +461,6 @@ const VoiceUploadPage = () => {
                   Duration: {recordingTime} seconds
                 </span>
                 <div className="flex">
-                  <button
-                    onClick={handleRecordUpload}
-                    className="hover:bg-custom-teal px-4 py-2 text-white rounded-3xl hover:bg-green-700 transition-colors"
-                  >
-                    <UploadIcon />
-                  </button>
                   <button
                     onClick={() => setAudioBlob(null)}
                     className="flex items-center px-4 py-2 rounded-3xl hover:bg-gray-100 transition-colors"
