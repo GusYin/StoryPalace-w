@@ -10,6 +10,7 @@ const AuthHeader = () => {
   };
 
   const navigate = useNavigate();
+
   return (
     <>
       {/* Sticky Navigation Bar */}

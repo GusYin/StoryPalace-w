@@ -1,17 +1,17 @@
 // React Router generated types for route:
-// routes/upload-voice.tsx
+// routes/add-a-voice/upload-voice.tsx
 
 import type * as T from "react-router/route-module"
 
-import type { Info as Parent0 } from "../../+types/root.js"
-import type { Info as Parent1 } from "../../components/+types/protected-route.js"
+import type { Info as Parent0 } from "../../../+types/root.js"
+import type { Info as Parent1 } from "../../../components/+types/protected-route.js"
 
 type Module = typeof import("../upload-voice.js")
 
 export type Info = {
   parents: [Parent0, Parent1],
-  id: "routes/upload-voice"
-  file: "routes/upload-voice.tsx"
+  id: "routes/add-a-voice/upload-voice"
+  file: "routes/add-a-voice/upload-voice.tsx"
   path: "upload-voice"
   params: {} & { [key: string]: string | undefined }
   module: Module

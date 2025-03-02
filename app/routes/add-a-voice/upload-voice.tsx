@@ -5,6 +5,7 @@ import { MicrophoneIcon } from "~/components/icons/microphone-icon";
 import localforage from "localforage";
 import { PauseIcon } from "~/components/icons/pause-icon";
 import { PlayIcon } from "~/components/icons/play-icon";
+import { useNavigate } from "react-router";
 
 const STORAGE_KEY = "voiceUploads";
 
@@ -36,6 +37,8 @@ const VoiceUploadPage = () => {
   const [currentlyPlaying, setCurrentlyPlaying] = useState<string | null>(null);
 
   const startTimeRef = useRef<number>(0);
+
+  const navigate = useNavigate();
 
   // Initialize single Audio element
   useEffect(() => {
@@ -503,7 +506,10 @@ const VoiceUploadPage = () => {
 
           {/* Navigation Footer */}
           <div className="mt-9 flex justify-between items-center">
-            <button className="font-bold text-xl bg-[#F1F8F7] rounded-3xl w-28 h-14 px-6 py-2 text-black hover:text-gray-800 transition-colors">
+            <button
+              onClick={() => navigate("/name-your-voice")}
+              className="font-bold text-xl bg-[#F1F8F7] rounded-3xl w-28 h-14 px-6 py-2 text-black hover:text-gray-800 transition-colors"
+            >
               Back
             </button>
             <button className="font-bold text-xl w-52 h-14 bg-black text-white rounded-3xl px-6 py-2 hover:bg-blue-700 transition-colors">

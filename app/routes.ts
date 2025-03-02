@@ -16,6 +16,7 @@ export default [
   route("reset-password", "routes/reset-password.tsx"),
   layout("components/protected-route.tsx", [
     route("my-account", "routes/my-account.tsx"),
-    route("upload-voice", "routes/upload-voice.tsx"),
+    route("name-your-voice", "routes/add-a-voice/name-your-voice.tsx"),
+    route("upload-voice", "routes/add-a-voice/upload-voice.tsx"),
   ]),
 ] satisfies RouteConfig;
