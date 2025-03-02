@@ -35,6 +35,8 @@ const VoiceUploadPage = () => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [currentlyPlaying, setCurrentlyPlaying] = useState<string | null>(null);
 
+  const startTimeRef = useRef<number>(0);
+
   const handlePlayPause = (id: string, url: string) => {
     if (currentlyPlaying === id) {
       // Pause current audio
@@ -240,6 +242,8 @@ const VoiceUploadPage = () => {
 
   const startRecording = async () => {
     try {
+      startTimeRef.current = Date.now(); // Track start time
+
       setRecordingTime(0);
       setError(null);
 
@@ -256,13 +260,17 @@ const VoiceUploadPage = () => {
       };
 
       mediaRecorder.current.onstop = async () => {
-        const blob = new Blob(audioChunks.current, { type: "audio/wav" });
-        audioChunks.current = []; // Clear chunks
-
-        // Generate URL and get duration
-        const url = URL.createObjectURL(blob);
         try {
-          const duration = await getAudioDuration(url);
+          const blob = new Blob(audioChunks.current, { type: "audio/wav" });
+          audioChunks.current = []; // Clear chunks
+
+          // Calculate duration from actual recording time
+          const duration = Math.round(
+            (Date.now() - startTimeRef.current) / 1000
+          );
+
+          // Generate URL and get duration
+          const url = URL.createObjectURL(blob);
           const newFile: UploadedFile = {
             id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
             name: `Recording ${new Date().toLocaleString()}`,
@@ -457,7 +465,8 @@ const VoiceUploadPage = () => {
                 </div>
               ))}
               <p className="text-center text-gray-600 mt-4">
-                Continue to add recordings for a better clone
+                We need at least 10 seconds of total recordings for a better
+                clone
               </p>
             </div>
           )}
