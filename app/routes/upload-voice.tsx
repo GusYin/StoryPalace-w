@@ -37,23 +37,26 @@ const VoiceUploadPage = () => {
 
   const startTimeRef = useRef<number>(0);
 
-  const handlePlayPause = (id: string, url: string) => {
-    if (currentlyPlaying === id) {
-      // Pause current audio
+  // Initialize single Audio element
+  useEffect(() => {
+    audioRef.current = new Audio();
+    audioRef.current.addEventListener("ended", () => setCurrentlyPlaying(null));
+    return () => {
       audioRef.current?.pause();
+      audioRef.current?.removeEventListener("ended", () =>
+        setCurrentlyPlaying(null)
+      );
+    };
+  }, []);
+
+  const handlePlayPause = (id: string, url: string) => {
+    if (!audioRef.current) return;
+    if (currentlyPlaying === id) {
+      audioRef.current.pause();
       setCurrentlyPlaying(null);
     } else {
-      // Pause any currently playing audio
-      if (audioRef.current) {
-        audioRef.current.pause();
-      }
-
-      // Create new audio element and play
-      const newAudio = new Audio(url);
-      newAudio.play();
-      newAudio.addEventListener("ended", () => setCurrentlyPlaying(null));
-
-      audioRef.current = newAudio;
+      audioRef.current.src = url;
+      audioRef.current.play().catch(() => setError("Failed to play audio"));
       setCurrentlyPlaying(id);
     }
   };
@@ -169,7 +172,13 @@ const VoiceUploadPage = () => {
     setUploadedFiles((prev) => {
       const newFiles = prev.filter((file) => file.id !== id);
       const removedFile = prev.find((file) => file.id === id);
-      if (removedFile) URL.revokeObjectURL(removedFile.url);
+      if (removedFile) {
+        URL.revokeObjectURL(removedFile.url);
+        if (currentlyPlaying === id && audioRef.current) {
+          audioRef.current.pause();
+          setCurrentlyPlaying(null);
+        }
+      }
       return newFiles;
     });
   };
