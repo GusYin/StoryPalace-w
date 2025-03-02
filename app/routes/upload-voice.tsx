@@ -19,13 +19,11 @@ interface UploadedFile {
 const VoiceUploadPage = () => {
   const [showRecordingUI, setShowRecordingUI] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
-  const [audioUrl, setAudioUrl] = useState<string | null>(null);
 
   const [microphones, setMicrophones] = useState<MediaDeviceInfo[] | []>([]);
   const [selectedMic, setSelectedMic] = useState<string>("");
 
   const [recording, setRecording] = useState(false);
-  const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const mediaRecorder = useRef<MediaRecorder | null>(null);
@@ -227,18 +225,6 @@ const VoiceUploadPage = () => {
       navigator.mediaDevices.removeEventListener("devicechange", handler);
   }, [selectedMic]);
 
-  // Generate object URL when audioBlob changes and revoke it when component unmounts
-  useEffect(() => {
-    if (audioBlob) {
-      const url = URL.createObjectURL(audioBlob);
-      setAudioUrl(url);
-      return () => URL.revokeObjectURL(url);
-    } else {
-      setAudioUrl(null);
-      setRecordingTime(0);
-    }
-  }, [audioBlob]);
-
   // Timer effect for recording duration
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -255,6 +241,7 @@ const VoiceUploadPage = () => {
   const startRecording = async () => {
     try {
       setRecordingTime(0);
+      setError(null);
 
       // Use selected microphone constraints
       const constraints = {
@@ -270,8 +257,31 @@ const VoiceUploadPage = () => {
 
       mediaRecorder.current.onstop = async () => {
         const blob = new Blob(audioChunks.current, { type: "audio/wav" });
-        setAudioBlob(blob);
-        audioChunks.current = [];
+        audioChunks.current = []; // Clear chunks
+
+        // Generate URL and get duration
+        const url = URL.createObjectURL(blob);
+        try {
+          const duration = await getAudioDuration(url);
+          const newFile: UploadedFile = {
+            id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            name: `Recording ${new Date().toLocaleString()}`,
+            duration,
+            data: blob,
+            url,
+          };
+          setUploadedFiles((prev) => [...prev, newFile]);
+        } catch (err) {
+          setError("Failed to process recording");
+        }
+
+        // Cleanup media streams
+        if (mediaRecorder.current?.stream) {
+          mediaRecorder.current.stream
+            .getTracks()
+            .forEach((track) => track.stop());
+        }
+        setRecording(false);
       };
 
       mediaRecorder.current.start();
@@ -449,26 +459,6 @@ const VoiceUploadPage = () => {
               <p className="text-center text-gray-600 mt-4">
                 Continue to add recordings for a better clone
               </p>
-            </div>
-          )}
-
-          {/* Recording preview section */}
-          {audioBlob && audioUrl && (
-            <div className="space-y-4 mt-3">
-              <audio controls src={audioUrl} className="w-full" />
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600">
-                  Duration: {recordingTime} seconds
-                </span>
-                <div className="flex">
-                  <button
-                    onClick={() => setAudioBlob(null)}
-                    className="flex items-center px-4 py-2 rounded-3xl hover:bg-gray-100 transition-colors"
-                  >
-                    <DeleteIcon />
-                  </button>
-                </div>
-              </div>
             </div>
           )}
 
