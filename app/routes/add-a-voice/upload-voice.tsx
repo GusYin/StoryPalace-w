@@ -40,15 +40,14 @@ const VoiceUploadPage = () => {
 
   const navigate = useNavigate();
 
-  // Initialize single Audio element
+  // Initialize single Audio element for playback
+  const handleEnded = () => setCurrentlyPlaying(null);
   useEffect(() => {
     audioRef.current = new Audio();
-    audioRef.current.addEventListener("ended", () => setCurrentlyPlaying(null));
+    audioRef.current.addEventListener("ended", handleEnded);
     return () => {
       audioRef.current?.pause();
-      audioRef.current?.removeEventListener("ended", () =>
-        setCurrentlyPlaying(null)
-      );
+      audioRef.current?.removeEventListener("ended", handleEnded);
     };
   }, []);
 
@@ -76,6 +75,11 @@ const VoiceUploadPage = () => {
         setUploadedFiles(filesWithUrls);
       }
     });
+
+    // Cleanup on unmount
+    return () => {
+      uploadedFiles.forEach((file) => URL.revokeObjectURL(file.url));
+    };
   }, []);
 
   // Save files to storage when they change
@@ -185,13 +189,6 @@ const VoiceUploadPage = () => {
       return newFiles;
     });
   };
-
-  // Cleanup object URLs
-  useEffect(() => {
-    return () => {
-      uploadedFiles.forEach((file) => URL.revokeObjectURL(file.url));
-    };
-  }, [uploadedFiles]);
 
   // Drag and drop handlers
   const handleDrag = (e: React.DragEvent) => {
