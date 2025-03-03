@@ -7,6 +7,13 @@ const STORAGE_KEY = "nameYourVoice";
 const ConfirmSavePage = () => {
   const navigate = useNavigate();
 
+  // Track each checkbox state
+  const [hasNecessaryRights, setHasNecessaryRights] = useState(false);
+  const [consentToUse, setConsentToUse] = useState(false);
+
+  // Combine logic: button should be enabled only if both are checked
+  const isButtonDisabled = !(hasNecessaryRights && consentToUse);
+
   return (
     <div className="font-dosis min-h-screen bg-gray-50 p-8">
       <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-md p-8">
@@ -21,18 +28,55 @@ const ConfirmSavePage = () => {
           </p>
         </div>
 
-        <div className="mt-[69px]">
+        <div className="mt-[69px] space-y-4">
+          {/* Checkboxes */}
+          <div>
+            <label className="flex items-start gap-2 cursor-pointer">
+              <input
+                className="mt-1 form-checkbox h-4 w-4 rounded-[2px] text-blue-600"
+                type="checkbox"
+                checked={hasNecessaryRights}
+                onChange={(e) => setHasNecessaryRights(e.target.checked)}
+              />
+              <span>
+                I confirm that I have all necessary rights and consents to
+                upload and use this voice sample.
+              </span>
+            </label>
+          </div>
+
+          <div>
+            <label className="flex items-start gap-2 cursor-pointer mt-3">
+              <input
+                className="mt-1 form-checkbox h-5 w-5 rounded-[2px] text-blue-600"
+                type="checkbox"
+                checked={consentToUse}
+                onChange={(e) => setConsentToUse(e.target.checked)}
+              />
+              <span>
+                I consent to Story Palace using this voice sample to create
+                personalized narrations for stories on this platform.
+              </span>
+            </label>
+          </div>
+
           {/* Navigation Footer */}
           <div className="mt-9 flex justify-between items-center">
             <button
-              onClick={() => navigate("/my-account")}
+              onClick={() => navigate("/upload-voice")}
               className="font-bold text-xl bg-[#F1F8F7] rounded-3xl w-28 h-14 px-6 py-2 text-black hover:text-gray-800 transition-colors"
             >
               Back
             </button>
             <button
-              onClick={() => navigate("/upload-voice")}
-              className="font-bold text-xl w-52 h-14 bg-black text-white rounded-3xl px-6 py-2 hover:bg-blue-700 transition-colors"
+              disabled={isButtonDisabled}
+              className={`font-bold text-xl w-52 h-14 rounded-3xl px-6 py-2 transition-colors 
+                ${
+                  isButtonDisabled
+                    ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                    : "bg-custom-teal text-white hover:bg-blue-700"
+                }
+              `}
             >
               Add voice
             </button>

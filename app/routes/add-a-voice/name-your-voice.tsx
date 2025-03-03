@@ -6,11 +6,25 @@ const STORAGE_KEY = "nameYourVoice";
 
 const NameYourVoicePage = () => {
   const navigate = useNavigate();
+  const [voiceName, setVoiceName] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
   function handleVoiceNameChange(
     event: React.ChangeEvent<HTMLInputElement>
   ): void {
-    localforage.setItem(STORAGE_KEY, event.target.value);
+    setError(null);
+    const newName = event.target.value;
+    setVoiceName(newName);
+    localforage.setItem(STORAGE_KEY, newName);
+  }
+
+  function handleOnNext(): void {
+    if (voiceName.trim() === "") {
+      setError("Please enter a name before proceeding.");
+      return;
+    }
+
+    navigate("/upload-voice");
   }
 
   return (
@@ -39,6 +53,12 @@ const NameYourVoicePage = () => {
             />
           </div>
 
+          {error && (
+            <div className="p-4 bg-red-50 text-red-700 rounded-lg mt-4 mb-4">
+              {error}
+            </div>
+          )}
+
           {/* Navigation Footer */}
           <div className="mt-9 flex justify-between items-center">
             <button
@@ -48,7 +68,7 @@ const NameYourVoicePage = () => {
               Cancel
             </button>
             <button
-              onClick={() => navigate("/upload-voice")}
+              onClick={handleOnNext}
               className="font-bold text-xl w-52 h-14 bg-black text-white rounded-3xl px-6 py-2 hover:bg-blue-700 transition-colors"
             >
               Next
