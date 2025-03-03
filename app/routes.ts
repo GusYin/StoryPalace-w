@@ -18,5 +18,6 @@ export default [
     route("my-account", "routes/my-account.tsx"),
     route("name-your-voice", "routes/add-a-voice/name-your-voice.tsx"),
     route("upload-voice", "routes/add-a-voice/upload-voice.tsx"),
+    route("confirm-save", "routes/add-a-voice/confirm-save.tsx"),
   ]),
 ] satisfies RouteConfig;

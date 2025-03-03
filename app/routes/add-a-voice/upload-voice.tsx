@@ -316,6 +316,20 @@ const VoiceUploadPage = () => {
     }
   };
 
+  function handleOnNext(): void {
+    const totalDuration = uploadedFiles.reduce(
+      (acc, file) => acc + file.duration,
+      0
+    );
+
+    if (totalDuration < 10) {
+      setError("Please upload at least 10 seconds of audio");
+      return;
+    }
+
+    navigate("/confirm-save");
+  }
+
   return (
     <div className="font-dosis min-h-screen bg-gray-50 p-8">
       <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-md p-8">
@@ -509,7 +523,10 @@ const VoiceUploadPage = () => {
             >
               Back
             </button>
-            <button className="font-bold text-xl w-52 h-14 bg-black text-white rounded-3xl px-6 py-2 hover:bg-blue-700 transition-colors">
+            <button
+              onClick={handleOnNext}
+              className="font-bold text-xl w-52 h-14 bg-black text-white rounded-3xl px-6 py-2 hover:bg-blue-700 transition-colors"
+            >
               Next
             </button>
           </div>
