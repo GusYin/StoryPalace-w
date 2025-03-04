@@ -56,6 +56,11 @@ const NameYourVoicePage = () => {
               placeholder="e.g. Daddy, Mummy, Grand Ma..."
               pattern="[a-zA-Z0-9]*"
               onChange={handleVoiceNameChange}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  handleOnNext();
+                }
+              }}
               className={`w-full h-14 bg-[#F9FBFB] border border-[#829793] rounded-xl p-5 transition-colors`}
               id="voice-name"
             />
