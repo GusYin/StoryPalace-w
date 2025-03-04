@@ -332,7 +332,15 @@ const VoiceUploadPage = () => {
 
   return (
     <div className="font-dosis min-h-screen bg-gray-50 p-8">
-      <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-md p-8">
+      <div className="relative max-w-4xl mx-auto bg-white rounded-xl shadow-md p-8">
+        {/* "X" Button within the white card */}
+        <button
+          onClick={() => navigate("/my-account")}
+          className="absolute text-[#707978] top-4 right-4 text-2xl font-bold text-gray-600 hover:text-gray-800"
+        >
+          X
+        </button>
+
         {/* Centered Title */}
         <div className="text-center mb-8 flex flex-col items-center">
           <h1 className="text-xl font-bold text-black">Add a voice</h1>
