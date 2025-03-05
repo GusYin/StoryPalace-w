@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import localforage from "localforage";
 import { useNavigate } from "react-router";
 
@@ -8,6 +8,14 @@ const NameYourVoicePage = () => {
   const navigate = useNavigate();
   const [voiceName, setVoiceName] = useState("");
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    localforage.getItem(STORAGE_KEY).then((name) => {
+      if (name) {
+        setVoiceName(name as string);
+      }
+    });
+  }, []);
 
   function handleVoiceNameChange(
     event: React.ChangeEvent<HTMLInputElement>
@@ -53,6 +61,7 @@ const NameYourVoicePage = () => {
           <div className="item-center">
             <input
               type="text"
+              value={voiceName}
               placeholder="e.g. Daddy, Mummy, Grand Ma..."
               pattern="[a-zA-Z0-9]*"
               onChange={handleVoiceNameChange}
