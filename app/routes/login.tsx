@@ -46,8 +46,8 @@ export default function Login() {
             </p>
           </div>
 
-          <form className="" onSubmit={handleSubmit}>
-            <div className="text-black mt-12 rounded-md shadow-sm space-y-4">
+          <form onSubmit={handleSubmit}>
+            <div className="mt-12 space-y-4">
               <input
                 id="email"
                 name="email"
@@ -89,7 +89,7 @@ export default function Login() {
       </main>
 
       <div className="mt-7 font-dosis font-xl text-center text-black space-y-4">
-        <p className="">
+        <p>
           Forgot password?{" "}
           <a
             href="/reset-password"
@@ -98,7 +98,7 @@ export default function Login() {
             Reset password
           </a>
         </p>
-        <p className="">
+        <p>
           Don't have an account?{" "}
           <a
             href="/signup"

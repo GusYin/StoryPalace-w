@@ -1,6 +1,5 @@
 import React, { useState, type FormEvent } from "react";
 import { useNavigate } from "react-router";
-import { StoryPalaceLogo } from "~/components/icons/story-palace-logo";
 import UnauthHeader from "~/components/unauth-header";
 import { createUserWithEmailAndPw } from "~/firebase/firebase";
 
@@ -37,65 +36,63 @@ const SignUpPage = () => {
       <UnauthHeader />
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 pt-16 flex flex-col items-center">
+      <main className="mt-[60px] text-black container mx-auto px-4 flex flex-col items-center">
         <div className="max-w-md w-full space-y-6">
           {/* Headings */}
-          <div className="text-center">
-            <h1 className="text-3xl font-bold text-gray-900">
+          <div className=" text-center">
+            <h1 className="font-fraunces text-4xl font-semibold">
               Create an Account
             </h1>
-            <p className="mt-2 text-xl text-blue-600">
+            <p className="font-dosis font-medium text-3xl mt-[50px]">
               Welcome to Story Palace
             </p>
-            <p className="mt-2 text-gray-600">
+            <p className="mt-5 font-dosis font-medium">
               Create your account to start your adventure
             </p>
           </div>
 
           {/* Sign Up Form */}
-          <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-            <div className="space-y-4">
-              <div>
-                <input
-                  type="text"
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Enter your name"
-                  onChange={(e) => setUserName(e.target.value)}
-                />
-              </div>
+          <form onSubmit={handleSubmit}>
+            <div className="mt-12 space-y-4">
+              <input
+                type="text"
+                className="font-dosis font-medium text-xl placeholder-black bg-[#F3F7F7] mt-1 block w-full rounded-xl border border-[#829793] px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Your name"
+                onChange={(e) => setUserName(e.target.value)}
+              />
 
-              <div>
-                <input
-                  type="email"
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Enter your email"
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </div>
+              <input
+                type="email"
+                className="font-dosis font-medium text-xl placeholder-black bg-[#F3F7F7] mt-1 block w-full rounded-xl border border-[#829793] px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Email address"
+                onChange={(e) => setEmail(e.target.value)}
+              />
 
-              <div>
-                <input
-                  type="password"
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Enter your password"
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </div>
+              <input
+                type="password"
+                className="font-dosis font-medium text-xl placeholder-black bg-[#F3F7F7]  mt-1 block w-full rounded-xl border border-[#829793] px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Password"
+                onChange={(e) => setPassword(e.target.value)}
+              />
             </div>
+
+            {error && (
+              <p className="mt-4 text-red-600 text-xl text-center">{error}</p>
+            )}
 
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              className="font-dosis font-xl bg-black mt-6 w-full text-white py-2 px-4 rounded-full hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
             >
-              {isLoading ? "Creating an account..." : "Create Account"}
+              {isLoading ? "Creating an account..." : "Create account"}
             </button>
 
-            <div className="text-center text-sm text-gray-500">
+            <div className="mt-7 text-center text-sm text-black font-dosis font-xl space-y-4">
               Already have an account?{" "}
               <a
                 href="/login"
-                className="font-medium text-blue-600 hover:text-blue-500"
+                className="underline font-medium text-[#06846F] hover:text-blue-500"
               >
                 Login
               </a>
