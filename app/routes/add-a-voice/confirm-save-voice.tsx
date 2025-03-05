@@ -1,10 +1,11 @@
-import React, { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import localforage from "localforage";
 import { useNavigate } from "react-router";
 
-const STORAGE_KEY = "nameYourVoice";
+const STORAGE_KEY_VOICE_NAME = "nameYourVoice";
+const STORAGE_KEY_VOICE_UPLOADS = "voiceUploads";
 
-const ConfirmSavePage = () => {
+const ConfirmSaveVoicePage = () => {
   const navigate = useNavigate();
 
   // Track each checkbox state
@@ -95,4 +96,4 @@ const ConfirmSavePage = () => {
   );
 };
 
-export default ConfirmSavePage;
+export default ConfirmSaveVoicePage;
