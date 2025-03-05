@@ -36,10 +36,10 @@ const ConfirmSavePage = () => {
           </p>
         </div>
 
-        <div className="mt-[69px] space-y-4">
+        <div className="mt-[103px] space-y-5">
           {/* Checkboxes */}
           <div>
-            <label className="flex items-start gap-2 cursor-pointer">
+            <label className="leading-[1.03] font-medium text-xl flex items-start gap-2 cursor-pointer">
               <input
                 className="mt-1 form-checkbox h-4 w-4 rounded-[2px] text-blue-600"
                 type="checkbox"
@@ -54,7 +54,7 @@ const ConfirmSavePage = () => {
           </div>
 
           <div>
-            <label className="flex items-start gap-2 cursor-pointer mt-3">
+            <label className="leading-[1.03] font-medium text-xl flex items-start gap-2 cursor-pointer mt-3">
               <input
                 className="mt-1 form-checkbox h-5 w-5 rounded-[2px] text-blue-600"
                 type="checkbox"
@@ -69,7 +69,7 @@ const ConfirmSavePage = () => {
           </div>
 
           {/* Navigation Footer */}
-          <div className="mt-9 flex justify-between items-center">
+          <div className="mt-[60px] flex justify-between items-center">
             <button
               onClick={() => navigate("/upload-voice")}
               className="font-bold text-xl bg-[#F1F8F7] rounded-3xl w-28 h-14 px-6 py-2 text-black hover:text-gray-800 transition-colors"

@@ -28,7 +28,7 @@ const UnauthHeader = () => {
   return (
     <>
       {/* Sticky Navigation Bar */}
-      <nav className="shadow-[0_4px_20px_0_rgba(0,0,0,0.05)] font-dosis text-sm font-[700] sticky h-[64px] top-0 bg-white shadow-sm z-50 relative">
+      <nav className="pr-8 shadow-[0_4px_20px_0_rgba(0,0,0,0.05)] font-dosis text-sm font-[700] sticky h-[64px] top-0 bg-white shadow-sm z-50 relative">
         {/* Left-aligned Logo */}
         <button
           className="absolute top-1/2 -translate-y-1/2"
@@ -37,14 +37,9 @@ const UnauthHeader = () => {
           <StoryPalaceLogo />
         </button>
 
-        {/* Centered Navigation Buttons */}
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex space-x-8">
-          <button className="hover:text-blue-600">Library</button>
-          <button className="hover:text-blue-600">Story Player</button>
-        </div>
-
         {/* Right-aligned Auth Buttons */}
-        <div className="absolute right-8 top-1/2 -translate-y-1/2 flex space-x-4 items-center">
+        <div className="absolute right-8 top-1/2 -translate-y-1/2 flex space-x-9 items-center">
+          <button className="hover:text-blue-600">Library</button>
           <button onClick={doLogin} className="hover:text-blue-600">
             Login
           </button>

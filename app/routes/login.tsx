@@ -28,87 +28,83 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen  bg-white">
+    <div className="min-h-screen bg-white">
       {/* Sticky Navigation Bar */}
       <UnauthHeader />
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 pt-16 flex flex-col items-center mb-4">
+      <main className="text-black container mx-auto px-4 mt-[60px] flex flex-col items-center mb-4">
         <div className="max-w-md w-full space-y-6">
           {/* Headings */}
           <div className="text-center">
-            <h1 className="text-3xl font-bold text-gray-900">Login</h1>
-            <p className="mt-2 text-xl text-blue-600">
+            <h1 className="font-fraunces text-4xl font-semibold">Login</h1>
+            <p className="font-dosis font-medium text-3xl mt-[60px]">
               Welcome back to Story Palace!
             </p>
-            <p className="mt-2 text-gray-600">
+            <p className="mt-5 font-dosis font-medium">
               Sign in to continue your adventure
             </p>
           </div>
 
-          <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-            <div className="rounded-md shadow-sm space-y-4">
-              <div>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  placeholder="Email address"
-                  autoComplete="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="mt-1 appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                />
-              </div>
+          <form className="" onSubmit={handleSubmit}>
+            <div className="text-black mt-12 rounded-md shadow-sm space-y-4">
+              <input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="Email address"
+                autoComplete="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="font-dosis font-medium text-xl placeholder-black bg-[#F3F7F7] mt-1 appearance-none block w-full px-3 py-2 border border-[#829793] rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              />
 
-              <div>
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  placeholder="Password"
-                  autoComplete="current-password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="mt-1 appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                />
-              </div>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                placeholder="Password"
+                autoComplete="current-password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="font-dosis font-medium text-xl placeholder-black bg-[#F3F7F7] mt-1 appearance-none block w-full px-3 py-2 border border-[#829793] rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              />
             </div>
 
             {error && (
-              <p className="text-red-600 text-sm text-center">{error}</p>
+              <p className="mt-4 text-red-600 text-xl text-center">{error}</p>
             )}
 
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+              className="font-dosis font-xl bg-black mt-6 w-full flex justify-center py-2 px-4 border border-transparent rounded-full shadow-sm font-bold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
-              {isLoading ? "Signing in..." : "Continue"}
+              {isLoading ? "Signing in..." : "Login"}
             </button>
           </form>
         </div>
       </main>
 
-      <div className="text-center text-sm space-y-4">
-        <p className="text-gray-600">
-          Can't log in?{" "}
+      <div className="mt-7 font-dosis font-xl text-center text-black space-y-4">
+        <p className="">
+          Forgot password?{" "}
           <a
             href="/reset-password"
-            className="font-medium text-blue-600 hover:text-blue-500"
+            className="underline font-medium text-[#06846F] hover:text-blue-500"
           >
-            Reset your password
+            Reset password
           </a>
         </p>
-        <p className="text-gray-600">
+        <p className="">
           Don't have an account?{" "}
           <a
             href="/signup"
-            className="font-medium text-blue-600 hover:text-blue-500"
+            className="underline font-medium text-[#06846F] hover:text-blue-500"
           >
-            Create an account
+            Create account
           </a>
         </p>
       </div>
