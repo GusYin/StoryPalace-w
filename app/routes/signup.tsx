@@ -56,21 +56,21 @@ const SignUpPage = () => {
             <div className="mt-12 space-y-4">
               <input
                 type="text"
-                className="font-dosis font-medium text-xl placeholder-black bg-[#F3F7F7] mt-1 block w-full rounded-xl border border-[#829793] px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="font-dosis font-medium text-xl placeholder-black bg-[#F3F7F7] mt-1 block w-full rounded-xl border border-[#829793] px-5 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Your name"
                 onChange={(e) => setUserName(e.target.value)}
               />
 
               <input
                 type="email"
-                className="font-dosis font-medium text-xl placeholder-black bg-[#F3F7F7] mt-1 block w-full rounded-xl border border-[#829793] px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="font-dosis font-medium text-xl placeholder-black bg-[#F3F7F7] mt-1 block w-full rounded-xl border border-[#829793] px-5 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Email address"
                 onChange={(e) => setEmail(e.target.value)}
               />
 
               <input
                 type="password"
-                className="font-dosis font-medium text-xl placeholder-black bg-[#F3F7F7]  mt-1 block w-full rounded-xl border border-[#829793] px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="font-dosis font-medium text-xl placeholder-black bg-[#F3F7F7]  mt-1 block w-full rounded-xl border border-[#829793] px-5 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Password"
                 onChange={(e) => setPassword(e.target.value)}
               />
@@ -88,7 +88,7 @@ const SignUpPage = () => {
               {isLoading ? "Creating an account..." : "Create account"}
             </button>
 
-            <div className="mt-7 text-center text-sm text-black font-dosis font-xl space-y-4">
+            <div className="mt-11 text-center text-sm text-black font-dosis font-xl space-y-4">
               Already have an account?{" "}
               <a
                 href="/login"
