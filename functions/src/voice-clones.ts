@@ -1,15 +1,11 @@
 import * as functions from "firebase-functions/v2";
 import * as admin from "firebase-admin";
 import { getStorage } from "firebase-admin/storage";
-import { useFirestoreEmulatorIfLocal } from "./util";
 import { createHash } from "crypto";
 
 admin.initializeApp();
 const db = admin.firestore();
 const storage = getStorage();
-
-// Connect to Firestore Emulator in development
-useFirestoreEmulatorIfLocal(db);
 
 // Interface definitions
 interface VoiceClone {

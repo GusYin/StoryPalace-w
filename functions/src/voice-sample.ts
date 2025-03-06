@@ -1,18 +1,16 @@
 import * as functions from "firebase-functions/v2";
 import { getFirestore, Timestamp } from "firebase-admin/firestore";
 import { getStorage } from "firebase-admin/storage";
-import { throwIfUnauthenticated, useFirestoreEmulatorIfLocal } from "./util";
+import { throwIfUnauthenticated } from "./util";
 
 const db = getFirestore();
 const bucket = getStorage().bucket();
-
-// Connect to Firestore Emulator in development
-useFirestoreEmulatorIfLocal(db);
 
 type VALID_AUDIO_CONTENT_TYPE =
   | "audio/mp3"
   | "audio/wav"
   | "audio/m4a"
+  | "audio/mpeg"
   | string;
 
 // Interface for voice sample metadata
