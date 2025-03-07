@@ -29,22 +29,31 @@ export const generateVoiceUploadUrl = functions.https.onCall(
     throwIfUnauthenticated(request);
 
     const userId = request.auth?.uid;
-    const contentType = request.data.contentType || "audio/wav";
-    const filePath = `users/${userId}/voice-samples/${Date.now()}`;
+    const fileName = request.data.fileName || Date.now().toString();
+    const contentType = request.data.contentType || "audio/mpeg";
+    const filePath = `users/${userId}/voice-samples/${fileName}`;
 
-    // Generate signed URL for direct upload
-    const [url] = await bucket.file(filePath).getSignedUrl({
-      version: "v4",
-      action: "write",
-      expires: Date.now() + 15 * 60 * 1000, // 15 minutes
-      contentType: contentType,
-    });
+    try {
+      // Generate signed URL for direct upload
+      const [url] = await bucket.file(filePath).getSignedUrl({
+        version: "v4",
+        action: "write",
+        expires: Date.now() + 15 * 60 * 1000, // 15 minutes
+        contentType: contentType,
+      });
 
-    return {
-      uploadUrl: url,
-      filePath: filePath,
-      expires: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
-    };
+      return {
+        uploadUrl: url,
+        filePath: filePath,
+        expires: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
+      };
+    } catch (error) {
+      throw new functions.https.HttpsError(
+        "internal",
+        "Failed to generate signed URL",
+        error
+      );
+    }
   }
 );
 
@@ -64,7 +73,7 @@ export const processVoiceSample = functions.storage.onObjectFinalized(
     const voiceSampleDoc: VoiceSample = {
       userId: userId,
       downloadUrl: downloadUrl,
-      contentType: file.contentType || "audio/wav",
+      contentType: file.contentType || "audio/mpeg",
       createdAt: Timestamp.now(),
       status: "processing",
     };
