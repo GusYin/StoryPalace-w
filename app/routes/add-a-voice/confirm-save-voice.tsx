@@ -1,9 +1,13 @@
 import { useState } from "react";
 import localforage from "localforage";
 import { useNavigate } from "react-router";
-
-const STORAGE_KEY_VOICE_NAME = "nameYourVoice";
-const STORAGE_KEY_VOICE_UPLOADS = "voiceUploads";
+import {
+  STORAGE_KEY_VOICE_NAME,
+  STORAGE_KEY_VOICE_SAMPLES,
+  uploadVoiceSamples,
+  type UploadItem,
+  type VoiceSampleFile,
+} from "./add-voice";
 
 const ConfirmSaveVoicePage = () => {
   const navigate = useNavigate();
@@ -14,6 +18,22 @@ const ConfirmSaveVoicePage = () => {
 
   // Combine logic: button should be enabled only if both are checked
   const isButtonDisabled = !(hasNecessaryRights && consentToUse);
+
+  async function handleAddVoice(): Promise<void> {
+    const voiceName = (await localforage.getItem(
+      STORAGE_KEY_VOICE_NAME
+    )) as string;
+    const voiceSamples = (await localforage.getItem(
+      STORAGE_KEY_VOICE_SAMPLES
+    )) as VoiceSampleFile[];
+
+    const fileItems = voiceSamples.map((sample) => ({
+      file: sample,
+      onProgress: undefined,
+    })) as UploadItem[];
+
+    await uploadVoiceSamples(voiceName, fileItems);
+  }
 
   return (
     <div className="font-dosis min-h-screen bg-gray-50 p-8">
@@ -78,6 +98,7 @@ const ConfirmSaveVoicePage = () => {
               Back
             </button>
             <button
+              onClick={handleAddVoice}
               disabled={isButtonDisabled}
               className={`font-bold text-xl w-52 h-14 rounded-3xl px-6 py-2 transition-colors 
                 ${

@@ -1,8 +1,7 @@
-import React, { use, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import localforage from "localforage";
 import { useNavigate } from "react-router";
-
-const STORAGE_KEY = "nameYourVoice";
+import { STORAGE_KEY_VOICE_NAME } from "./add-voice";
 
 const NameYourVoicePage = () => {
   const navigate = useNavigate();
@@ -10,7 +9,7 @@ const NameYourVoicePage = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    localforage.getItem(STORAGE_KEY).then((name) => {
+    localforage.getItem(STORAGE_KEY_VOICE_NAME).then((name) => {
       if (name) {
         setVoiceName(name as string);
       }
@@ -23,7 +22,7 @@ const NameYourVoicePage = () => {
     setError(null);
     const newName = event.target.value;
     setVoiceName(newName);
-    localforage.setItem(STORAGE_KEY, newName);
+    localforage.setItem(STORAGE_KEY_VOICE_NAME, newName);
   }
 
   function handleOnNext(): void {

@@ -9,25 +9,12 @@ import {
 } from "firebase/storage";
 import { auth } from "~/firebase/firebase";
 
-// Define the return type for the upload result
-interface UploadResult {
-  filePath: string;
-  downloadUrl: string;
-}
+export const STORAGE_KEY_VOICE_NAME = "voiceName";
+export const STORAGE_KEY_VOICE_SAMPLES = "voiceSamples";
 
-/**
- * Uploads an audio file to Firebase Storage under the authenticated user's directory.
- * @param file The audio file to upload.
- * @param fileName Optional custom file name; defaults to current timestamp.
- * @param contentType Optional MIME type; defaults to "audio/mpeg".
- * @param onProgress Optional callback to report upload progress (0-100).
- * @returns A promise resolving to the file path and download URL.
- * @throws Error if the user is not authenticated.
- */
-async function uploadVoiceSample(
-  file: File,
-  fileName?: string,
-  contentType?: string,
+export async function uploadVoiceSample(
+  file: VoiceSampleFile,
+  voiceName: string,
   onProgress?: (progress: number) => void
 ): Promise<UploadResult> {
   // Ensure the user is authenticated
@@ -36,19 +23,25 @@ async function uploadVoiceSample(
   }
 
   // Set default values if not provided
-  const finalFileName = fileName || Date.now().toString();
-  const finalContentType = contentType || "audio/mpeg";
+  const fileName =
+    `${voiceName}_${file.name}_${file.id}` || `${voiceName}_${Date.now()}`;
+  const contentType = file.data.type || "audio/mpeg";
 
   // Construct the file path
-  const filePath = `users/${auth.currentUser?.uid}/voice-samples/${finalFileName}`;
+  const filePath = `users/${auth.currentUser?.uid}/voice-samples/${voiceName}/${fileName}`;
 
   // Initialize Firebase Storage and create a reference to the file path
   const storage = getStorage();
   const fileRef: StorageReference = ref(storage, filePath);
 
   // Upload the file with resumable upload for progress tracking
-  const uploadTask: UploadTask = uploadBytesResumable(fileRef, file, {
-    contentType: finalContentType,
+  const uploadTask: UploadTask = uploadBytesResumable(fileRef, file.data, {
+    contentType: contentType,
+    customMetadata: {
+      voiceName: voiceName,
+      originalFileName: file.name,
+      duration: file.duration.toString(),
+    },
   });
 
   // Monitor upload progress if a callback is provided
@@ -72,16 +65,22 @@ async function uploadVoiceSample(
   };
 }
 
+export interface VoiceSampleFile {
+  id: string;
+  name: string;
+  duration: number;
+  data: Blob;
+  url: string;
+}
+
 // Define the interface for each upload item
-interface UploadItem {
-  file: File;
-  fileName?: string;
-  contentType?: string;
+export interface UploadItem {
+  file: VoiceSampleFile;
   onProgress?: (progress: number) => void;
 }
 
 // Define the return type for each upload result
-interface UploadResult {
+export interface UploadResult {
   filePath: string;
   downloadUrl: string;
 }
@@ -97,13 +96,8 @@ async function uploadSingleFile(
   return { filePath, downloadUrl };
 }
 
-/**
- * Uploads multiple audio files to Firebase Storage under the authenticated user's directory.
- * @param items An array of upload items, each containing a file and optional metadata.
- * @returns A promise resolving to an array of upload results, each with filePath and downloadUrl.
- * @throws Error if the user is not authenticated or email is not verified.
- */
-async function uploadVoiceSamples(
+export async function uploadVoiceSamples(
+  voiceName: string,
   items: UploadItem[]
 ): Promise<UploadResult[]> {
   // Ensure the user is authenticated and email is verified
@@ -117,15 +111,26 @@ async function uploadVoiceSamples(
   // Process each file in the array
   for (let i = 0; i < items.length; i++) {
     const item = items[i];
-    const fileName = item.fileName || `${Date.now()}_${i}`;
-    const contentType = item.contentType || "audio/mpeg";
-    const filePath = `users/${userId}/voice-samples/${fileName}`;
+    const fileName =
+      `${voiceName}_${item.file.name}_${item.file.id}` ||
+      `${voiceName}_${Date.now()}_${i}`;
+    const contentType = item.file.data.type || "audio/mpeg";
+    const filePath = `users/${userId}/voice-samples/${voiceName}/${fileName}`;
     const fileRef: StorageReference = ref(storage, filePath);
 
     // Create and start the upload task
-    const uploadTask: UploadTask = uploadBytesResumable(fileRef, item.file, {
-      contentType,
-    });
+    const uploadTask: UploadTask = uploadBytesResumable(
+      fileRef,
+      item.file.data,
+      {
+        contentType: contentType,
+        customMetadata: {
+          voiceName: voiceName,
+          originalFileName: item.file.name,
+          duration: item.file.duration.toString(),
+        },
+      }
+    );
 
     // Attach progress listener if provided
     if (item.onProgress) {

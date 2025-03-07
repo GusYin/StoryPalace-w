@@ -6,16 +6,7 @@ import localforage from "localforage";
 import { PauseIcon } from "~/components/icons/pause-icon";
 import { PlayIcon } from "~/components/icons/play-icon";
 import { useNavigate } from "react-router";
-
-const STORAGE_KEY = "voiceUploads";
-
-interface UploadedFile {
-  id: string;
-  name: string;
-  duration: number;
-  data: Blob;
-  url: string;
-}
+import { STORAGE_KEY_VOICE_SAMPLES, type VoiceSampleFile } from "./add-voice";
 
 const VoiceUploadPage = () => {
   const [showRecordingUI, setShowRecordingUI] = useState(false);
@@ -31,7 +22,9 @@ const VoiceUploadPage = () => {
   const audioChunks = useRef<Blob[]>([]);
 
   const [isDragging, setIsDragging] = useState(false);
-  const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
+  const [voiceSampleFiles, setVoiceSampleFiles] = useState<VoiceSampleFile[]>(
+    []
+  );
   const dropRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [currentlyPlaying, setCurrentlyPlaying] = useState<string | null>(null);
@@ -65,33 +58,37 @@ const VoiceUploadPage = () => {
 
   // Load files from storage on mount
   useEffect(() => {
-    localforage.getItem<UploadedFile[]>(STORAGE_KEY).then((storedFiles) => {
-      if (storedFiles) {
-        // Regenerate URLs for preview
-        const filesWithUrls = storedFiles.map((file) => ({
-          ...file,
-          url: URL.createObjectURL(file.data),
-        }));
-        setUploadedFiles(filesWithUrls);
-      }
-    });
+    localforage
+      .getItem<VoiceSampleFile[]>(STORAGE_KEY_VOICE_SAMPLES)
+      .then((storedFiles) => {
+        if (storedFiles) {
+          // Regenerate URLs for preview
+          const filesWithUrls = storedFiles.map((file) => ({
+            ...file,
+            url: URL.createObjectURL(file.data),
+          }));
+          setVoiceSampleFiles(filesWithUrls);
+        }
+      });
 
     // Cleanup on unmount
     return () => {
-      uploadedFiles.forEach((file) => URL.revokeObjectURL(file.url));
+      voiceSampleFiles.forEach((file) => URL.revokeObjectURL(file.url));
     };
   }, []);
 
   // Save files to storage when they change
   useEffect(() => {
-    const filesToStore = uploadedFiles.map(({ id, name, duration, data }) => ({
-      id,
-      name,
-      duration,
-      data,
-    }));
-    localforage.setItem(STORAGE_KEY, filesToStore);
-  }, [uploadedFiles]);
+    const filesToStore = voiceSampleFiles.map(
+      ({ id, name, duration, data }) => ({
+        id,
+        name,
+        duration,
+        data,
+      })
+    );
+    localforage.setItem(STORAGE_KEY_VOICE_SAMPLES, filesToStore);
+  }, [voiceSampleFiles]);
 
   const formatDuration = (durationInSeconds: number) => {
     const minutes = Math.floor(durationInSeconds / 60);
@@ -139,7 +136,7 @@ const VoiceUploadPage = () => {
           };
         })
       );
-      setUploadedFiles((prev) => [...prev, ...processedFiles]);
+      setVoiceSampleFiles((prev) => [...prev, ...processedFiles]);
     } catch (err) {
       setError("Failed to process audio files");
     }
@@ -169,14 +166,14 @@ const VoiceUploadPage = () => {
           };
         })
       );
-      setUploadedFiles((prev) => [...prev, ...processedFiles]);
+      setVoiceSampleFiles((prev) => [...prev, ...processedFiles]);
     } catch (err) {
       setError("Failed to process audio files");
     }
   };
 
   const removeFile = (id: string) => {
-    setUploadedFiles((prev) => {
+    setVoiceSampleFiles((prev) => {
       const newFiles = prev.filter((file) => file.id !== id);
       const removedFile = prev.find((file) => file.id === id);
       if (removedFile) {
@@ -210,7 +207,7 @@ const VoiceUploadPage = () => {
     setIsDragging(false);
   };
 
-  // Get initial devices
+  // Get initial microphone devices
   useEffect(() => {
     navigator.mediaDevices.enumerateDevices().then((devices) => {
       const mics = devices.filter((d) => d.kind === "audioinput");
@@ -219,7 +216,7 @@ const VoiceUploadPage = () => {
     });
   }, []);
 
-  // Listen for device changes
+  // Listen for microphone device changes
   useEffect(() => {
     const handler = () => {
       navigator.mediaDevices.enumerateDevices().then((devices) => {
@@ -280,14 +277,14 @@ const VoiceUploadPage = () => {
 
           // Generate URL and get duration
           const url = URL.createObjectURL(blob);
-          const newFile: UploadedFile = {
+          const newFile: VoiceSampleFile = {
             id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
             name: `Recording ${new Date().toLocaleString()}`,
             duration,
             data: blob,
             url,
           };
-          setUploadedFiles((prev) => [...prev, newFile]);
+          setVoiceSampleFiles((prev) => [...prev, newFile]);
         } catch (err) {
           setError("Failed to process recording");
         }
@@ -317,7 +314,7 @@ const VoiceUploadPage = () => {
   };
 
   function handleOnNext(): void {
-    const totalDuration = uploadedFiles.reduce(
+    const totalDuration = voiceSampleFiles.reduce(
       (acc, file) => acc + file.duration,
       0
     );
@@ -464,9 +461,9 @@ const VoiceUploadPage = () => {
           </div>
 
           {/* Uploaded files preview with play buttons */}
-          {uploadedFiles.length > 0 && (
+          {voiceSampleFiles.length > 0 && (
             <div className="space-y-4 mt-3">
-              {uploadedFiles.map((fileInfo) => (
+              {voiceSampleFiles.map((fileInfo) => (
                 <div
                   key={fileInfo.id}
                   className="flex justify-between items-center p-3 bg-gray-100 rounded-lg"
