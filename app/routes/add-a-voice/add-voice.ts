@@ -56,10 +56,8 @@ export async function uploadVoiceSamples(
   // Process each file in the array
   for (let i = 0; i < items.length; i++) {
     const item = items[i];
-    const fileName =
-      `${voiceName}_${item.file.name}_${item.file.id}` ||
-      `${voiceName}_${Date.now()}_${i}`;
-    const contentType = item.file.data.type || "audio/mpeg";
+    const fileName = `${voiceName}_${item.file.id}`;
+    const contentType = item.file.data.type || "audio/wav";
     const filePath = `users/${userId}/voice-samples/${voiceName}/${fileName}`;
     const fileRef: StorageReference = ref(storage, filePath);
 
@@ -107,9 +105,8 @@ export async function uploadVoiceSample(
   }
 
   // Set default values if not provided
-  const fileName =
-    `${voiceName}_${file.name}_${file.id}` || `${voiceName}_${Date.now()}`;
-  const contentType = file.data.type || "audio/mpeg";
+  const fileName = `${voiceName}_${file.id}`;
+  const contentType = file.data.type || "audio/wav";
 
   // Construct the file path
   const filePath = `users/${auth.currentUser?.uid}/voice-samples/${voiceName}/${fileName}`;

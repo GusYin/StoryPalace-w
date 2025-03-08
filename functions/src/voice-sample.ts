@@ -30,7 +30,7 @@ export const generateVoiceUploadUrl = functions.https.onCall(
 
     const userId = request.auth?.uid;
     const fileName = request.data.fileName || Date.now().toString();
-    const contentType = request.data.contentType || "audio/mpeg";
+    const contentType = request.data.contentType || "audio/wav";
     const filePath = `users/${userId}/voice-samples/${fileName}`;
 
     try {
@@ -73,7 +73,7 @@ export const processVoiceSample = functions.storage.onObjectFinalized(
     const voiceSampleDoc: VoiceSample = {
       userId: userId,
       downloadUrl: downloadUrl,
-      contentType: file.contentType || "audio/mpeg",
+      contentType: file.contentType || "audio/wav",
       createdAt: Timestamp.now(),
       status: "processing",
     };

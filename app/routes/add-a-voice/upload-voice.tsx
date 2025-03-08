@@ -351,7 +351,7 @@ const VoiceUploadPage = () => {
       return;
     }
 
-    navigate("/confirm-save");
+    navigate("/confirm-save-voice");
   }
 
   return (
@@ -457,7 +457,7 @@ const VoiceUploadPage = () => {
                 </p>
                 <input
                   type="file"
-                  accept="audio/mp3,audio/wav,audio/m4a"
+                  accept="audio/mp3,audio/wav,audio/m4a,audio/mpeg"
                   onChange={handleFileUpload}
                   disabled={uploadProgress !== null}
                   className="hidden"
