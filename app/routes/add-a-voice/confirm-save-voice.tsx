@@ -55,7 +55,7 @@ const ConfirmSaveVoicePage = () => {
     // Debounced progress update
     const updateProgress = debounce((progress: number) => {
       setTotalProgress(progress);
-    }, 100);
+    }, 300);
 
     // Create fileItems with progress callbacks
     const fileItems = voiceSamples.map((sample) => ({
@@ -77,7 +77,7 @@ const ConfirmSaveVoicePage = () => {
       // Ensure progress reaches 100% and stays visible briefly
       setTotalProgress(100);
       // Minimum 0.5s display time for 100% progress
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       setTotalProgress(null); // Reset to null after completion
       navigate("/add-voice-success");
     } catch (err) {
