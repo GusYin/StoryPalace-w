@@ -50,48 +50,54 @@ export async function uploadVoiceSamples(
   if (!auth.currentUser?.uid || !auth.currentUser?.emailVerified) {
     throw new Error("User is not authenticated or email is not verified");
   }
+
   const userId = auth.currentUser.uid;
   const uploadPromises: Promise<UploadResult>[] = [];
 
-  // Process each file in the array
-  for (let i = 0; i < items.length; i++) {
-    const item = items[i];
-    const fileName = `${voiceName}_${item.file.id}`;
-    const contentType = item.file.data.type || "audio/wav";
-    const filePath = `users/${userId}/voice-samples/${voiceName}/${fileName}`;
-    const fileRef: StorageReference = ref(storage, filePath);
+  try {
+    // Process each file in the array
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      const fileName = `${voiceName}_${item.file.id}`;
+      const contentType = item.file.data.type || "audio/wav";
+      const filePath = `users/${userId}/voice-samples/${voiceName}/${fileName}`;
+      const fileRef: StorageReference = ref(storage, filePath);
 
-    // Create and start the upload task
-    const uploadTask: UploadTask = uploadBytesResumable(
-      fileRef,
-      item.file.data,
-      {
-        contentType: contentType,
-        customMetadata: {
-          voiceName: voiceName,
-          originalFileName: item.file.name,
-          duration: item.file.duration.toString(),
-        },
+      // Create and start the upload task
+      const uploadTask: UploadTask = uploadBytesResumable(
+        fileRef,
+        item.file.data,
+        {
+          contentType: contentType,
+          customMetadata: {
+            voiceName: voiceName,
+            originalFileName: item.file.name,
+            duration: item.file.duration.toString(),
+          },
+        }
+      );
+
+      // Attach progress listener if provided
+      if (item.onProgress) {
+        const onProgress = item.onProgress;
+        uploadTask.on("state_changed", (snapshot: UploadTaskSnapshot) => {
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          onProgress(progress);
+        });
       }
-    );
 
-    // Attach progress listener if provided
-    if (item.onProgress) {
-      const onProgress = item.onProgress;
-      uploadTask.on("state_changed", (snapshot: UploadTaskSnapshot) => {
-        const progress =
-          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        onProgress(progress);
-      });
+      // Create a promise for this upload using the helper function
+      const uploadPromise = uploadSingleFile(uploadTask, fileRef, filePath);
+      uploadPromises.push(uploadPromise);
     }
 
-    // Create a promise for this upload using the helper function
-    const uploadPromise = uploadSingleFile(uploadTask, fileRef, filePath);
-    uploadPromises.push(uploadPromise);
+    // Wait for all uploads to complete and return the results
+    return Promise.all(uploadPromises);
+  } catch (error) {
+    console.error("Error uploading voice samples:", error);
+    throw error; // Rethrow the error to the caller
   }
-
-  // Wait for all uploads to complete and return the results
-  return Promise.all(uploadPromises);
 }
 
 export async function uploadVoiceSample(
