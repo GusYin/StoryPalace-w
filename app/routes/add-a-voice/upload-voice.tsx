@@ -13,7 +13,7 @@ const VoiceUploadPage = () => {
   const [recordingTime, setRecordingTime] = useState(0);
 
   const [microphones, setMicrophones] = useState<MediaDeviceInfo[] | []>([]);
-  const [selectedMic, setSelectedMic] = useState<string>("");
+  const [selectedMic, setSelectedMic] = useState<string | undefined>(undefined);
 
   const [recording, setRecording] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
@@ -207,7 +207,7 @@ const VoiceUploadPage = () => {
     setIsDragging(false);
   };
 
-  // Get initial microphone devices
+  // ensure the selected mic is in available microphones
   useEffect(() => {
     navigator.mediaDevices
       .getUserMedia({ audio: true })
@@ -215,34 +215,50 @@ const VoiceUploadPage = () => {
         // Permission granted, now enumerate devices
         navigator.mediaDevices.enumerateDevices().then((devices) => {
           const mics = devices.filter((d) => d.kind === "audioinput");
-          console.log(mics);
-          // Set initial microphone devices
           setMicrophones(mics);
-          if (mics.length > 0) setSelectedMic(mics[0].deviceId);
-          stream.getTracks().forEach((track) => track.stop()); //stop the stream after use.
+          if (!mics.some((m) => m.deviceId === selectedMic)) {
+            setSelectedMic(mics[0]?.deviceId);
+          }
+          //stop the stream after use.
+          stream.getTracks().forEach((track) => track.stop());
         });
       })
       .catch((error) => {
-        setError("Error getting microphone permission");
+        console.error("Error getting microphone devices", error);
+        setMicrophones([]);
+        setSelectedMic(undefined);
       });
-  }, []);
+  }, [selectedMic]);
 
   // Listen for microphone device changes
   useEffect(() => {
     const handler = () => {
-      navigator.mediaDevices.enumerateDevices().then((devices) => {
-        const mics = devices.filter((d) => d.kind === "audioinput");
-        setMicrophones(mics);
-        if (!mics.some((m) => m.deviceId === selectedMic)) {
-          setSelectedMic(mics[0]?.deviceId || "");
-        }
-      });
+      navigator.mediaDevices
+        .getUserMedia({ audio: true })
+        .then((stream) => {
+          // Permission granted, now enumerate devices
+          navigator.mediaDevices.enumerateDevices().then((devices) => {
+            const mics = devices.filter((d) => d.kind === "audioinput");
+            console.log(mics);
+            setMicrophones(mics);
+            if (!mics.some((m) => m.deviceId === selectedMic)) {
+              setSelectedMic(mics[0]?.deviceId);
+            }
+            //stop the stream after use.
+            stream.getTracks().forEach((track) => track.stop());
+          });
+        })
+        .catch((error) => {
+          console.error("Error getting microphone devices", error);
+          setMicrophones([]);
+          setSelectedMic(undefined);
+        });
     };
 
     navigator.mediaDevices.addEventListener("devicechange", handler);
     return () =>
       navigator.mediaDevices.removeEventListener("devicechange", handler);
-  }, [selectedMic]);
+  }, []);
 
   // Timer effect for recording duration
   useEffect(() => {

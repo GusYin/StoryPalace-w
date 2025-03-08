@@ -1,5 +1,4 @@
 import {
-  getStorage,
   ref,
   uploadBytesResumable,
   type UploadTask,
@@ -7,63 +6,10 @@ import {
   getDownloadURL,
   type StorageReference,
 } from "firebase/storage";
-import { auth } from "~/firebase/firebase";
+import { auth, storage } from "~/firebase/firebase";
 
 export const STORAGE_KEY_VOICE_NAME = "voiceName";
 export const STORAGE_KEY_VOICE_SAMPLES = "voiceSamples";
-
-export async function uploadVoiceSample(
-  file: VoiceSampleFile,
-  voiceName: string,
-  onProgress?: (progress: number) => void
-): Promise<UploadResult> {
-  // Ensure the user is authenticated
-  if (!auth.currentUser?.uid || !auth.currentUser?.emailVerified) {
-    throw new Error("User is not authenticated");
-  }
-
-  // Set default values if not provided
-  const fileName =
-    `${voiceName}_${file.name}_${file.id}` || `${voiceName}_${Date.now()}`;
-  const contentType = file.data.type || "audio/mpeg";
-
-  // Construct the file path
-  const filePath = `users/${auth.currentUser?.uid}/voice-samples/${voiceName}/${fileName}`;
-
-  // Initialize Firebase Storage and create a reference to the file path
-  const storage = getStorage();
-  const fileRef: StorageReference = ref(storage, filePath);
-
-  // Upload the file with resumable upload for progress tracking
-  const uploadTask: UploadTask = uploadBytesResumable(fileRef, file.data, {
-    contentType: contentType,
-    customMetadata: {
-      voiceName: voiceName,
-      originalFileName: file.name,
-      duration: file.duration.toString(),
-    },
-  });
-
-  // Monitor upload progress if a callback is provided
-  if (onProgress) {
-    uploadTask.on("state_changed", (snapshot: UploadTaskSnapshot) => {
-      const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-      onProgress(progress);
-    });
-  }
-
-  // Wait for the upload to complete
-  await uploadTask;
-
-  // Get the download URL for the uploaded file
-  const downloadUrl = await getDownloadURL(fileRef);
-
-  // Return the file path and download URL
-  return {
-    filePath,
-    downloadUrl,
-  };
-}
 
 export interface VoiceSampleFile {
   id: string;
@@ -105,7 +51,6 @@ export async function uploadVoiceSamples(
     throw new Error("User is not authenticated or email is not verified");
   }
   const userId = auth.currentUser.uid;
-  const storage = getStorage();
   const uploadPromises: Promise<UploadResult>[] = [];
 
   // Process each file in the array
@@ -149,4 +94,56 @@ export async function uploadVoiceSamples(
 
   // Wait for all uploads to complete and return the results
   return Promise.all(uploadPromises);
+}
+
+export async function uploadVoiceSample(
+  file: VoiceSampleFile,
+  voiceName: string,
+  onProgress?: (progress: number) => void
+): Promise<UploadResult> {
+  // Ensure the user is authenticated
+  if (!auth.currentUser?.uid || !auth.currentUser?.emailVerified) {
+    throw new Error("User is not authenticated");
+  }
+
+  // Set default values if not provided
+  const fileName =
+    `${voiceName}_${file.name}_${file.id}` || `${voiceName}_${Date.now()}`;
+  const contentType = file.data.type || "audio/mpeg";
+
+  // Construct the file path
+  const filePath = `users/${auth.currentUser?.uid}/voice-samples/${voiceName}/${fileName}`;
+
+  // Initialize Firebase Storage and create a reference to the file path
+  const fileRef: StorageReference = ref(storage, filePath);
+
+  // Upload the file with resumable upload for progress tracking
+  const uploadTask: UploadTask = uploadBytesResumable(fileRef, file.data, {
+    contentType: contentType,
+    customMetadata: {
+      voiceName: voiceName,
+      originalFileName: file.name,
+      duration: file.duration.toString(),
+    },
+  });
+
+  // Monitor upload progress if a callback is provided
+  if (onProgress) {
+    uploadTask.on("state_changed", (snapshot: UploadTaskSnapshot) => {
+      const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+      onProgress(progress);
+    });
+  }
+
+  // Wait for the upload to complete
+  await uploadTask;
+
+  // Get the download URL for the uploaded file
+  const downloadUrl = await getDownloadURL(fileRef);
+
+  // Return the file path and download URL
+  return {
+    filePath,
+    downloadUrl,
+  };
 }

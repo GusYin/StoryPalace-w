@@ -13,7 +13,7 @@ import {
 import { getAnalytics, isSupported } from "firebase/analytics";
 import { getFunctions, connectFunctionsEmulator } from "firebase/functions";
 import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
-import { getStorage } from "firebase/storage";
+import { connectStorageEmulator, getStorage } from "firebase/storage";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -49,6 +49,10 @@ if (process.env.NODE_ENV === "development") {
 export const auth = getAuth(app);
 
 export const storage = getStorage(app);
+if (process.env.NODE_ENV === "development") {
+  // Point to the Storage emulator running on localhost.
+  connectStorageEmulator(storage, "127.0.0.1", 9199);
+}
 
 export const createUserWithEmailAndPw = async (
   email: string,
