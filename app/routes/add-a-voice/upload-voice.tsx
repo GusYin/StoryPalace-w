@@ -209,11 +209,22 @@ const VoiceUploadPage = () => {
 
   // Get initial microphone devices
   useEffect(() => {
-    navigator.mediaDevices.enumerateDevices().then((devices) => {
-      const mics = devices.filter((d) => d.kind === "audioinput");
-      setMicrophones(mics);
-      if (mics.length > 0) setSelectedMic(mics[0].deviceId);
-    });
+    navigator.mediaDevices
+      .getUserMedia({ audio: true })
+      .then((stream) => {
+        // Permission granted, now enumerate devices
+        navigator.mediaDevices.enumerateDevices().then((devices) => {
+          const mics = devices.filter((d) => d.kind === "audioinput");
+          console.log(mics);
+          // Set initial microphone devices
+          setMicrophones(mics);
+          if (mics.length > 0) setSelectedMic(mics[0].deviceId);
+          stream.getTracks().forEach((track) => track.stop()); //stop the stream after use.
+        });
+      })
+      .catch((error) => {
+        setError("Error getting microphone permission");
+      });
   }, []);
 
   // Listen for microphone device changes
