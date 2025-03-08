@@ -9,6 +9,15 @@ import {
   type VoiceSampleFile,
 } from "./add-voice";
 
+// Debounce function to limit state updates
+const debounce = (func: (...args: any[]) => void, wait: number) => {
+  let timeout: NodeJS.Timeout;
+  return (...args: any[]) => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func(...args), wait);
+  };
+};
+
 const ConfirmSaveVoicePage = () => {
   const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
@@ -16,11 +25,16 @@ const ConfirmSaveVoicePage = () => {
   // Track each checkbox state
   const [hasNecessaryRights, setHasNecessaryRights] = useState(false);
   const [consentToUse, setConsentToUse] = useState(false);
+  // State for total upload progress (null means not uploading)
+  const [totalProgress, setTotalProgress] = useState<number | null>(null);
 
   // Combine logic: button should be enabled only if both are checked
   const isButtonDisabled = !(hasNecessaryRights && consentToUse);
 
   async function handleAddVoice(): Promise<void> {
+    setError(null);
+    setTotalProgress(0); // Start uploading, set to 0 to show progress bar
+
     const voiceName = (await localforage.getItem(
       STORAGE_KEY_VOICE_NAME
     )) as string;
@@ -28,12 +42,48 @@ const ConfirmSaveVoicePage = () => {
       STORAGE_KEY_VOICE_SAMPLES
     )) as VoiceSampleFile[];
 
+    if (!voiceName || !voiceSamples) {
+      setError("Voice name or samples are missing");
+      setTotalProgress(null); // Reset to null if validation fails
+      return;
+    }
+
+    // Track progress for all files
+    const progressValues: { [key: string]: number } = {};
+    const totalFiles = voiceSamples.length;
+
+    // Debounced progress update
+    const updateProgress = debounce((progress: number) => {
+      setTotalProgress(progress);
+    }, 100);
+
+    // Create fileItems with progress callbacks
     const fileItems = voiceSamples.map((sample) => ({
       file: sample,
-      onProgress: undefined,
+      onProgress: (progress: number) => {
+        progressValues[sample.id] = progress;
+        // Calculate average progress
+        const total = Object.values(progressValues).reduce(
+          (sum, val) => sum + val,
+          0
+        );
+        const averageProgress = total / totalFiles;
+        updateProgress(averageProgress);
+      },
     })) as UploadItem[];
 
-    await uploadVoiceSamples(voiceName, fileItems);
+    try {
+      await uploadVoiceSamples(voiceName, fileItems);
+      // Ensure progress reaches 100% and stays visible briefly
+      setTotalProgress(100);
+      // Minimum 0.5s display time for 100% progress
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      setTotalProgress(null); // Reset to null after completion
+      navigate("/add-voice-success");
+    } catch (err) {
+      setError("Upload failed");
+      setTotalProgress(null); // Reset to null on error
+    }
   }
 
   return (
@@ -91,7 +141,22 @@ const ConfirmSaveVoicePage = () => {
               {error}
             </div>
           )}
+
+          {/* Total Upload Progress */}
+          {totalProgress !== null && (
+            <div className="mt-6">
+              <h3 className="text-lg font-medium">Uploading files...</h3>
+              <div className="w-full bg-gray-200 rounded-full h-2.5 mt-2">
+                <div
+                  className="bg-blue-600 h-2.5 rounded-full transition-all duration-300 ease-in-out"
+                  style={{ width: `${totalProgress}%` }}
+                ></div>
+              </div>
+              <span>{Math.round(totalProgress)}%</span>
+            </div>
+          )}
         </div>
+
         {/* Navigation Footer */}
         <div className="mt-16 flex justify-between items-center">
           <button
