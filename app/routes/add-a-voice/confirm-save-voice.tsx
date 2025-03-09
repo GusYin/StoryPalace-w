@@ -25,11 +25,12 @@ const ConfirmSaveVoicePage = () => {
   // Track each checkbox state
   const [hasNecessaryRights, setHasNecessaryRights] = useState(false);
   const [consentToUse, setConsentToUse] = useState(false);
-  // State for total upload progress (null means not uploading)
-  const [totalProgress, setTotalProgress] = useState<number | null>(null);
 
   // Combine logic: button should be enabled only if both are checked
   const isButtonDisabled = !(hasNecessaryRights && consentToUse);
+
+  // State for total upload progress (null means not uploading)
+  const [totalProgress, setTotalProgress] = useState<number | null>(null);
 
   async function handleAddVoice(): Promise<void> {
     setError(null);
@@ -79,6 +80,9 @@ const ConfirmSaveVoicePage = () => {
       // Minimum 0.5s display time for 100% progress
       await new Promise((resolve) => setTimeout(resolve, 1000));
       setTotalProgress(null); // Reset to null after completion
+      // Clear local storage
+      await localforage.removeItem(STORAGE_KEY_VOICE_NAME);
+      await localforage.removeItem(STORAGE_KEY_VOICE_SAMPLES);
       navigate("/add-voice-success");
     } catch (err) {
       setError("Upload failed");
