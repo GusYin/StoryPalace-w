@@ -20,11 +20,7 @@ import { logger } from "firebase-functions/v2";
 
 import { initializeApp } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
-import { useFirestoreEmulatorIfLocal } from "./util";
 
 // Initialize Firebase Admin SDK
 initializeApp();
 const db = getFirestore();
-
-// Connect to Firestore Emulator in development
-useFirestoreEmulatorIfLocal(db);
