@@ -5,7 +5,7 @@ import {
   STORAGE_KEY_VOICE_NAME,
   STORAGE_KEY_VOICE_SAMPLES,
   uploadVoiceSamples,
-  type UploadItem,
+  type FileToUpload,
   type VoiceSampleFile,
 } from "./add-voice";
 
@@ -71,18 +71,19 @@ const ConfirmSaveVoicePage = () => {
         const averageProgress = total / totalFiles;
         updateProgress(averageProgress);
       },
-    })) as UploadItem[];
+    })) as FileToUpload[];
 
     try {
-      await uploadVoiceSamples(voiceName, fileItems);
+      // Upload all voice samples to firebase storage
+      const result = await uploadVoiceSamples(voiceName, fileItems);
       // Ensure progress reaches 100% and stays visible briefly
       setTotalProgress(100);
       // Minimum 0.5s display time for 100% progress
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 500));
       setTotalProgress(null); // Reset to null after completion
-      // Clear local storage
-      await localforage.removeItem(STORAGE_KEY_VOICE_NAME);
-      await localforage.removeItem(STORAGE_KEY_VOICE_SAMPLES);
+      // Clear local storage - comment out for testing
+      // await localforage.removeItem(STORAGE_KEY_VOICE_NAME);
+      // await localforage.removeItem(STORAGE_KEY_VOICE_SAMPLES);
       navigate("/add-voice-success");
     } catch (err) {
       setError("Upload failed");

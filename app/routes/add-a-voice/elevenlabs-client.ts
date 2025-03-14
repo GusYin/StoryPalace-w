@@ -1,45 +1,41 @@
-import axios, { AxiosInstance } from "axios";
+import axios, { type AxiosInstance } from "axios";
 import FormData from "form-data";
+import type { Voice } from "./add-voice";
 
 class ElevenLabsClient {
   private api: AxiosInstance;
-  private apiKey: string;
 
-  /** Initialize the client with the ElevenLabs API key from environment variables */
   constructor() {
-    const apiKey = process.env.ELEVENLABS_API_KEY;
-    if (!apiKey) {
+    if (!process.env.ELEVENLABS_API_KEY) {
       throw new Error("ELEVENLABS_API_KEY is not set");
     }
-    this.apiKey = apiKey;
-    if (!this.apiKey) {
-      throw new Error("ELEVENLABS_API_KEY is not set");
-    }
+
     this.api = axios.create({
       baseURL: "https://api.elevenlabs.io/v1",
       headers: {
-        "xi-api-key": this.apiKey,
+        "xi-api-key": process.env.ELEVENLABS_API_KEY,
       },
     });
   }
 
-  /**
-   * Creates a voice clone using audio samples from provided URLs
-   * @param sampleUrls Array of URLs pointing to audio samples in Firebase Storage
-   * @param voiceName Name of the voice to create
-   * @returns The voiceId of the newly created voice
-   */
-  async createClone(sampleUrls: string[], voiceName: string): Promise<string> {
+  async createClone(voiceSamples: Voice): Promise<string> {
     const formData = new FormData();
-    formData.append("name", voiceName);
+    formData.append("name", voiceSamples.uniqueVoiceName);
     formData.append("description", "Cloned voice");
+    formData.append(
+      "voice_settings",
+      JSON.stringify({ stability: 0.75, similarity_boost: 0.75 })
+    );
 
     // Fetch audio files from Firebase Storage URLs
-    for (const url of sampleUrls) {
-      const response = await axios.get(url, { responseType: "arraybuffer" });
+    for (const [index, voiceSample] of voiceSamples.uploadedFiles.entries()) {
+      const response = await axios.get(voiceSample.downloadUrl, {
+        responseType: "arraybuffer",
+      });
       const buffer = Buffer.from(response.data);
+
       formData.append("files", buffer, {
-        filename: "sample.mp3",
+        filename: `sample_${index}.mp3`,
         contentType: "audio/mpeg",
       });
     }
