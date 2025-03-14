@@ -1,10 +1,12 @@
 import {
+  deleteObject,
+  getDownloadURL,
+  listAll,
   ref,
+  type StorageReference,
   uploadBytesResumable,
   type UploadTask,
   type UploadTaskSnapshot,
-  getDownloadURL,
-  type StorageReference,
 } from "firebase/storage";
 import { auth, storage } from "~/firebase/firebase";
 
@@ -108,5 +110,31 @@ export async function uploadVoiceSamples(
   } catch (error) {
     console.error("Error uploading voice samples:", error);
     throw error; // Rethrow the error to the caller
+  }
+}
+
+export async function clearPreviousVoiceSamples(
+  voiceName: string
+): Promise<void> {
+  // Ensure the user is authenticated and email is verified
+  if (!auth.currentUser?.uid || !auth.currentUser?.emailVerified) {
+    throw new Error("User is not authenticated or email is not verified");
+  }
+
+  const userId = auth.currentUser.uid;
+  const folderRef = ref(storage, `users/${userId}/voice-samples/${voiceName}`);
+
+  try {
+    // List all files in the voice samples folder
+    const listResult = await listAll(folderRef);
+
+    // Create array of delete promises
+    const deletePromises = listResult.items.map((item) => deleteObject(item));
+
+    // Wait for all files to be deleted
+    await Promise.all(deletePromises);
+  } catch (error) {
+    console.error("Error clearing previous voice samples:", error);
+    throw error;
   }
 }

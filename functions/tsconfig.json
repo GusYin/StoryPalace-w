@@ -11,5 +11,5 @@
     "target": "es2017"
   },
   "compileOnSave": true,
-  "include": ["src", "../app/routes/add-a-voice/elevenlabs-client.ts"]
+  "include": ["src", "src/elevenlabs-client.ts"]
 }

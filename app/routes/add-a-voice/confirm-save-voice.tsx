@@ -2,6 +2,7 @@ import { useState } from "react";
 import localforage from "localforage";
 import { useNavigate } from "react-router";
 import {
+  clearPreviousVoiceSamples,
   STORAGE_KEY_VOICE_NAME,
   STORAGE_KEY_VOICE_SAMPLES,
   uploadVoiceSamples,
@@ -74,6 +75,9 @@ const ConfirmSaveVoicePage = () => {
     })) as FileToUpload[];
 
     try {
+      // Clear previous uploads - comment out for testing
+      // await clearPreviousVoiceSamples(voiceName);
+
       // Upload all voice samples to firebase storage
       const result = await uploadVoiceSamples(voiceName, fileItems);
       // Ensure progress reaches 100% and stays visible briefly

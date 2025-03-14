@@ -1,6 +1,18 @@
 import axios, { type AxiosInstance } from "axios";
 import FormData from "form-data";
-import type { Voice } from "./add-voice";
+
+// Define the return type for each upload result
+export interface VoiceSample {
+  fileName: string;
+  downloadUrl: string;
+  filePath?: string;
+  contentType?: string;
+}
+
+export interface VoiceToClone {
+  uniqueVoiceName: string;
+  samples: VoiceSample[];
+}
 
 class ElevenLabsClient {
   private api: AxiosInstance;
@@ -18,25 +30,26 @@ class ElevenLabsClient {
     });
   }
 
-  async createClone(voiceSamples: Voice): Promise<string> {
+  async createClone(voiceToClone: VoiceToClone): Promise<string> {
     const formData = new FormData();
-    formData.append("name", voiceSamples.uniqueVoiceName);
+    formData.append("name", voiceToClone.uniqueVoiceName);
     formData.append("description", "Cloned voice");
     formData.append(
       "voice_settings",
-      JSON.stringify({ stability: 0.75, similarity_boost: 0.75 })
+      JSON.stringify({ stability: 0.75, similarity_boost: 0.75 }),
+      { contentType: "application/json" }
     );
 
     // Fetch audio files from Firebase Storage URLs
-    for (const [index, voiceSample] of voiceSamples.uploadedFiles.entries()) {
+    for (const [index, voiceSample] of voiceToClone.samples.entries()) {
       const response = await axios.get(voiceSample.downloadUrl, {
         responseType: "arraybuffer",
       });
       const buffer = Buffer.from(response.data);
 
       formData.append("files", buffer, {
-        filename: `sample_${index}.mp3`,
-        contentType: "audio/mpeg",
+        filename: voiceSample.fileName,
+        contentType: voiceSample.contentType || "audio/wav",
       });
     }
 
@@ -44,7 +57,7 @@ class ElevenLabsClient {
       const response = await this.api.post("/voices/add", formData, {
         headers: formData.getHeaders(),
       });
-      return response.data.voiceId; // Assumes the API returns voiceId
+      return response.data.voice_id; // Assumes the API returns voiceId
     } catch (error) {
       console.error("Error creating voice clone:", error);
       throw error;
