@@ -9,11 +9,13 @@ const db = admin.firestore();
 const storage = getStorage();
 
 // Interface definitions
+// uniqueVoiceName is consisted of the user basefire id and the voice name
 interface VoiceClone {
   userId: string;
-  voiceId: string;
+  uniqueVoiceName: string;
   lastUsed: FirebaseFirestore.Timestamp;
   sampleUrl: string;
+  elevenLabsVoiceId: string; // Added field to store actual API voice ID
 }
 
 interface TTSQuota {
@@ -42,10 +44,9 @@ export const createVoiceClone = functions.https.onCall(async (request) => {
   }
 
   // Validate request data
-  if (
-    !request.data.voiceToClone?.samples ||
-    !request.data.voiceToClone?.uniqueVoiceName
-  ) {
+  const voiceToClone = request.data.voiceToClone as VoiceToClone;
+
+  if (!voiceToClone?.samples || !voiceToClone?.uniqueVoiceName) {
     throw new functions.https.HttpsError(
       "invalid-argument",
       "Missing required voice clone data"
@@ -55,16 +56,13 @@ export const createVoiceClone = functions.https.onCall(async (request) => {
   try {
     const userId = request.auth.uid;
     const elevenLabs = new ElevenLabsClient();
-
-    // 11 labs Creator plan
-    const voiceSlotsLimit = 30;
-    const voiceOperationMonthlyQuota = 95;
-
+    const uniqueVoiceName = voiceToClone.uniqueVoiceName;
     const voiceClonesRef = db.collection("voiceClones");
 
-    // Check existing user voice clone
+    // 1. Check for existing voice with same unique name for this user
     const userVoiceQuery = await voiceClonesRef
       .where("userId", "==", userId)
+      .where("uniqueVoiceName", "==", uniqueVoiceName)
       .limit(1)
       .get();
 
@@ -73,10 +71,26 @@ export const createVoiceClone = functions.https.onCall(async (request) => {
       await voiceClonesRef.doc(userVoiceQuery.docs[0].id).update({
         lastUsed: admin.firestore.FieldValue.serverTimestamp(),
       });
-      return { voiceId: voiceData.voiceId };
+      return { uniqueVoiceName: voiceData.uniqueVoiceName };
     }
 
-    // Check available slots and evict LRU if needed
+    // 2. Check user's voice count
+    const userVoicesQuery = await voiceClonesRef
+      .where("userId", "==", userId)
+      .count()
+      .get();
+
+    if (userVoicesQuery.data().count >= 2) {
+      throw new functions.https.HttpsError(
+        "failed-precondition",
+        "Maximum of 2 voice clones per user"
+      );
+    }
+
+    // 3. Check global slots (original 30-voice limit)
+    // 11labs Creator plan
+    const voiceOperationMonthlyQuota = 95;
+    const voiceSlotsLimit = 30;
     const totalVoices = (await voiceClonesRef.count().get()).data().count;
     if (totalVoices >= voiceSlotsLimit) {
       const lruQuery = await voiceClonesRef
@@ -85,23 +99,26 @@ export const createVoiceClone = functions.https.onCall(async (request) => {
         .get();
 
       const lruVoice = lruQuery.docs[0].data() as VoiceClone;
-      await elevenLabs.deleteVoice(lruVoice.voiceId);
+      // Delete using actual ElevenLabs voice ID
+      await elevenLabs.deleteVoice(lruVoice.elevenLabsVoiceId);
       await voiceClonesRef.doc(lruQuery.docs[0].id).delete();
     }
 
     // Create new voice clone
-    const newVoiceId = await elevenLabs.createClone(
+    const elevenLabsVoiceId = await elevenLabs.createClone(
       request.data.voiceToClone as VoiceToClone
     );
 
+    // Store both identifiers
     await voiceClonesRef.add({
       userId,
-      voiceId: newVoiceId,
+      uniqueVoiceName,
+      elevenLabsVoiceId,
       lastUsed: admin.firestore.FieldValue.serverTimestamp(),
       sampleUrl: request.data.sampleUrl,
     } as VoiceClone);
 
-    return { voiceId: newVoiceId };
+    return { uniqueVoiceName };
   } catch (error) {
     console.error("Error in createVoiceClone:", error);
     throw new functions.https.HttpsError(
@@ -115,10 +132,6 @@ export const createVoiceClone = functions.https.onCall(async (request) => {
 // TTS Quota Management
 // Modified generateTTS function with caching
 export const generateTTS = functions.https.onCall(async (request) => {
-  // 11 labs Creator plan
-  const TTS_MONTHLY_QUOTA_MINUTES = 100;
-  const CHARACTERS_PER_5_MINUTE = 1500;
-
   if (!request.auth?.uid) {
     throw new functions.https.HttpsError(
       "unauthenticated",
@@ -126,24 +139,43 @@ export const generateTTS = functions.https.onCall(async (request) => {
     );
   }
 
-  const elevenLabs = new ElevenLabsClient(); // Instantiate client
+  // 11 labs Creator plan
+  const TTS_MONTHLY_QUOTA_MINUTES = 100;
+  const CHARACTERS_PER_5_MINUTE = 1500;
+
+  const elevenLabs = new ElevenLabsClient();
   const userId = request.auth.uid;
-  const text = request.data.text;
-  const voiceId = request.data.voiceId;
+  const storyText = request.data.text;
+  const storyName = request.data.storyName;
+  const uniqueVoiceName = request.data.uniqueVoiceName;
+
   try {
-    // Create unique hash for the text/voice combination
-    const textHash = createHash("sha256")
-      .update(text + voiceId)
+    // First get the ElevenLabs voice ID from Firestore
+    const voiceDoc = await db
+      .collection("voiceClones")
+      .where("uniqueVoiceName", "==", uniqueVoiceName)
+      .limit(1)
+      .get();
+
+    if (voiceDoc.empty) {
+      throw new Error("Voice not found");
+    }
+
+    const elevenLabsVoiceId = voiceDoc.docs[0].data().elevenLabsVoiceId;
+
+    // Create unique hash for the storyName/voice combination
+    const storyNameAndVoiceHash = createHash("sha256")
+      .update(storyName + uniqueVoiceName)
       .digest("hex");
 
-    const estimatedMinutes = text.length / CHARACTERS_PER_5_MINUTE;
+    const estimatedMinutes = storyText.length / CHARACTERS_PER_5_MINUTE;
     const ttsAudioRef = db.collection("ttsAudio");
     const quotaRef = db.collection("ttsQuota").doc("monthlyUsage");
 
     // Check for existing audio first
     const existingAudio = await ttsAudioRef
-      .where("textHash", "==", textHash)
-      .where("voiceId", "==", voiceId)
+      .where("storyNameAndVoiceHash", "==", storyNameAndVoiceHash)
+      .where("uniqueVoiceName", "==", uniqueVoiceName)
       .where("userId", "==", userId)
       .limit(1)
       .get();
@@ -169,19 +201,22 @@ export const generateTTS = functions.https.onCall(async (request) => {
       }
 
       // Generate audio
-      const audioBuffer = await elevenLabs.generateTTS(text, voiceId);
+      const audioBuffer = await elevenLabs.generateTTS(
+        storyText,
+        elevenLabsVoiceId
+      );
 
       // Upload to storage
-      const filePath = `tts/${userId}/${textHash}-${voiceId}.mp3`;
+      const filePath = `tts/${userId}/${storyName}/${storyNameAndVoiceHash}.mp3`;
       const file = storage.bucket().file(filePath);
 
       await file.save(audioBuffer, {
         metadata: {
           contentType: "audio/mpeg",
           metadata: {
-            userId,
-            voiceId,
-            originalTextHash: textHash,
+            userEmail: request.auth?.token.email,
+            userDisplayName: request.auth?.token.name,
+            voiceName: uniqueVoiceName,
           },
         },
       });
@@ -195,8 +230,8 @@ export const generateTTS = functions.https.onCall(async (request) => {
       // Create audio document
       const audioDoc: TTSAudio = {
         userId,
-        textHash,
-        voiceId,
+        textHash: storyNameAndVoiceHash,
+        voiceId: uniqueVoiceName,
         storagePath: filePath,
         url,
         duration: estimatedMinutes * 60, // Convert to seconds
