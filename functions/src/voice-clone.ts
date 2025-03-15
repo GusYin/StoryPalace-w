@@ -1,20 +1,18 @@
 import * as functions from "firebase-functions/v2";
 import * as admin from "firebase-admin";
-import { getStorage } from "firebase-admin/storage";
 import { createHash } from "crypto";
-import ElevenLabsClient, { VoiceToClone } from "./elevenlabs-client";
+import ElevenLabsClient, { VoiceSample } from "./elevenlabs-client";
 
 admin.initializeApp();
 const db = admin.firestore();
-const storage = getStorage();
+const bucket = admin.storage().bucket();
 
 // Interface definitions
-// uniqueVoiceName is consisted of the user basefire id and the voice name
+// uniqueVoiceName is consisted of the user id and the voice name
 interface VoiceClone {
   userId: string;
-  uniqueVoiceName: string;
+  voiceName: string;
   lastUsed: FirebaseFirestore.Timestamp;
-  sampleUrl: string;
   elevenLabsVoiceId: string; // Added field to store actual API voice ID
 }
 
@@ -44,9 +42,7 @@ export const createVoiceClone = functions.https.onCall(async (request) => {
   }
 
   // Validate request data
-  const voiceToClone = request.data.voiceToClone as VoiceToClone;
-
-  if (!voiceToClone?.samples || !voiceToClone?.uniqueVoiceName) {
+  if (!request.data.voiceName) {
     throw new functions.https.HttpsError(
       "invalid-argument",
       "Missing required voice clone data"
@@ -56,13 +52,13 @@ export const createVoiceClone = functions.https.onCall(async (request) => {
   try {
     const userId = request.auth.uid;
     const elevenLabs = new ElevenLabsClient();
-    const uniqueVoiceName = voiceToClone.uniqueVoiceName;
+    const voiceName = request.data.voiceName;
     const voiceClonesRef = db.collection("voiceClones");
 
-    // 1. Check for existing voice with same unique name for this user
+    // 1. Check for existing voice with unique voice name for this user
     const userVoiceQuery = await voiceClonesRef
       .where("userId", "==", userId)
-      .where("uniqueVoiceName", "==", uniqueVoiceName)
+      .where("voiceName", "==", voiceName)
       .limit(1)
       .get();
 
@@ -71,7 +67,7 @@ export const createVoiceClone = functions.https.onCall(async (request) => {
       await voiceClonesRef.doc(userVoiceQuery.docs[0].id).update({
         lastUsed: admin.firestore.FieldValue.serverTimestamp(),
       });
-      return { uniqueVoiceName: voiceData.uniqueVoiceName };
+      return { voiceName: voiceData.voiceName };
     }
 
     // 2. Check user's voice count
@@ -87,11 +83,40 @@ export const createVoiceClone = functions.https.onCall(async (request) => {
       );
     }
 
-    // 3. Check global slots (original 30-voice limit)
+    // 3. Fetch voice samples from Firebase Storage
+    const prefix = `users/${userId}/voice-samples/${voiceName}`;
+    const [files] = await bucket.getFiles({ prefix });
+
+    const samples: VoiceSample[] = [];
+    for (const file of files) {
+      // Get download URL that works without authentication
+      // The Admin SDK bypasses security rules by default
+      const [downloadUrl] = await file.getSignedUrl({
+        action: "read",
+        expires: Date.now() + 15 * 60 * 1000, // 15 minutes
+        version: "v4", // Always use v4 signed URLs
+      });
+
+      samples.push({
+        fileName: file.name,
+        downloadUrl: downloadUrl,
+        contentType: file.metadata.contentType || "audio/wav",
+      });
+    }
+
+    if (samples.length === 0) {
+      throw new functions.https.HttpsError(
+        "invalid-argument",
+        `No voice samples found for the given ${voiceName}`
+      );
+    }
+
+    // 4. Check global slots (original 30-voice limit)
     // 11labs Creator plan
     const voiceOperationMonthlyQuota = 95;
     const voiceSlotsLimit = 30;
     const totalVoices = (await voiceClonesRef.count().get()).data().count;
+
     if (totalVoices >= voiceSlotsLimit) {
       const lruQuery = await voiceClonesRef
         .orderBy("lastUsed", "asc")
@@ -105,20 +130,20 @@ export const createVoiceClone = functions.https.onCall(async (request) => {
     }
 
     // Create new voice clone
-    const elevenLabsVoiceId = await elevenLabs.createClone(
-      request.data.voiceToClone as VoiceToClone
-    );
+    const elevenLabsVoiceId = await elevenLabs.createClone({
+      uniqueVoiceName: voiceName,
+      samples,
+    });
 
-    // Store both identifiers
+    // Store voice clone data in Firestore
     await voiceClonesRef.add({
       userId,
-      uniqueVoiceName,
+      voiceName,
       elevenLabsVoiceId,
       lastUsed: admin.firestore.FieldValue.serverTimestamp(),
-      sampleUrl: request.data.sampleUrl,
     } as VoiceClone);
 
-    return { uniqueVoiceName };
+    return { voiceName };
   } catch (error) {
     console.error("Error in createVoiceClone:", error);
     throw new functions.https.HttpsError(
@@ -208,7 +233,7 @@ export const generateTTS = functions.https.onCall(async (request) => {
 
       // Upload to storage
       const filePath = `tts/${userId}/${storyName}/${storyNameAndVoiceHash}.mp3`;
-      const file = storage.bucket().file(filePath);
+      const file = bucket.file(filePath);
 
       await file.save(audioBuffer, {
         metadata: {
@@ -225,6 +250,7 @@ export const generateTTS = functions.https.onCall(async (request) => {
       const [url] = await file.getSignedUrl({
         action: "read",
         expires: "2040-01-01", // Valid ISO 8601 format
+        version: "v4", // Always use v4 signed URLs
       });
 
       // Create audio document

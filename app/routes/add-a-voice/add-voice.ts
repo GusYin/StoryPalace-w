@@ -28,15 +28,16 @@ export interface FileToUpload {
 }
 
 // Define the return type for each upload result
-export interface UploadResultForEachFile {
+export interface UploadResultForEachVoiceSample {
   fileName?: string;
-  filePath?: string;
   downloadUrl: string;
+  filePath: string;
+  contentType?: string;
 }
 
-export interface Voice {
+export interface VoiceSampled {
   uniqueVoiceName: string;
-  uploadedFiles: UploadResultForEachFile[];
+  uploadedFiles: UploadResultForEachVoiceSample[];
 }
 
 // Helper function to upload a single file and return UploadResult
@@ -44,7 +45,7 @@ async function uploadSingleFile(
   uploadTask: UploadTask,
   fileRef: StorageReference,
   filePath: string
-): Promise<UploadResultForEachFile> {
+): Promise<UploadResultForEachVoiceSample> {
   await uploadTask;
   const downloadUrl = await getDownloadURL(fileRef);
   return { filePath, downloadUrl };
@@ -53,14 +54,14 @@ async function uploadSingleFile(
 export async function uploadVoiceSamples(
   voiceName: string,
   items: FileToUpload[]
-): Promise<Voice> {
+): Promise<VoiceSampled> {
   // Ensure the user is authenticated and email is verified
   if (!auth.currentUser?.uid || !auth.currentUser?.emailVerified) {
     throw new Error("User is not authenticated or email is not verified");
   }
 
   const userId = auth.currentUser.uid;
-  const uploadPromises: Promise<UploadResultForEachFile>[] = [];
+  const uploadPromises: Promise<UploadResultForEachVoiceSample>[] = [];
 
   try {
     // Process each file in the array

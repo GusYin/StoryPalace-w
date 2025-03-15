@@ -1,12 +1,10 @@
 import axios, { type AxiosInstance } from "axios";
 import FormData from "form-data";
 
-// Define the return type for each upload result
 export interface VoiceSample {
   fileName: string;
   downloadUrl: string;
-  filePath?: string;
-  contentType?: string;
+  contentType: string;
 }
 
 export interface VoiceToClone {
@@ -49,7 +47,7 @@ class ElevenLabsClient {
 
       formData.append("files", buffer, {
         filename: voiceSample.fileName,
-        contentType: voiceSample.contentType || "audio/wav",
+        contentType: voiceSample.contentType,
       });
     }
 
