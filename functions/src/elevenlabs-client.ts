@@ -1,5 +1,6 @@
-import axios, { type AxiosInstance } from "axios";
-import FormData from "form-data";
+import { ElevenLabsClient } from "elevenlabs";
+import axios from "axios";
+import { Readable } from "stream";
 
 export interface VoiceSample {
   fileName: string;
@@ -8,97 +9,78 @@ export interface VoiceSample {
 }
 
 export interface VoiceToClone {
-  uniqueVoiceName: string;
+  voiceName: string;
   samples: VoiceSample[];
 }
 
-class ElevenLabsClient {
-  private api: AxiosInstance;
+class ElevenLabsSDK {
+  private client: ElevenLabsClient;
 
   constructor() {
     if (!process.env.ELEVENLABS_API_KEY) {
       throw new Error("ELEVENLABS_API_KEY is not set");
     }
 
-    this.api = axios.create({
-      baseURL: "https://api.elevenlabs.io/v1",
-      headers: {
-        "xi-api-key": process.env.ELEVENLABS_API_KEY,
-      },
+    this.client = new ElevenLabsClient({
+      apiKey: process.env.ELEVENLABS_API_KEY,
     });
   }
 
   async createClone(voiceToClone: VoiceToClone): Promise<string> {
-    const formData = new FormData();
-    formData.append("name", voiceToClone.uniqueVoiceName);
-    formData.append("description", "Cloned voice");
-    formData.append(
-      "voice_settings",
-      JSON.stringify({ stability: 0.75, similarity_boost: 0.75 }),
-      { contentType: "application/json" }
+    // Fetch audio files from URLs and convert to Buffers
+    const files = await Promise.all(
+      voiceToClone.samples.map(async (sample) => {
+        const response = await axios.get(sample.downloadUrl, {
+          responseType: "arraybuffer",
+        });
+        return new Blob([response.data], { type: sample.contentType });
+      })
     );
 
-    // Fetch audio files from Firebase Storage URLs
-    for (const [index, voiceSample] of voiceToClone.samples.entries()) {
-      const response = await axios.get(voiceSample.downloadUrl, {
-        responseType: "arraybuffer",
-      });
-      const buffer = Buffer.from(response.data);
+    const voice = await this.client.voices.add({
+      name: voiceToClone.voiceName,
+      files,
+    });
 
-      formData.append("files", buffer, {
-        filename: voiceSample.fileName,
-        contentType: voiceSample.contentType,
-      });
-    }
-
-    try {
-      const response = await this.api.post("/voices/add", formData, {
-        headers: formData.getHeaders(),
-      });
-      return response.data.voice_id; // Assumes the API returns voiceId
-    } catch (error) {
-      console.error("Error creating voice clone:", error);
-      throw error;
-    }
+    return voice.voice_id;
   }
 
-  /**
-   * Deletes a voice by its ID
-   * @param voiceId The ID of the voice to delete
-   */
+  async getVoice(voiceId: string) {
+    return await this.client.voices.get(voiceId);
+  }
+
   async deleteVoice(voiceId: string): Promise<void> {
-    try {
-      await this.api.delete(`/voices/${voiceId}`);
-    } catch (error) {
-      console.error("Error deleting voice:", error);
-      throw error;
-    }
+    await this.client.voices.delete(voiceId);
   }
 
-  /**
-   * Generates text-to-speech audio using a specified voice
-   * @param text The text to convert to speech
-   * @param voiceId The ID of the voice to use
-   * @returns Buffer containing the generated audio
-   */
   async generateTTS(text: string, voiceId: string): Promise<Buffer> {
-    try {
-      const response = await this.api.post(
-        `/text-to-speech/${voiceId}`,
-        {
-          text,
-          // Optional: Add model_id, voice_settings, etc., as needed
-        },
-        {
-          responseType: "arraybuffer",
-        }
-      );
-      return Buffer.from(response.data);
-    } catch (error) {
-      console.error("Error generating TTS:", error);
-      throw error;
-    }
+    const audio = await this.client.textToSpeech.convert(voiceId, {
+      text,
+      // MP3 with 192kbps bitrate requires you to be subscribed to Creator tier
+      // or above. PCM with 44.1kHz sample rate requires you to be subscribed
+      // to Pro tier or above.
+      output_format: "mp3_44100_128",
+      model_id: "eleven_multilingual_v2",
+      voice_settings: {
+        stability: 0.75,
+        similarity_boost: 0.75,
+      },
+    });
+
+    // Convert Readable stream to Buffer
+    const buffer = await this.streamToBuffer(audio);
+
+    return buffer;
+  }
+
+  private async streamToBuffer(stream: Readable): Promise<Buffer> {
+    return new Promise((resolve, reject) => {
+      const chunks: Buffer[] = [];
+      stream.on("data", (chunk) => chunks.push(chunk));
+      stream.on("error", reject);
+      stream.on("end", () => resolve(Buffer.concat(chunks)));
+    });
   }
 }
 
-export default ElevenLabsClient;
+export default ElevenLabsSDK;

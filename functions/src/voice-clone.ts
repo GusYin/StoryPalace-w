@@ -1,7 +1,9 @@
 import * as functions from "firebase-functions/v2";
 import * as admin from "firebase-admin";
 import { createHash } from "crypto";
-import ElevenLabsClient, { VoiceSample } from "./elevenlabs-client";
+import ElevenLabsClientBespoke, {
+  VoiceSample,
+} from "./elevenlabs-client-bespoke";
 
 admin.initializeApp();
 const db = admin.firestore();
@@ -51,7 +53,7 @@ export const createVoiceClone = functions.https.onCall(async (request) => {
 
   try {
     const userId = request.auth.uid;
-    const elevenLabs = new ElevenLabsClient();
+    const elevenLabs = new ElevenLabsClientBespoke();
     const voiceName = request.data.voiceName;
     const voiceClonesRef = db.collection("voiceClones");
 
@@ -168,7 +170,7 @@ export const generateTTS = functions.https.onCall(async (request) => {
   const TTS_MONTHLY_QUOTA_MINUTES = 100;
   const CHARACTERS_PER_5_MINUTE = 1500;
 
-  const elevenLabs = new ElevenLabsClient();
+  const elevenLabs = new ElevenLabsClientBespoke();
   const userId = request.auth.uid;
   const storyText = request.data.text;
   const storyName = request.data.storyName;
