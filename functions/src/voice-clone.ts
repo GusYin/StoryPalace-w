@@ -1,16 +1,12 @@
 import * as functions from "firebase-functions/v2";
 import * as admin from "firebase-admin";
 import { createHash } from "crypto";
-import ElevenLabsClientBespoke, {
-  VoiceSample,
-} from "./elevenlabs-client-bespoke";
+import ElevenLabsClientBespoke, { VoiceSample } from "./elevenlabs-client";
 
 admin.initializeApp();
 const db = admin.firestore();
 const bucket = admin.storage().bucket();
 
-// Interface definitions
-// uniqueVoiceName is consisted of the user id and the voice name
 interface VoiceClone {
   userId: string;
   voiceName: string;
@@ -23,14 +19,14 @@ interface TTSQuota {
   lastReset: FirebaseFirestore.Timestamp;
 }
 
-// New interface for TTS audio metadata
+// TTS audio doc in Firestore
 interface TTSAudio {
   userId: string;
-  textHash: string;
-  voiceId: string;
+  storyNameAndVoiceHash: string;
+  voiceName: string;
   storagePath: string;
   url: string;
-  duration: number;
+  estimatedDuration: number;
   createdAt: admin.firestore.Timestamp;
 }
 
@@ -57,7 +53,7 @@ export const createVoiceClone = functions.https.onCall(async (request) => {
     const voiceName = request.data.voiceName;
     const voiceClonesRef = db.collection("voiceClones");
 
-    // 1. Check for existing voice with unique voice name for this user
+    // 1. Check for existing voice with voice name for this user
     const userVoiceQuery = await voiceClonesRef
       .where("userId", "==", userId)
       .where("voiceName", "==", voiceName)
@@ -133,7 +129,7 @@ export const createVoiceClone = functions.https.onCall(async (request) => {
 
     // Create new voice clone
     const elevenLabsVoiceId = await elevenLabs.createClone({
-      uniqueVoiceName: voiceName,
+      voiceName,
       samples,
     });
 
@@ -174,13 +170,14 @@ export const generateTTS = functions.https.onCall(async (request) => {
   const userId = request.auth.uid;
   const storyText = request.data.text;
   const storyName = request.data.storyName;
-  const uniqueVoiceName = request.data.uniqueVoiceName;
+  const voiceName = request.data.voiceName;
 
   try {
     // First get the ElevenLabs voice ID from Firestore
     const voiceDoc = await db
       .collection("voiceClones")
-      .where("uniqueVoiceName", "==", uniqueVoiceName)
+      .where("userId", "==", userId)
+      .where("voiceName", "==", voiceName)
       .limit(1)
       .get();
 
@@ -192,7 +189,7 @@ export const generateTTS = functions.https.onCall(async (request) => {
 
     // Create unique hash for the storyName/voice combination
     const storyNameAndVoiceHash = createHash("sha256")
-      .update(storyName + uniqueVoiceName)
+      .update(storyName + voiceName)
       .digest("hex");
 
     const estimatedMinutes = storyText.length / CHARACTERS_PER_5_MINUTE;
@@ -202,7 +199,7 @@ export const generateTTS = functions.https.onCall(async (request) => {
     // Check for existing audio first
     const existingAudio = await ttsAudioRef
       .where("storyNameAndVoiceHash", "==", storyNameAndVoiceHash)
-      .where("uniqueVoiceName", "==", uniqueVoiceName)
+      .where("voiceName", "==", voiceName)
       .where("userId", "==", userId)
       .limit(1)
       .get();
@@ -234,8 +231,8 @@ export const generateTTS = functions.https.onCall(async (request) => {
       );
 
       // Upload to storage
-      const filePath = `tts/${userId}/${storyName}/${storyNameAndVoiceHash}.mp3`;
-      const file = bucket.file(filePath);
+      const storagePath = `tts/${userId}/${storyName}/${storyNameAndVoiceHash}.mp3`;
+      const file = bucket.file(storagePath);
 
       await file.save(audioBuffer, {
         metadata: {
@@ -243,7 +240,7 @@ export const generateTTS = functions.https.onCall(async (request) => {
           metadata: {
             userEmail: request.auth?.token.email,
             userDisplayName: request.auth?.token.name,
-            voiceName: uniqueVoiceName,
+            voiceName,
           },
         },
       });
@@ -258,11 +255,11 @@ export const generateTTS = functions.https.onCall(async (request) => {
       // Create audio document
       const audioDoc: TTSAudio = {
         userId,
-        textHash: storyNameAndVoiceHash,
-        voiceId: uniqueVoiceName,
-        storagePath: filePath,
+        storyNameAndVoiceHash,
+        voiceName,
+        storagePath,
         url,
-        duration: estimatedMinutes * 60, // Convert to seconds
+        estimatedDuration: estimatedMinutes * 60, // Convert to seconds
         createdAt: admin.firestore.Timestamp.now(),
       };
 
@@ -314,3 +311,38 @@ export const resetTTSUsage = functions.scheduler.onSchedule(
     }
   }
 );
+
+export const getExistingVoices = functions.https.onCall(async (request) => {
+  if (!request.auth?.uid || !request.auth?.token?.email_verified) {
+    throw new functions.https.HttpsError(
+      "unauthenticated",
+      "Authentication and email verified required"
+    );
+  }
+
+  try {
+    const userId = request.auth.uid;
+    const voiceClonesRef = db.collection("voiceClones");
+    const snapshot = await voiceClonesRef
+      .where("userId", "==", userId)
+      .orderBy("lastUsed", "desc")
+      .get();
+
+    const voices = snapshot.docs.map((doc) => {
+      const data = doc.data() as VoiceClone;
+      return {
+        voiceName: data.voiceName,
+        lastUsed: data.lastUsed.toDate(), // Convert Firestore Timestamp to JS Date
+      };
+    });
+
+    return { voices };
+  } catch (error) {
+    console.error("Error fetching existing voices:", error);
+    throw new functions.https.HttpsError(
+      "internal",
+      "Failed to retrieve voices",
+      error instanceof Error ? error.message : undefined
+    );
+  }
+});
