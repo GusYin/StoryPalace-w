@@ -9,6 +9,7 @@ const NameYourVoicePage = () => {
   const navigate = useNavigate();
   const [voiceName, setVoiceName] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [terminatingError, setTerminatingError] = useState(false);
   const [existingVoices, setExistingVoices] = useState<
     Array<{ voiceName: string }>
   >([]);
@@ -42,6 +43,7 @@ const NameYourVoicePage = () => {
         setError(
           "Failed to load existing voices. Please refresh to try again."
         );
+        setTerminatingError(true);
       } finally {
         setIsLoadingVoices(false);
       }
@@ -145,10 +147,16 @@ const NameYourVoicePage = () => {
               Cancel
             </button>
             <button
-              disabled={isLoadingVoices || existingVoices.length >= 2}
+              disabled={
+                terminatingError ||
+                isLoadingVoices ||
+                existingVoices.length >= 2
+              }
               onClick={handleOnNext}
               className={`font-bold text-xl w-52 h-14 text-white rounded-3xl px-6 py-2 transition-colors ${
-                isLoadingVoices || existingVoices.length >= 2
+                terminatingError ||
+                isLoadingVoices ||
+                existingVoices.length >= 2
                   ? "bg-gray-400 cursor-not-allowed"
                   : "bg-black hover:bg-blue-700"
               }`}
