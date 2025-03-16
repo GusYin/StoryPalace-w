@@ -9,17 +9,15 @@ const NameYourVoicePage = () => {
   const navigate = useNavigate();
   const [voiceName, setVoiceName] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [terminatingError, setTerminatingError] = useState(false);
+  const [terminationError, setTerminationError] = useState(false);
   const [existingVoices, setExistingVoices] = useState<
     Array<{ voiceName: string }>
   >([]);
   const [isLoadingVoices, setIsLoadingVoices] = useState(true);
 
   useEffect(() => {
-    localforage.getItem(STORAGE_KEY_VOICE_NAME).then((name) => {
-      if (name) {
-        setVoiceName(name as string);
-      }
+    localforage.getItem<string>(STORAGE_KEY_VOICE_NAME).then((name) => {
+      name && setVoiceName(name);
     });
 
     // Fetch existing voices on component mount
@@ -43,7 +41,7 @@ const NameYourVoicePage = () => {
         setError(
           "Failed to load existing voices. Please refresh to try again."
         );
-        setTerminatingError(true);
+        setTerminationError(true);
       } finally {
         setIsLoadingVoices(false);
       }
@@ -148,13 +146,13 @@ const NameYourVoicePage = () => {
             </button>
             <button
               disabled={
-                terminatingError ||
+                terminationError ||
                 isLoadingVoices ||
                 existingVoices.length >= 2
               }
               onClick={handleOnNext}
               className={`font-bold text-xl w-52 h-14 text-white rounded-3xl px-6 py-2 transition-colors ${
-                terminatingError ||
+                terminationError ||
                 isLoadingVoices ||
                 existingVoices.length >= 2
                   ? "bg-gray-400 cursor-not-allowed"
