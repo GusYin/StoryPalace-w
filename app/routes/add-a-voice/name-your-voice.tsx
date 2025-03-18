@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import localforage from "localforage";
 import { useNavigate } from "react-router";
 import { STORAGE_KEY_VOICE_NAME } from "./add-voice";
-import { getFunctions, httpsCallable } from "firebase/functions";
+import { httpsCallable } from "firebase/functions";
 import { functions } from "~/firebase/firebase";
 
 const NameYourVoicePage = () => {
