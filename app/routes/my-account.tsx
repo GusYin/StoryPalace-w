@@ -19,14 +19,12 @@ const MyAccount: React.FC = () => {
 
         {/* Plan Section */}
         <div className="bg-white p-6 rounded-lg shadow-sm">
-          <div className="flex justify-between items-start">
-            <h3 className="font-semibold text-lg">YOUR PLAN</h3>
-            <div className="flex items-center gap-4">
-              <span className="text-gray-600">Story Palace Free</span>
-              <button className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors">
-                Upgrade plan
-              </button>
-            </div>
+          <h3 className="font-semibold text-lg mb-4">YOUR PLAN</h3>
+          <div className="flex justify-between items-center">
+            <span className="text-gray-600">Story Palace Free</span>
+            <button className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors">
+              Upgrade plan
+            </button>
           </div>
         </div>
 
