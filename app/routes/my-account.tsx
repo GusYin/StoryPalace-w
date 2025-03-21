@@ -30,30 +30,32 @@ const MyAccount: React.FC = () => {
               Story Palace Free
             </span>
           </div>
-          <button className="w-full sm:w-auto md:w-80 bg-custom-teal text-white px-4 py-2 rounded-3xl hover:bg-blue-600 transition-colors">
+          <button className="w-full sm:w-auto md:w-80 bg-custom-teal text-white px-3 py-3 rounded-3xl hover:bg-blue-600 transition-colors">
             Upgrade plan
           </button>
         </div>
 
         {/* Account Settings */}
         <div className="bg-[#F3F7F6] p-6 rounded-lg shadow-sm">
-          <h3 className="font-semibold text-lg mb-6">ACCOUNT SETTINGS</h3>
-          <div className="space-y-6">
-            <div>
-              <label className="text-sm text-gray-500 block">Name</label>
-              <div className="text-gray-900 mt-1">{user.name}</div>
+          <h3 className="text-[#707978] font-medium text-xl mb-3">
+            ACCOUNT SETTINGS
+          </h3>
+          <div className="space-y-8">
+            <div className="text-xl">
+              <label className="text-black block">Name</label>
+              <div className="text-[#707978] mt-1">{user.name}</div>
             </div>
-            <div>
-              <label className="text-sm text-gray-500 block">
-                Email Address
-              </label>
-              <div className="text-gray-900 mt-1">{user.email}</div>
+            <div className="text-xl">
+              <label className="text-black block">Email Address</label>
+              <div className="text-[#707978] mt-1">{user.email}</div>
             </div>
-            <div>
-              <label className="text-sm text-gray-500 block">Password</label>
-              <div className="flex justify-between items-center mt-1">
-                <span className="text-gray-900">**********</span>
-                <button className="text-blue-500 hover:text-blue-600">
+            <div className="flex justify-between items-center mt-1">
+              <div>
+                <label className="text-xl text-black block">Password</label>
+                <div className="text-[#707978] mt-1">**********</div>
+              </div>
+              <div>
+                <button className="border border-[#829793] px-3 py-3 rounded-3xl w-auto bg-white text-black hover:text-blue-600 transition-colors">
                   Change Password
                 </button>
               </div>
