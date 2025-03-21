@@ -64,15 +64,15 @@ const MyAccount: React.FC = () => {
         </div>
 
         {/* Actions Section */}
-        <div className="bg-white p-6 rounded-lg shadow-sm space-y-4 pl-0">
-          <button className="text-left py-2 px-4 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+        <div className="bg-white p-6 shadow-sm space-y-16 pl-0">
+          <button className="w-[200px] text-black py-3 px-3 border border-[#829793] rounded-3xl hover:bg-gray-50 transition-colors">
             Log out
           </button>
-          <div className="border-t pt-4">
-            <button className="text-red-600 hover:text-red-700 px-4 py-2 border border-red-600 rounded-md hover:bg-red-50 transition-colors">
+          <div className="">
+            <button className="w-[200px] text-[#EF4444] hover:text-red-700 px-4 py-2 border border-[#EF4444] rounded-3xl hover:bg-red-50 transition-colors">
               Delete Account
             </button>
-            <p className="text-sm text-gray-500 mt-2">
+            <p className="text-lg text-[#707978] mt-2">
               Deleting your account is permanent.
             </p>
           </div>
