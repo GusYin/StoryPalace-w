@@ -10,15 +10,15 @@ const MyAccount: React.FC = () => {
   return (
     <div className="min-h-screen bg-white">
       <AuthHeader />
-      <div className="max-w-2xl mx-auto space-y-8 p-4">
+      <div className="font-dosis max-w-2xl mx-auto space-y-8 p-4">
         {/* Combined Title and Welcome Section */}
-        <div className="bg-white p-6 rounded-lg shadow-sm space-y-4">
-          <h1 className="text-3xl font-bold text-gray-900">MY ACCOUNT</h1>
-          <h2 className="text-xl font-semibold">Welcome back, {user.name}!</h2>
+        <div className="text-black font-semibold tracking-[3%] bg-white p-6 space-y-5">
+          <div className="text-xl ">MY ACCOUNT</div>
+          <h2 className="font-fraunces text-4xl">Welcome back, {user.name}!</h2>
         </div>
 
         {/* Plan Section */}
-        <div className="bg-white p-6 rounded-lg shadow-sm">
+        <div className="bg-[#F3F7F6] mt-3 p-6 rounded-lg shadow-sm">
           <h3 className="font-semibold text-lg mb-4">YOUR PLAN</h3>
           <div className="flex justify-between items-center">
             <span className="text-gray-600">Story Palace Free</span>
