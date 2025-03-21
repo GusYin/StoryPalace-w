@@ -1,8 +1,10 @@
-export const StoryPalaceLogo = () => (
+export const StoryPalaceLogoWithText = ({
+  className,
+  ...props
+}: React.SVGProps<SVGSVGElement>) => (
   <svg
-    className="w-35 h-35"
-    width="250"
-    height="35"
+    {...props}
+    className={className}
     viewBox="0 0 250 35"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"

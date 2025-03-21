@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router";
-import { StoryPalaceLogo } from "./icons/story-palace-logo";
+import { StoryPalaceLogoWithText } from "./icons/story-palace-logo";
 import { StoryPalaceLogoNoText } from "./icons/story-palace-logo-no-text";
 
 const AuthHeader = () => {
@@ -9,12 +9,21 @@ const AuthHeader = () => {
     <>
       {/* Sticky Navigation Bar */}
       <nav className="shadow-[0_4px_20px_0_rgba(0,0,0,0.05)] sticky h-[64px] top-0 bg-white shadow-sm z-50 relative font-dosis text-sm font-[700]">
+        {/* Responsive Logo */}
         {/* Left-aligned Logo */}
         <button
-          className="absolute top-1/2 -translate-y-1/2"
+          className="absolute top-1/2 -translate-y-1/2 left-4 md:left-8"
           onClick={() => navigate("/")}
         >
-          <StoryPalaceLogo />
+          {/* Mobile logo (visible on small screens) */}
+          <span className="block md:hidden">
+            <StoryPalaceLogoNoText className="h-8 w-auto" />
+          </span>
+
+          {/* Desktop logo (visible on medium screens and up) */}
+          <span className="hidden md:block">
+            <StoryPalaceLogoWithText className="h-8 w-auto" />
+          </span>
         </button>
 
         {/* Right-aligned Auth Buttons */}

@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router";
-import { StoryPalaceLogo } from "./icons/story-palace-logo";
+import { StoryPalaceLogoWithText } from "./icons/story-palace-logo";
 import { getAuth } from "firebase/auth";
 
 const UnauthHeader = () => {
@@ -34,7 +34,7 @@ const UnauthHeader = () => {
           className="absolute top-1/2 -translate-y-1/2"
           onClick={() => navigate("/")}
         >
-          <StoryPalaceLogo />
+          <StoryPalaceLogoWithText />
         </button>
 
         {/* Right-aligned Auth Buttons */}

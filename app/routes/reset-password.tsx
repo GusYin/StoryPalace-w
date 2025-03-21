@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { StoryPalaceLogo } from "~/components/icons/story-palace-logo";
+import { StoryPalaceLogoWithText } from "~/components/icons/story-palace-logo";
 import UnauthHeader from "~/components/unauth-header";
 import { sendPasswordResetLinkToEmail } from "~/firebase/firebase";
 
