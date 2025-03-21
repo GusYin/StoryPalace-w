@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router";
 import { StoryPalaceLogo } from "./icons/story-palace-logo";
+import { StoryPalaceLogoNoText } from "./icons/story-palace-logo-no-text";
 
 const AuthHeader = () => {
   const navigate = useNavigate();
