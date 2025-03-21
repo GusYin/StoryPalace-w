@@ -10,7 +10,7 @@ const MyAccount: React.FC = () => {
   return (
     <div className="min-h-screen bg-white">
       <AuthHeader />
-      <div className="font-dosis max-w-2xl mx-auto space-y-8 p-4">
+      <div className="font-dosis w-full mx-auto space-y-8 mt-14 px-20">
         {/* Combined Title and Welcome Section */}
         <div className="text-black tracking-[3%] bg-white p-6 space-y-5 mb-[46px] pl-0">
           <div className="text-xl font-medium">MY ACCOUNT</div>
@@ -30,7 +30,7 @@ const MyAccount: React.FC = () => {
               Story Palace Free
             </span>
           </div>
-          <button className="w-full sm:w-auto bg-custom-teal text-white px-4 py-2 rounded-3xl hover:bg-blue-600 transition-colors">
+          <button className="w-full sm:w-auto md:w-80 bg-custom-teal text-white px-4 py-2 rounded-3xl hover:bg-blue-600 transition-colors">
             Upgrade plan
           </button>
         </div>
