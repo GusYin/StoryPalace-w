@@ -12,7 +12,7 @@ const MyAccount: React.FC = () => {
       <AuthHeader />
       <div className="font-dosis max-w-2xl mx-auto space-y-8 p-4">
         {/* Combined Title and Welcome Section */}
-        <div className="text-black font-semibold tracking-[3%] bg-white p-6 space-y-5 mb-[46px]">
+        <div className="text-black font-semibold tracking-[3%] bg-white p-6 space-y-5 mb-[46px] pl-0">
           <div className="text-xl">MY ACCOUNT</div>
           <h2 className="font-fraunces text-4xl">Welcome back, {user.name}!</h2>
         </div>
@@ -55,7 +55,7 @@ const MyAccount: React.FC = () => {
         </div>
 
         {/* Actions Section */}
-        <div className="bg-white p-6 rounded-lg shadow-sm space-y-4">
+        <div className="bg-white p-6 rounded-lg shadow-sm space-y-4 pl-0">
           <button className="text-left py-2 px-4 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
             Log out
           </button>
