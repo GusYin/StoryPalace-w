@@ -1,14 +1,7 @@
 import { useNavigate } from "react-router";
 import { StoryPalaceLogo } from "./icons/story-palace-logo";
-import { logout } from "~/firebase/firebase";
 
 const AuthHeader = () => {
-  const doLogout = async () => {
-    logout()
-      .then(() => navigate("/"))
-      .catch((err) => console.error(err));
-  };
-
   const navigate = useNavigate();
 
   return (
@@ -23,16 +16,13 @@ const AuthHeader = () => {
           <StoryPalaceLogo />
         </button>
 
-        {/* Centered Navigation Buttons */}
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex space-x-8">
-          <button className="hover:text-blue-600">Library</button>
-          <button className="hover:text-blue-600">Story Player</button>
-        </div>
-
         {/* Right-aligned Auth Buttons */}
         <div className="absolute right-8 top-1/2 -translate-y-1/2 flex space-x-4 items-center">
-          <button onClick={doLogout} className="hover:text-blue-600">
-            Logout
+          <button
+            onClick={() => navigate("/library")}
+            className="hover:text-blue-600"
+          >
+            Library
           </button>
           <button
             type="button"
