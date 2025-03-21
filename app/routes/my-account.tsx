@@ -12,20 +12,27 @@ const MyAccount: React.FC = () => {
       <AuthHeader />
       <div className="font-dosis max-w-2xl mx-auto space-y-8 p-4">
         {/* Combined Title and Welcome Section */}
-        <div className="text-black font-semibold tracking-[3%] bg-white p-6 space-y-5 mb-[46px] pl-0">
-          <div className="text-xl">MY ACCOUNT</div>
-          <h2 className="font-fraunces text-4xl">Welcome back, {user.name}!</h2>
+        <div className="text-black tracking-[3%] bg-white p-6 space-y-5 mb-[46px] pl-0">
+          <div className="text-xl font-medium">MY ACCOUNT</div>
+          <h2 className="font-fraunces font-semibold text-4xl">
+            Welcome back, {user.name}!
+          </h2>
         </div>
 
         {/* Plan Section */}
-        <div className="bg-[#F3F7F6] p-6 rounded-lg shadow-sm">
-          <h3 className="font-semibold text-lg mb-4">YOUR PLAN</h3>
-          <div className="flex justify-between items-center">
-            <span className="text-gray-600">Story Palace Free</span>
-            <button className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors">
-              Upgrade plan
-            </button>
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-[#F3F7F6] p-6 rounded-lg shadow-sm">
+          {/* Plan Details */}
+          <div className="mb-4 sm:mb-0">
+            <h3 className="text-[#707978] font-medium text-xl mb-4">
+              YOUR PLAN
+            </h3>
+            <span className="text-black font-bold text-4xl">
+              Story Palace Free
+            </span>
           </div>
+          <button className="w-full sm:w-auto bg-custom-teal text-white px-4 py-2 rounded-3xl hover:bg-blue-600 transition-colors">
+            Upgrade plan
+          </button>
         </div>
 
         {/* Account Settings */}
