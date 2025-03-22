@@ -1,15 +1,14 @@
 import {
   deleteUser,
   EmailAuthProvider,
-  getAuth,
   reauthenticateWithCredential,
   updatePassword,
   updateProfile,
 } from "firebase/auth";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import AuthHeader from "~/components/auth-header";
-import { logout } from "~/firebase/firebase";
+import { auth, logout } from "~/firebase/firebase";
 
 const MyAccount: React.FC = () => {
   const navigate = useNavigate();
@@ -27,9 +26,23 @@ const MyAccount: React.FC = () => {
     premium: "Premium",
   };
 
-  const auth = getAuth();
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (!user || !user.emailVerified) {
+        navigate("/");
+      } else {
+        setUser({
+          name: user.displayName,
+          email: user.email,
+          plan: "free" as keyof typeof planNames,
+        });
+      }
+    });
 
-  const [user, setUser] = React.useState({
+    return () => unsubscribe();
+  }, []);
+
+  const [user, setUser] = useState({
     name: auth.currentUser?.displayName,
     email: auth.currentUser?.email,
     plan: "free" as keyof typeof planNames,
