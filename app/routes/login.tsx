@@ -57,7 +57,7 @@ export default function Login() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="font-dosis font-medium text-xl placeholder-black bg-[#F3F7F7] mt-1 appearance-none block w-full px-3 py-2 border border-[#829793] rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="font-dosis font-medium text-xl placeholder-black bg-[#F3F7F7] mt-1 appearance-none block w-full px-3 py-2 border border-[#829793] rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors"
               />
 
               <input
@@ -69,7 +69,7 @@ export default function Login() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="font-dosis font-medium text-xl placeholder-black bg-[#F3F7F7] mt-1 appearance-none block w-full px-3 py-2 border border-[#829793] rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="font-dosis font-medium text-xl placeholder-black bg-[#F3F7F7] mt-1 appearance-none block w-full px-3 py-2 border border-[#829793] rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors"
               />
             </div>
 

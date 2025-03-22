@@ -225,25 +225,25 @@ const MyAccount: React.FC = () => {
                 placeholder="Current Password"
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
-                className="border p-2 w-full rounded-lg"
+                className="font-dosis bg-[#F3F7F7] border border-[#829793] p-2 w-full rounded-xl transition-colors"
               />
               <input
                 type="password"
                 placeholder="New Password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                className="border p-2 w-full rounded-lg"
+                className="font-dosis bg-[#F3F7F7] border border-[#829793] p-2 w-full rounded-xl transition-colors"
               />
               <div className="flex gap-2">
                 <button
                   onClick={handleChangePassword}
-                  className="bg-blue-500 text-white px-4 py-2 rounded-lg"
+                  className="text-base w-auto bg-custom-teal text-white px-5 py-3 rounded-3xl hover:bg-blue-600 transition-colors"
                 >
                   Submit
                 </button>
                 <button
                   onClick={() => setShowChangePassword(false)}
-                  className="bg-gray-500 text-white px-4 py-2 rounded-lg"
+                  className="text-base border border-[#829793] px-3 py-3 rounded-3xl w-auto bg-white text-black hover:text-blue-600 transition-colors"
                 >
                   Cancel
                 </button>
