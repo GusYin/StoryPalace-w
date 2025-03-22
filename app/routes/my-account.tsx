@@ -1,3 +1,10 @@
+import {
+  deleteUser,
+  EmailAuthProvider,
+  reauthenticateWithCredential,
+  updatePassword,
+  updateProfile,
+} from "firebase/auth";
 import React from "react";
 import { useNavigate } from "react-router";
 import AuthHeader from "~/components/auth-header";
@@ -5,20 +12,39 @@ import { auth, logout } from "~/firebase/firebase";
 
 const MyAccount: React.FC = () => {
   const navigate = useNavigate();
+  const [editingName, setEditingName] = React.useState(false);
+  const [newName, setNewName] = React.useState("");
+  const [currentPassword, setCurrentPassword] = React.useState("");
+  const [newPassword, setNewPassword] = React.useState("");
+  const [showChangePassword, setShowChangePassword] = React.useState(false);
+  const [error, setError] = React.useState("");
+  const [success, setSuccess] = React.useState("");
+
+  const planNames = {
+    free: "Free",
+    basic: "Basic",
+    premium: "Premium",
+  };
 
   const [user, setUser] = React.useState({
     name: auth.currentUser?.displayName,
     email: auth.currentUser?.email,
+    plan: "free" as keyof typeof planNames,
   });
 
+  // Plans: free, basic, premium
   React.useEffect(() => {
     const fetchUserPlan = async () => {
       if (auth.currentUser) {
         const idTokenResult = await auth.currentUser.getIdTokenResult();
-        setUser((prevUser) => ({
-          ...prevUser,
-          plan: idTokenResult.claims.plan || "Free",
-        }));
+        setUser((prevUser) => {
+          const plan =
+            (idTokenResult.claims.plan as keyof typeof planNames) || "free";
+          return {
+            ...prevUser,
+            plan,
+          };
+        });
       }
     };
 
@@ -31,10 +57,63 @@ const MyAccount: React.FC = () => {
       .catch((err) => console.error(err))
       .finally(() => navigate("/"));
 
+  const handleUpdateName = async () => {
+    try {
+      await updateProfile(auth.currentUser!, { displayName: newName });
+      setUser((prev) => ({ ...prev, name: newName }));
+      setEditingName(false);
+      setSuccess("Name updated successfully");
+    } catch (error) {
+      setError("Error updating name");
+    }
+  };
+
+  const handleChangePassword = async () => {
+    try {
+      const credential = EmailAuthProvider.credential(
+        auth.currentUser!.email!,
+        currentPassword
+      );
+      await reauthenticateWithCredential(auth.currentUser!, credential);
+      await updatePassword(auth.currentUser!, newPassword);
+      setSuccess("Password changed successfully");
+      setShowChangePassword(false);
+      setCurrentPassword("");
+      setNewPassword("");
+    } catch (error) {
+      setError("Error changing password. Please check your current password.");
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (
+      window.confirm(
+        "Are you sure you want to permanently delete your account?"
+      )
+    ) {
+      try {
+        await deleteUser(auth.currentUser!);
+        navigate("/");
+      } catch (error) {
+        setError("Error deleting account. Please reauthenticate.");
+      }
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white">
       <AuthHeader />
       <div className="font-dosis w-full mx-auto space-y-8 mt-14 px-20">
+        {/* Success/Error Messages */}
+        {error && (
+          <div className="text-red-500 p-3 bg-red-50 rounded-lg">{error}</div>
+        )}
+        {success && (
+          <div className="text-green-500 p-3 bg-green-50 rounded-lg">
+            {success}
+          </div>
+        )}
+
         {/* Combined Title and Welcome Section */}
         <div className="text-black tracking-[3%] bg-white p-6 space-y-5 mb-[46px] pl-0">
           <div className="text-xl font-medium">MY ACCOUNT</div>
@@ -45,21 +124,26 @@ const MyAccount: React.FC = () => {
 
         {/* Plan Section */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-[#F3F7F6] p-6 rounded-lg shadow-sm">
-          {/* Plan Details */}
           <div className="mb-4 sm:mb-0">
             <h3 className="text-[#707978] font-medium text-xl mb-4">
               YOUR PLAN
             </h3>
             <span className="text-black font-bold text-4xl">
-              Story Palace Free
+              Story Palace {planNames[user.plan]}
             </span>
           </div>
-          <button
-            onClick={() => console.log("/upgrade-to-")}
-            className="w-full sm:w-auto md:w-80 bg-custom-teal text-white px-3 py-3 rounded-3xl hover:bg-blue-600 transition-colors"
-          >
-            Upgrade plan
-          </button>
+          {user.plan === "premium" ? (
+            <button className="w-full sm:w-auto md:w-80 bg-gray-600 text-white px-3 py-3 rounded-3xl hover:bg-gray-700 transition-colors">
+              Manage Plan
+            </button>
+          ) : (
+            <button
+              onClick={() => navigate("/upgrade")}
+              className="w-full sm:w-auto md:w-80 bg-custom-teal text-white px-3 py-3 rounded-3xl hover:bg-blue-600 transition-colors"
+            >
+              Upgrade plan
+            </button>
+          )}
         </div>
 
         {/* Account Settings */}
@@ -70,9 +154,42 @@ const MyAccount: React.FC = () => {
           <div className="space-y-8">
             <div className="text-xl">
               <label className="text-black block">Name</label>
-              <div className="text-[#707978] mt-1">
-                {user.name || "You don't have a name yet..."}
-              </div>
+              {editingName ? (
+                <div className="mt-1 flex gap-2">
+                  <input
+                    type="text"
+                    value={newName}
+                    onChange={(e) => setNewName(e.target.value)}
+                    className="border p-2 rounded-lg"
+                    placeholder="Enter new name"
+                  />
+                  <button
+                    onClick={handleUpdateName}
+                    className="bg-blue-500 text-white px-4 py-2 rounded-lg"
+                  >
+                    Save
+                  </button>
+                  <button
+                    onClick={() => setEditingName(false)}
+                    className="bg-gray-500 text-white px-4 py-2 rounded-lg"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              ) : (
+                <div className="text-[#707978] mt-1 flex items-center gap-2">
+                  {user.name || "You don't have a name yet..."}
+                  <button
+                    onClick={() => {
+                      setNewName(user.name || "");
+                      setEditingName(true);
+                    }}
+                    className="text-blue-500 hover:text-blue-700"
+                  >
+                    Edit
+                  </button>
+                </div>
+              )}
             </div>
             <div className="text-xl">
               <label className="text-black block">Email Address</label>
@@ -84,13 +201,53 @@ const MyAccount: React.FC = () => {
                 <div className="text-[#707978] mt-1">**********</div>
               </div>
               <div>
-                <button className="border border-[#829793] px-3 py-3 rounded-3xl w-auto bg-white text-black hover:text-blue-600 transition-colors">
+                <button
+                  onClick={() => setShowChangePassword(true)}
+                  className="border border-[#829793] px-3 py-3 rounded-3xl w-auto bg-white text-black hover:text-blue-600 transition-colors"
+                >
                   Change Password
                 </button>
               </div>
             </div>
           </div>
         </div>
+
+        {/* Change Password Modal */}
+        {showChangePassword && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+            <div className="bg-white p-6 rounded-lg space-y-4">
+              <h3 className="text-xl font-bold">Change Password</h3>
+              <input
+                type="password"
+                placeholder="Current Password"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                className="border p-2 w-full rounded-lg"
+              />
+              <input
+                type="password"
+                placeholder="New Password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                className="border p-2 w-full rounded-lg"
+              />
+              <div className="flex gap-2">
+                <button
+                  onClick={handleChangePassword}
+                  className="bg-blue-500 text-white px-4 py-2 rounded-lg"
+                >
+                  Submit
+                </button>
+                <button
+                  onClick={() => setShowChangePassword(false)}
+                  className="bg-gray-500 text-white px-4 py-2 rounded-lg"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Actions Section */}
         <div className="bg-white p-6 shadow-sm space-y-16 pl-0">
@@ -101,7 +258,10 @@ const MyAccount: React.FC = () => {
             Log out
           </button>
           <div className="">
-            <button className="w-[200px] text-[#EF4444] hover:text-red-700 px-4 py-2 border border-[#EF4444] rounded-3xl hover:bg-red-50 transition-colors">
+            <button
+              onClick={handleDeleteAccount}
+              className="w-[200px] text-[#EF4444] hover:text-red-700 px-4 py-2 border border-[#EF4444] rounded-3xl hover:bg-red-50 transition-colors"
+            >
               Delete Account
             </button>
             <p className="text-lg text-[#707978] mt-2">
