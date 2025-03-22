@@ -1,29 +1,21 @@
 import { Link, useNavigate } from "react-router";
-import { StoryPalaceLogoNoText } from "./icons/story-palace-logo-no-text";
 import { StoryPalaceLogoWithText } from "./icons/story-palace-logo";
+import { InstagramIcon } from "./icons/instagram";
 
 const Footer = () => {
   const navigate = useNavigate();
 
   return (
-    <footer className="font-dosis w-full bg-grey-bg-lucile py-8">
-      <button
-        className="top-1/2 -translate-y-1/2 left-4 md:left-8"
-        onClick={() => navigate("/")}
-      >
-        {/* Mobile logo (visible on small screens) */}
-        <span className="block md:hidden">
-          <StoryPalaceLogoNoText className="h-8 w-auto" />
-        </span>
-
-        {/* Desktop logo (visible on medium screens and up) */}
-        <span className="hidden md:block">
-          <StoryPalaceLogoWithText className="h-8 w-auto" />
-        </span>
-      </button>
-
+    <footer className="font-dosis w-full bg-grey-bg-lucile py-8 py-12">
       <div className="px-20 mx-auto">
+        <button
+          className="top-1/2 -translate-y-1/2 left-4 md:left-8"
+          onClick={() => navigate("/")}
+        >
+          <StoryPalaceLogoWithText className="h-8 w-auto -ml-8" />
+        </button>
         <h3 className="text-[#707978] font-medium text-xl mb-4">FOLLOW US</h3>
+        <InstagramIcon />
         <div className="flex space-x-6">
           <Link
             to="/"
