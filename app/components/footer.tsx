@@ -22,9 +22,9 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Right Column (Links) */}
-          <div className="md:self-end">
-            <div className="flex flex-col md:flex-row md:items-center md:gap-8 space-y-4 md:space-y-0">
+          {/* Right Column (Links) - Vertical on desktop */}
+          <div className="md:self-start">
+            <div className="flex flex-row flex-wrap gap-x-6 gap-y-4 md:flex-col md:gap-4">
               <Link
                 to="/"
                 className="text-black text-lg hover:text-blue-600 transition-colors"
