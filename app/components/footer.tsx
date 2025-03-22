@@ -11,7 +11,7 @@ const Footer = () => {
         {/* Main container with 2 columns on desktop */}
         <div className="flex flex-col md:flex-row md:justify-between gap-8">
           {/* Left Column (Logo + Social) */}
-          <div className="flex flex-col space-y-4 md:max-w-[50%]">
+          <div className="flex flex-col space-y-10 md:max-w-[50%]">
             <button onClick={() => navigate("/")} className="self-start">
               <StoryPalaceLogoWithText className="h-8 w-auto -ml-8" />
             </button>
