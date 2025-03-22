@@ -8,6 +8,7 @@ import {
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import AuthHeader from "~/components/auth-header";
+import Footer from "~/components/footer";
 import { auth, logout } from "~/firebase/firebase";
 
 const MyAccount: React.FC = () => {
@@ -286,6 +287,7 @@ const MyAccount: React.FC = () => {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 };

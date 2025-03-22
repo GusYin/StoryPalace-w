@@ -21,7 +21,7 @@ const AuthHeader = () => {
           </span>
 
           {/* Desktop logo (visible on medium screens and up) */}
-          <span className="hidden md:block">
+          <span className="hidden md:block -ml-8">
             <StoryPalaceLogoWithText className="h-8 w-auto" />
           </span>
         </button>
