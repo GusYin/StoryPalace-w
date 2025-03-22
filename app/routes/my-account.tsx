@@ -1,6 +1,7 @@
 import {
   deleteUser,
   EmailAuthProvider,
+  getAuth,
   reauthenticateWithCredential,
   updatePassword,
   updateProfile,
@@ -8,7 +9,7 @@ import {
 import React from "react";
 import { useNavigate } from "react-router";
 import AuthHeader from "~/components/auth-header";
-import { auth, logout } from "~/firebase/firebase";
+import { logout } from "~/firebase/firebase";
 
 const MyAccount: React.FC = () => {
   const navigate = useNavigate();
@@ -25,6 +26,8 @@ const MyAccount: React.FC = () => {
     basic: "Basic",
     premium: "Premium",
   };
+
+  const auth = getAuth();
 
   const [user, setUser] = React.useState({
     name: auth.currentUser?.displayName,
@@ -155,23 +158,23 @@ const MyAccount: React.FC = () => {
             <div className="text-xl">
               <label className="text-black block">Name</label>
               {editingName ? (
-                <div className="mt-1 flex gap-2">
+                <div className="text-[#707978] text-xl mt-1 flex gap-2">
                   <input
                     type="text"
                     value={newName}
                     onChange={(e) => setNewName(e.target.value)}
-                    className="border p-2 rounded-lg"
+                    className="font-dosis bg-[#F3F7F7] mt-1 block w-full rounded-xl border border-[#829793] px-3 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Enter new name"
                   />
                   <button
                     onClick={handleUpdateName}
-                    className="bg-blue-500 text-white px-4 py-2 rounded-lg"
+                    className="text-base w-auto bg-custom-teal text-white px-6 py-3 rounded-3xl hover:bg-blue-600 transition-colors"
                   >
                     Save
                   </button>
                   <button
                     onClick={() => setEditingName(false)}
-                    className="bg-gray-500 text-white px-4 py-2 rounded-lg"
+                    className="text-base border border-[#829793] px-3 py-3 rounded-3xl w-auto bg-white text-black hover:text-blue-600 transition-colors"
                   >
                     Cancel
                   </button>
@@ -184,7 +187,7 @@ const MyAccount: React.FC = () => {
                       setNewName(user.name || "");
                       setEditingName(true);
                     }}
-                    className="text-blue-500 hover:text-blue-700"
+                    className="underline text-[#06846F] hover:text-blue-500"
                   >
                     Edit
                   </button>
