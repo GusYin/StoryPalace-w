@@ -267,7 +267,7 @@ const MyAccount: React.FC = () => {
         )}
 
         {/* Actions Section */}
-        <div className="bg-white p-6 shadow-sm space-y-16 pl-0">
+        <div className="bg-white p-6 space-y-16 pl-0">
           <button
             onClick={doLogout}
             className="w-[200px] text-black py-3 px-3 border border-[#829793] rounded-3xl hover:bg-gray-50 transition-colors"
