@@ -26,28 +26,25 @@ const Footer = () => {
 
           {/* Right Column (Links) - Vertical on desktop */}
           <div className="md:self-start">
-            <div className="flex flex-row flex-wrap gap-x-6 gap-y-4 md:flex-col md:gap-4">
-              <Link
-                to="/"
-                className="text-black text-lg hover:text-blue-600 transition-colors"
-              >
+            <div className="text-black text-md flex flex-row flex-wrap gap-x-6 gap-y-4 md:flex-col md:gap-4">
+              <Link to="/" className="hover:text-blue-600 transition-colors">
                 Home
               </Link>
               <Link
                 to="/library"
-                className="text-black text-lg hover:text-blue-600 transition-colors"
+                className="hover:text-blue-600 transition-colors"
               >
                 Library
               </Link>
               <Link
                 to="/pricing"
-                className="text-black text-lg hover:text-blue-600 transition-colors"
+                className="hover:text-blue-600 transition-colors"
               >
                 Pricing
               </Link>
               <Link
                 to="/contact"
-                className="text-black text-lg hover:text-blue-600 transition-colors"
+                className="hover:text-blue-600 transition-colors"
               >
                 Contact Us
               </Link>
