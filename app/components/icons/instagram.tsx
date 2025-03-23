@@ -1,6 +1,6 @@
 import React from "react";
 
-export const InstagramIcon: React.FC = ({
+export const InstagramIcon = ({
   className,
   ...props
 }: React.SVGProps<SVGSVGElement>) => (

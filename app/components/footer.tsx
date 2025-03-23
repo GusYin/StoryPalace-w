@@ -16,9 +16,11 @@ const Footer = () => {
               <StoryPalaceLogoWithText className="h-8 w-auto -ml-8" />
             </button>
 
-            <div className="flex items-center gap-4">
+            {/* Updated Social Section */}
+            <div className="flex flex-col gap-2">
               <h3 className="text-[#707978] font-medium text-xl">FOLLOW US</h3>
-              <InstagramIcon />
+              <InstagramIcon className="ml-[-2px]" />{" "}
+              {/* Added slight alignment adjustment */}
             </div>
           </div>
 
