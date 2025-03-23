@@ -140,7 +140,7 @@ const MyAccount: React.FC = () => {
         </div>
 
         {/* Plan Section */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-[#F3F7F6] p-6 rounded-lg shadow-sm">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-[#F3F7F6] p-6 rounded-xl shadow-sm">
           <div className="mb-4 sm:mb-0">
             <h3 className="text-[#707978] font-medium text-xl mb-4">
               YOUR PLAN
@@ -164,7 +164,7 @@ const MyAccount: React.FC = () => {
         </div>
 
         {/* Account Settings */}
-        <div className="bg-[#F3F7F6] p-6 rounded-lg shadow-sm">
+        <div className="bg-[#F3F7F6] p-6 rounded-xl shadow-sm">
           <h3 className="text-[#707978] font-medium text-xl mb-3">
             ACCOUNT SETTINGS
           </h3>
