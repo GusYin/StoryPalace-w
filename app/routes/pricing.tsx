@@ -16,14 +16,12 @@ export default function PricingPage() {
             <p className="text-gray-500 mb-6">
               Enjoy listening to 3 free stories.
             </p>
-
             <div className="border-t border-gray-200 pt-6">
               <p className="text-gray-500">0 custom narrators</p>
               <p className="text-sm text-gray-400 mt-1">
                 This plan doesn't offer custom narrators.
               </p>
             </div>
-
             <button className="w-full mt-6 px-4 py-2 border-2 border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors">
               Get Started
             </button>
@@ -38,14 +36,12 @@ export default function PricingPage() {
             </div>
             <h2 className="text-2xl font-bold text-gray-800 mb-4">Basic</h2>
             <p className="text-lg text-gray-600 mb-6">Create Free Account</p>
-
             <div className="space-y-4 mb-6">
               <p className="text-gray-600">Get access to 20+ stories</p>
               <p className="text-gray-600">
                 Unlimited access to all the Story Palace stories
               </p>
             </div>
-
             <div className="border-t border-gray-200 pt-6 mb-8">
               <p className="text-gray-600">2 custom narrators</p>
               <p className="text-sm text-gray-400 mt-1">
@@ -55,7 +51,7 @@ export default function PricingPage() {
             </div>
 
             {/* Subscription Options Grid */}
-            <div className="grid gap-6">
+            <div className="grid lg:grid-cols-2 gap-6">
               {/* Monthly Plan */}
               <div className="bg-gray-50 p-6 rounded-lg">
                 <div className="mb-4">
