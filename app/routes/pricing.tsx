@@ -8,8 +8,8 @@ export default function PricingPage() {
           Pricing
         </h1>
 
-        {/* Free Plan */}
-        <div className="grid md:grid-cols-2 gap-8 mb-8">
+        <div className="grid md:grid-cols-2 gap-8">
+          {/* Free Plan */}
           <div className="bg-white p-8 rounded-lg shadow-sm border border-gray-200">
             <h2 className="text-2xl font-bold text-gray-800 mb-4">Free</h2>
             <p className="text-lg text-gray-600 mb-6">3 Free Stories</p>
@@ -29,7 +29,7 @@ export default function PricingPage() {
             </button>
           </div>
 
-          {/* Basic Plan */}
+          {/* Basic Plan with Subscription Options */}
           <div className="bg-white p-8 rounded-lg shadow-md border-2 border-blue-500">
             <div className="mb-4">
               <span className="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">
@@ -46,7 +46,7 @@ export default function PricingPage() {
               </p>
             </div>
 
-            <div className="border-t border-gray-200 pt-6">
+            <div className="border-t border-gray-200 pt-6 mb-8">
               <p className="text-gray-600">2 custom narrators</p>
               <p className="text-sm text-gray-400 mt-1">
                 Record your voice once, and we'll use it to narrate your
@@ -54,45 +54,45 @@ export default function PricingPage() {
               </p>
             </div>
 
-            <button className="w-full mt-6 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors">
-              Start Free Trial
-            </button>
-          </div>
-        </div>
+            {/* Subscription Options Grid */}
+            <div className="grid gap-6">
+              {/* Monthly Plan */}
+              <div className="bg-gray-50 p-6 rounded-lg">
+                <div className="mb-4">
+                  <h3 className="text-lg font-semibold text-gray-800">
+                    Monthly
+                  </h3>
+                  <p className="text-2xl font-bold text-gray-900 mt-1">
+                    $19.99<span className="text-base text-gray-500">/mo</span>
+                  </p>
+                  <p className="text-sm text-gray-500 mt-1">Cancel anytime</p>
+                </div>
+                <button className="w-full px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition-colors">
+                  Subscribe
+                </button>
+              </div>
 
-        {/* Premium Plans */}
-        <div className="grid md:grid-cols-2 gap-8">
-          {/* Monthly Plan */}
-          <div className="bg-white p-8 rounded-lg shadow-sm border border-gray-200">
-            <div className="mb-6">
-              <h3 className="text-xl font-bold text-gray-800">Monthly</h3>
-              <p className="text-3xl font-bold text-gray-900 mt-2">
-                $19.99<span className="text-lg text-gray-500">/mo</span>
-              </p>
-              <p className="text-gray-500 mt-2">Cancel anytime</p>
+              {/* Yearly Plan */}
+              <div className="bg-gray-50 p-6 rounded-lg relative">
+                <div className="absolute top-0 right-0 bg-blue-500 text-white px-3 py-1 text-sm rounded-bl-lg">
+                  BEST DEAL
+                </div>
+                <div className="mb-4">
+                  <h3 className="text-lg font-semibold text-gray-800">
+                    Yearly
+                  </h3>
+                  <p className="text-2xl font-bold text-gray-900 mt-1">
+                    $12.99<span className="text-base text-gray-500">/mo</span>
+                  </p>
+                  <p className="text-gray-900 mt-1">
+                    $155.88<span className="text-gray-500">/y</span>
+                  </p>
+                </div>
+                <button className="w-full px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors">
+                  Subscribe
+                </button>
+              </div>
             </div>
-            <button className="w-full px-4 py-2 bg-gray-900 text-white rounded-md hover:bg-gray-800 transition-colors">
-              Subscribe
-            </button>
-          </div>
-
-          {/* Yearly Plan */}
-          <div className="bg-white p-8 rounded-lg shadow-md border-2 border-blue-500 relative">
-            <div className="absolute top-0 right-0 bg-blue-500 text-white px-3 py-1 text-sm rounded-bl-lg">
-              BEST DEAL
-            </div>
-            <div className="mb-6">
-              <h3 className="text-xl font-bold text-gray-800">Yearly</h3>
-              <p className="text-3xl font-bold text-gray-900 mt-2">
-                $12.99<span className="text-lg text-gray-500">/mo</span>
-              </p>
-              <p className="text-gray-900 mt-2">
-                $155.88<span className="text-gray-500">/y</span>
-              </p>
-            </div>
-            <button className="w-full px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors">
-              Subscribe
-            </button>
           </div>
         </div>
       </div>
