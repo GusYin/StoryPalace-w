@@ -1,7 +1,7 @@
 import React from "react";
 
 export default function PricingPage() {
-  const hasPremium = false;
+  const hasPremium = true;
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
@@ -58,7 +58,11 @@ export default function PricingPage() {
               </p>
             </div>
 
-            <div className="grid lg:grid-cols-2 gap-6">
+            <div
+              className={`grid ${
+                hasPremium ? "xl:grid-cols-2" : "lg:grid-cols-2"
+              } gap-6`}
+            >
               {/* Monthly Plan */}
               <div className="bg-gray-50 p-6 rounded-lg">
                 <div className="mb-4">
@@ -119,7 +123,11 @@ export default function PricingPage() {
                 </p>
               </div>
 
-              <div className="grid lg:grid-cols-2 gap-6">
+              <div
+                className={`grid ${
+                  hasPremium ? "xl:grid-cols-2" : "lg:grid-cols-2"
+                } gap-6`}
+              >
                 {/* Monthly Plan */}
                 <div className="bg-gray-50 p-6 rounded-lg">
                   <div className="mb-4">
