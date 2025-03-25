@@ -15,6 +15,7 @@ type Params = {
   "/signup": {};
   "/verify-email": {};
   "/reset-password": {};
+  "/pricing": {};
   "/my-account": {};
   "/upgrade-plan": {};
   "/name-your-voice": {};

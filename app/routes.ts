@@ -14,6 +14,7 @@ export default [
   route("signup", "routes/signup.tsx"),
   route("verify-email", "routes/verify-email.tsx"),
   route("reset-password", "routes/reset-password.tsx"),
+  route("pricing", "routes/pricing.tsx"),
   layout("components/protected-route.tsx", [
     route("my-account", "routes/my-account/my-account.tsx"),
     route("upgrade-plan", "routes/my-account/upgrade-plan.tsx"),
