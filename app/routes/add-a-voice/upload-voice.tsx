@@ -368,7 +368,7 @@ const VoiceUploadPage = () => {
         {/* Centered Title */}
         <div className="text-center mb-8 flex flex-col items-center">
           <h1 className="text-xl font-bold text-black">Add a voice</h1>
-          <div className="text-[#F1F8F7] text-[40px] font-fraunces font-semibold flex-shrink-0 w-14 h-14 bg-custom-teal text-white rounded-full flex items-center justify-center mt-[70px]">
+          <div className="text-[#F1F8F7] text-[40px] font-fraunces font-semibold shrink-0 w-14 h-14 bg-custom-teal text-white rounded-full flex items-center justify-center mt-[70px]">
             2
           </div>
           <p className="text-3xl font-medium text-black mt-6">

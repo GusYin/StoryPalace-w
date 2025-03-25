@@ -28,10 +28,10 @@ const UnauthHeader = () => {
   return (
     <>
       {/* Sticky Navigation Bar */}
-      <nav className="pr-8 shadow-[0_4px_20px_0_rgba(0,0,0,0.05)] font-dosis text-sm font-[700] sticky h-[64px] top-0 bg-white shadow-sm z-50 relative">
+      <nav className="pr-8 shadow-[0_4px_20px_0_rgba(0,0,0,0.05)] font-dosis text-sm font-[700] sticky h-[64px] top-0 bg-white shadow-xs z-50 relative">
         {/* Left-aligned Logo */}
         <button
-          className="absolute top-1/2 -translate-y-1/2"
+          className="cursor-pointer absolute top-1/2 -translate-y-1/2"
           onClick={() => navigate("/")}
         >
           <StoryPalaceLogoWithText />
@@ -46,7 +46,7 @@ const UnauthHeader = () => {
           <button
             type="button"
             onClick={doGetStarted}
-            className="text-white bg-custom-teal hover:bg-teal-700 focus:outline-none focus:ring-4 focus:ring-green-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
+            className="text-white bg-custom-teal hover:bg-teal-700 focus:outline-hidden focus:ring-4 focus:ring-green-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
           >
             Get started
           </button>

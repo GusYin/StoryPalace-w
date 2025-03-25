@@ -22,7 +22,7 @@ const AddVoiceSuccessPage = () => {
         {/* Centered Title */}
         <div className="text-black text-center mb-8 flex flex-col items-center">
           <h1 className="text-xl font-bold">Add a voice</h1>
-          <div className="text-[#F1F8F7] text-[40px] font-fraunces font-semibold flex-shrink-0 w-14 h-14 bg-custom-teal text-white rounded-full flex items-center justify-center mt-[70px]">
+          <div className="text-[#F1F8F7] text-[40px] font-fraunces font-semibold shrink-0 w-14 h-14 bg-custom-teal text-white rounded-full flex items-center justify-center mt-[70px]">
             <TickIcon />
           </div>
           <p className="text-3xl font-medium  mt-14">

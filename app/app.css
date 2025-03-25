@@ -1,13 +1,20 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-html,
-body {
-  @apply bg-white dark:bg-gray-950;
+@theme {
+  --font-dosis: "Dosis", "sans-serif";
+  --font-fraunces: "Fraunces", "sans-serif";
+  --color-custom-teal: #06846f;
+  --color-grey-bg-lucile: #f1f8f7;
+}
 
-  @media (prefers-color-scheme: dark) {
-    color-scheme: dark;
+@layer utilities {
+  html,
+  body {
+    @apply bg-white dark:bg-gray-950;
+
+    @media (prefers-color-scheme: dark) {
+      color-scheme: dark;
+    }
   }
 }
 
@@ -64,15 +71,6 @@ body {
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
-  }
-}
-
-@layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
   }
 }
 

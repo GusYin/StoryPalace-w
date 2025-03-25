@@ -12,14 +12,17 @@ const Footer = () => {
         <div className="flex flex-col md:flex-row md:justify-between gap-8">
           {/* Left Column (Logo + Social) */}
           <div className="flex flex-col space-y-10 md:max-w-[50%]">
-            <button onClick={() => navigate("/")} className="self-start">
+            <button
+              onClick={() => navigate("/")}
+              className="cursor-pointer self-start"
+            >
               <StoryPalaceLogoWithText className="h-8 w-auto -ml-8" />
             </button>
 
             {/* Updated Social Section */}
             <div className="flex flex-col gap-2">
               <h3 className="text-[#707978] font-medium text-xl">FOLLOW US</h3>
-              <InstagramIcon className="ml-[-2px]" />{" "}
+              <InstagramIcon className="cursor-pointer ml-[-2px]" />{" "}
               {/* Added slight alignment adjustment */}
             </div>
           </div>

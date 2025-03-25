@@ -62,7 +62,7 @@ export default function Home() {
 
   return (
     <Fragment>
-      <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white font-body">
+      <div className="min-h-screen bg-linear-to-b from-gray-900 to-gray-800 text-white font-body">
         {/* Ambient Background Image Container */}
         <div ref={containerRef} className="absolute inset-0 z-0">
           <img

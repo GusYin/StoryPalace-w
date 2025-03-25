@@ -140,7 +140,7 @@ const MyAccount: React.FC = () => {
         </div>
 
         {/* Plan Section */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-[#F3F7F6] p-6 rounded-xl shadow-sm">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-[#F3F7F6] p-6 rounded-xl shadow-xs">
           <div className="mb-4 sm:mb-0">
             <h3 className="text-[#707978] font-medium text-xl mb-4">
               YOUR PLAN
@@ -158,13 +158,13 @@ const MyAccount: React.FC = () => {
               onClick={() => navigate("/upgrade")}
               className="w-full sm:w-auto md:w-80 bg-custom-teal text-white px-3 py-3 rounded-3xl hover:bg-blue-600 transition-colors"
             >
-              Upgrade plan
+              Upgrade Plan
             </button>
           )}
         </div>
 
         {/* Account Settings */}
-        <div className="bg-[#F3F7F6] p-6 rounded-xl shadow-sm">
+        <div className="bg-[#F3F7F6] p-6 rounded-xl shadow-xs">
           <h3 className="text-[#707978] font-medium text-xl mb-3">
             ACCOUNT SETTINGS
           </h3>
@@ -177,7 +177,7 @@ const MyAccount: React.FC = () => {
                     type="text"
                     value={newName}
                     onChange={(e) => setNewName(e.target.value)}
-                    className="font-dosis bg-[#F3F7F7] mt-1 block w-full rounded-xl border border-[#829793] px-3 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="font-dosis bg-[#F3F7F7] mt-1 block w-full rounded-xl border border-[#829793] px-3 py-3 focus:outline-hidden focus:ring-2 focus:ring-blue-500"
                     placeholder="Enter new name"
                   />
                   <button
@@ -231,7 +231,7 @@ const MyAccount: React.FC = () => {
 
         {/* Change Password Modal */}
         {showChangePassword && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="fixed inset-0 bg-black bg-black/50 flex items-center justify-center">
             <div className="bg-white p-6 rounded-lg space-y-4">
               <h3 className="text-xl font-bold">Change Password</h3>
               <input

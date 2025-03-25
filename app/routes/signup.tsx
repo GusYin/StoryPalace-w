@@ -56,21 +56,21 @@ const SignUpPage = () => {
             <div className="mt-12 space-y-4">
               <input
                 type="text"
-                className="font-dosis font-medium text-xl placeholder-black bg-[#F3F7F7] mt-1 block w-full rounded-xl border border-[#829793] px-5 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="font-dosis font-medium text-xl placeholder-black bg-[#F3F7F7] mt-1 block w-full rounded-xl border border-[#829793] px-5 py-3 focus:outline-hidden focus:ring-2 focus:ring-blue-500"
                 placeholder="Your name"
                 onChange={(e) => setUserName(e.target.value)}
               />
 
               <input
                 type="email"
-                className="font-dosis font-medium text-xl placeholder-black bg-[#F3F7F7] mt-1 block w-full rounded-xl border border-[#829793] px-5 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="font-dosis font-medium text-xl placeholder-black bg-[#F3F7F7] mt-1 block w-full rounded-xl border border-[#829793] px-5 py-3 focus:outline-hidden focus:ring-2 focus:ring-blue-500"
                 placeholder="Email address"
                 onChange={(e) => setEmail(e.target.value)}
               />
 
               <input
                 type="password"
-                className="font-dosis font-medium text-xl placeholder-black bg-[#F3F7F7]  mt-1 block w-full rounded-xl border border-[#829793] px-5 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="font-dosis font-medium text-xl placeholder-black bg-[#F3F7F7]  mt-1 block w-full rounded-xl border border-[#829793] px-5 py-3 focus:outline-hidden focus:ring-2 focus:ring-blue-500"
                 placeholder="Password"
                 onChange={(e) => setPassword(e.target.value)}
               />
@@ -83,7 +83,7 @@ const SignUpPage = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="font-dosis font-xl bg-black mt-6 w-full text-white py-2 px-4 rounded-full hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              className="font-dosis font-xl bg-black mt-6 w-full text-white py-2 px-4 rounded-full hover:bg-blue-700 focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
             >
               {isLoading ? "Creating an account..." : "Create account"}
             </button>
