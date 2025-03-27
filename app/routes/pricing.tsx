@@ -1,17 +1,17 @@
 import React from "react";
 import Footer from "~/components/footer";
-import UnauthHeader from "~/components/unauth-header";
+import Header from "~/components/header";
 
 export default function PricingPage() {
   const hasPremium = true;
   return (
     <div className="min-h-screen bg-white">
-      <UnauthHeader />
-      <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <Header />
+      <div className="min-h-screen bg-gray-50 py-15 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           {" "}
           {/* Changed to max-w-7xl to accommodate 3 columns */}
-          <h1 className="text-4xl font-bold text-center text-gray-900 mb-12">
+          <h1 className="font-fraunces text-4xl font-semibold text-center mb-20">
             Pricing
           </h1>
           {/* Changed to grid-cols-1 for mobile/tablet, lg:grid-cols-3 for desktop */}
@@ -23,7 +23,7 @@ export default function PricingPage() {
             {" "}
             {/* Changed to 3 columns */}
             {/* Free Plan */}
-            <div className="bg-white p-8 rounded-lg shadow-sm border border-gray-200">
+            <div className="bg-white p-8 rounded-lg shadow-xs border border-gray-200">
               <h2 className="text-2xl font-bold text-gray-800 mb-4">Free</h2>
               <p className="text-lg text-gray-600 mb-6">3 Free Stories</p>
               <p className="text-gray-500 mb-6">
