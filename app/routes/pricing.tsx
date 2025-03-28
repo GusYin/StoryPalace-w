@@ -7,7 +7,7 @@ export default function PricingPage() {
   return (
     <div className="min-h-screen bg-white">
       <Header />
-      <div className="min-h-screen bg-gray-50 py-15 px-4 sm:px-6 lg:px-8">
+      <div className="py-15 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           {" "}
           {/* Changed to max-w-7xl to accommodate 3 columns */}
@@ -18,29 +18,29 @@ export default function PricingPage() {
           <div
             className={`grid grid-cols-1 md:grid-cols-2 ${
               hasPremium ? "lg:grid-cols-3" : "lg:grid-cols-2"
-            } gap-8`}
+            } gap-7`}
           >
             {" "}
             {/* Changed to 3 columns */}
             {/* Free Plan */}
-            <div className="bg-white p-8 rounded-lg shadow-xs border border-gray-200">
-              <h2 className="text-2xl font-bold text-gray-800 mb-4">Free</h2>
-              <p className="text-lg text-gray-600 mb-6">3 Free Stories</p>
-              <p className="text-gray-500 mb-6">
+            <div className="text-black font-dosis bg-container-grey py-8 px-5 rounded-xl">
+              <h2 className="text-xl font-bold mb-15">Free</h2>
+              <p className="text-xl mb-0">3 Free Stories</p>
+              <p className="text-md text-custom-text-grey font-medium">
                 Enjoy listening to 3 free stories.
               </p>
-              <div className="border-t border-gray-200 pt-6">
-                <p className="text-gray-500">0 custom narrators</p>
-                <p className="text-sm text-gray-400 mt-1">
+              <div className="mt-5">
+                <p className="text-xl mb-0">0 custom narrators</p>
+                <p className="text-md text-custom-text-grey font-medium">
                   This plan doesn't offer custom narrators.
                 </p>
               </div>
-              <button className="w-full mt-6 px-4 py-2 border-2 border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors">
-                Get Started
+              <button className="font-semibold text-xl w-full mt-13 px-4 py-2 border-1 border-custom-stroke-grey rounded-2xl hover:bg-gray-50 transition-colors">
+                Create Free Account
               </button>
             </div>
             {/* Basic Plan */}
-            <div className="bg-white p-8 rounded-lg shadow-md border-2 border-blue-500">
+            <div className="bg-container-grey py-8 px-5 rounded-xl">
               <div className="mb-4">
                 <span className="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">
                   Try the 7 days Free Trial
@@ -107,7 +107,7 @@ export default function PricingPage() {
             </div>
             {/* Premium Plan - Conditionally Rendered */}
             {hasPremium && (
-              <div className="bg-white p-8 rounded-lg shadow-md border-2 border-purple-500">
+              <div className="bg-container-grey py-8 px-5 rounded-xl">
                 <div className="mb-4">
                   <span className="bg-purple-100 text-purple-800 text-sm font-semibold px-3 py-1 rounded-full">
                     Premium Features
