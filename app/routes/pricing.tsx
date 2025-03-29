@@ -85,30 +85,34 @@ export default function PricingPage() {
                 </div>
 
                 {/* Yearly Plan */}
-                <div className="border-1 border-black pt-5 pb-3 px-3 rounded-2xl relative">
-                  <div className="absolute top-0 right-0 left-0 bg-black text-white px-3 py-1 text-sm rounded-t-2xl">
+                <div className="relative">
+                  {" "}
+                  {/* Added wrapper div */}
+                  <div className="tracking-normal absolute -top-[35px] left-0 right-0 bg-black text-white px-3 py-1 text-xl rounded-t-2xl w-[calc(100%-2px)] text-center">
                     BEST DEAL
                   </div>
-                  <div className="mb-3">
-                    <h3 className="text-lg font-medium">Yearly</h3>
-                    <p className="tracking-tighter text-4xl font-bold">
-                      $12.99
-                      <span className="text-base tracking-normal text-custom-text-grey">
-                        {" "}
-                        / mo
-                      </span>
-                    </p>
-                    <p className="tracking-tighter text-lg text-custom-text-grey">
-                      $155.88
-                      <span className="text-base tracking-normal text-gray-500">
-                        {" "}
-                        / y
-                      </span>
-                    </p>
+                  <div className="border-1 border-black pt-5 pb-3 px-3 rounded-2xl rounded-t-none">
+                    <div className="mb-3">
+                      <h3 className="text-lg font-medium">Yearly</h3>
+                      <p className="tracking-tighter text-4xl font-bold">
+                        $12.99
+                        <span className="text-base tracking-normal text-custom-text-grey">
+                          {" "}
+                          / mo
+                        </span>
+                      </p>
+                      <p className="tracking-tighter text-lg text-custom-text-grey">
+                        $155.88
+                        <span className="text-base tracking-normal text-gray-500">
+                          {" "}
+                          / y
+                        </span>
+                      </p>
+                    </div>
+                    <button className="tracking-normal text-lg font-bold border-1 border-custom-stroke-grey w-full px-4 py-2 rounded-2xl hover:bg-white transition-colors">
+                      Subscribe
+                    </button>
                   </div>
-                  <button className="tracking-normal text-lg font-bold border-1 border-custom-stroke-grey w-full px-4 py-2 rounded-2xl hover:bg-white transition-colors">
-                    Subscribe
-                  </button>
                 </div>
               </div>
             </div>
