@@ -114,7 +114,7 @@ export default function PricingPage() {
               </div>
 
               {/* Content wrapper with flex-grow */}
-              <div className="flex-grow">
+              <div className="flex-grow mb-13">
                 <p className="text-xl">Unlimited story access</p>
                 <p className="text-md text-custom-text-grey font-medium">
                   Unlimited access to all the Story Palace stories
@@ -202,34 +202,34 @@ export default function PricingPage() {
                 </div>
 
                 {/* Content wrapper with flex-grow */}
-                <div className="flex-grow">
+                <div className="flex-grow mb-13">
                   <div className="mb-5">
                     <p className="text-xl">Basic Plan Plus</p>
                     <p className="text-md text-custom-text-grey font-medium">
                       Everything in the Basic Plan, plus more!
                     </p>
                   </div>
-                </div>
 
-                <div className="mb-5">
-                  <p className="text-xl">Premium content</p>
-                  <p className="text-md text-custom-text-grey font-medium">
-                    Exclusive access to premium content
-                  </p>
-                </div>
+                  <div className="mb-5">
+                    <p className="text-xl">Premium content</p>
+                    <p className="text-md text-custom-text-grey font-medium">
+                      Exclusive access to premium content
+                    </p>
+                  </div>
 
-                <div className="mb-5">
-                  <p className="text-xl">Custom narrators</p>
-                  <p className="text-md text-custom-text-grey font-medium">
-                    Record your voice once, and we'll use it to narrate your
-                    favorite stories.
-                  </p>
+                  <div className="mb-5">
+                    <p className="text-xl">Custom narrators</p>
+                    <p className="text-md text-custom-text-grey font-medium">
+                      Record your voice once, and we'll use it to narrate your
+                      favorite stories.
+                    </p>
+                  </div>
                 </div>
 
                 <div
-                  className={`gap-x-10 grid ${
+                  className={`gap-x-5 grid ${
                     hasPremium ? "xl:grid-cols-2" : "lg:grid-cols-2"
-                  } gap-y-12`}
+                  } gap-y-10`}
                 >
                   {/* Monthly Plan */}
                   <div className="border-1 border-black pt-5 pb-3 px-3 rounded-2xl">
