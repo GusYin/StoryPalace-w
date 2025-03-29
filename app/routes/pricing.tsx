@@ -88,9 +88,10 @@ export default function PricingPage() {
                 <div className="relative">
                   {" "}
                   {/* Added wrapper div */}
-                  <div className="tracking-normal absolute -top-[35px] left-0 right-0 bg-black text-white px-3 py-1 text-xl rounded-t-2xl w-[calc(100%-2px)] text-center">
+                  <div className="absolute -top-[35px] left-[-.1px] right-[-.1px] bg-black text-white px-3 py-1 text-xl text-center rounded-t-2xl">
                     BEST DEAL
                   </div>
+                  {/* Content div */}
                   <div className="border-1 border-black pt-5 pb-3 px-3 rounded-2xl rounded-t-none">
                     <div className="mb-3">
                       <h3 className="text-lg font-medium">Yearly</h3>
