@@ -4,13 +4,7 @@ import { useNavigate } from "react-router";
 import Footer from "~/components/footer";
 import Header from "~/components/header";
 import { auth } from "~/firebase/firebase";
-
-const planNames = {
-  noPlan: "noPlan",
-  free: "Free",
-  basic: "Basic",
-  premium: "Premium",
-};
+import type { planNames } from "~/lib/constant";
 
 export default function PricingPage() {
   const hasPremium = true;

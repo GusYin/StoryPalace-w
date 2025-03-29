@@ -10,6 +10,7 @@ import { useNavigate } from "react-router";
 import AuthHeader from "~/components/auth-header";
 import Footer from "~/components/footer";
 import { auth, logout } from "~/firebase/firebase";
+import { planNames } from "~/lib/constant";
 
 const MyAccount: React.FC = () => {
   const navigate = useNavigate();
@@ -21,13 +22,6 @@ const MyAccount: React.FC = () => {
   const [error, setError] = React.useState("");
   const [success, setSuccess] = React.useState("");
 
-  const planNames = {
-    noPlan: "noPlan",
-    free: "Free",
-    basic: "Basic",
-    premium: "Premium",
-  };
-
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (!user || !user.emailVerified) {
@@ -36,7 +30,7 @@ const MyAccount: React.FC = () => {
         setUser({
           name: user.displayName,
           email: user.email,
-          plan: "free" as keyof typeof planNames,
+          plan: planNames.noPlan as keyof typeof planNames,
         });
       }
     });
@@ -47,7 +41,7 @@ const MyAccount: React.FC = () => {
   const [user, setUser] = useState({
     name: auth.currentUser?.displayName,
     email: auth.currentUser?.email,
-    plan: "free" as keyof typeof planNames,
+    plan: planNames.noPlan as keyof typeof planNames,
   });
 
   // Plans: free, basic, premium
@@ -57,7 +51,8 @@ const MyAccount: React.FC = () => {
         const idTokenResult = await auth.currentUser.getIdTokenResult();
         setUser((prevUser) => {
           const plan =
-            (idTokenResult.claims.plan as keyof typeof planNames) || "free";
+            (idTokenResult.claims.plan as keyof typeof planNames) ||
+            planNames.noPlan;
           return {
             ...prevUser,
             plan,
