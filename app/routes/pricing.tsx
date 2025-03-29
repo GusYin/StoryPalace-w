@@ -105,28 +105,33 @@ export default function PricingPage() {
               </button>
             </div>
             {/* Basic Plan */}
-            <div className="text-black font-dosis bg-container-grey py-8 px-5 rounded-xl">
+            <div className="flex flex-col h-full text-black font-dosis bg-container-grey py-8 px-5 rounded-xl">
               <div className="flex items-center justify-between mb-15">
                 <h2 className="text-xl font-bold">Basic</h2>
                 <span className="bg-black text-white text-lg font-semibold px-3 py-1 rounded-full">
                   Try the 7 days Free Trial
                 </span>
               </div>
-              <p className="text-xl">Unlimited story access</p>
-              <p className="text-md text-custom-text-grey font-medium">
-                Unlimited access to all the Story Palace stories
-              </p>
-              <div className="mt-5">
-                <p className="text-xl">Early access to new features</p>
+
+              {/* Content wrapper with flex-grow */}
+              <div className="flex-grow">
+                <p className="text-xl">Unlimited story access</p>
                 <p className="text-md text-custom-text-grey font-medium">
-                  {" "}
-                  Be the first to experience and provide feedback on our latest
-                  updates and features
+                  Unlimited access to all the Story Palace stories
                 </p>
+                <div className="mt-5">
+                  <p className="text-xl">Early access to new features</p>
+                  <p className="text-md text-custom-text-grey font-medium">
+                    {" "}
+                    Be the first to experience and provide feedback on our
+                    latest updates and features
+                  </p>
+                </div>
               </div>
 
+              {/* Pricing Grid - Now at bottom */}
               <div
-                className={`mt-13 gap-x-10 grid ${
+                className={`gap-x-10 grid ${
                   hasPremium ? "xl:grid-cols-2" : "lg:grid-cols-2"
                 } gap-y-12`}
               >
@@ -188,7 +193,7 @@ export default function PricingPage() {
             </div>
             {/* Premium Plan - Conditionally Rendered */}
             {hasPremium && (
-              <div className="text-black font-dosis bg-container-grey py-8 px-5 rounded-xl">
+              <div className="flex flex-col h-full text-black font-dosis bg-container-grey py-8 px-5 rounded-xl">
                 <div className="flex items-center justify-between mb-15">
                   <h2 className="text-xl font-bold">Premium</h2>
                   <span className="bg-black text-white text-lg font-semibold px-3 py-1 rounded-full">
@@ -196,11 +201,14 @@ export default function PricingPage() {
                   </span>
                 </div>
 
-                <div className="mb-5">
-                  <p className="text-xl">Basic Plan Plus</p>
-                  <p className="text-md text-custom-text-grey font-medium">
-                    Everything in the Basic Plan, plus more!
-                  </p>
+                {/* Content wrapper with flex-grow */}
+                <div className="flex-grow">
+                  <div className="mb-5">
+                    <p className="text-xl">Basic Plan Plus</p>
+                    <p className="text-md text-custom-text-grey font-medium">
+                      Everything in the Basic Plan, plus more!
+                    </p>
+                  </div>
                 </div>
 
                 <div className="mb-5">
@@ -219,7 +227,7 @@ export default function PricingPage() {
                 </div>
 
                 <div
-                  className={`mt-13 gap-x-10 grid ${
+                  className={`gap-x-10 grid ${
                     hasPremium ? "xl:grid-cols-2" : "lg:grid-cols-2"
                   } gap-y-12`}
                 >
