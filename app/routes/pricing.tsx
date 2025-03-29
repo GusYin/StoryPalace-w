@@ -21,15 +21,17 @@ export default function PricingPage() {
   }, []);
 
   function handleCreateFreeAccount(): void {
-    if (user) {
-      if (user.emailVerified) {
-        navigate("/my-account");
-      } else {
-        navigate("/verify-email");
-      }
-    } else {
+    if (!user) {
       navigate("/signup");
+      return;
     }
+
+    if (!user.emailVerified) {
+      navigate("/verify-email");
+      return;
+    }
+
+    navigate("/my-account");
   }
 
   const fetchUserPlan = async () => {
@@ -45,18 +47,22 @@ export default function PricingPage() {
   };
 
   async function subscribeBasicPlanMonthly(): Promise<void> {
-    if (user) {
-      if (user.emailVerified) {
-        if (userPlan === null) {
-          await fetchUserPlan();
-        }
-
-        if (userPlan === planNames.free) navigate("/subscribe-basic-plan");
-      } else {
-        navigate("/verify-email");
-      }
-    } else {
+    if (!user) {
       navigate("/signup");
+      return;
+    }
+
+    if (!user.emailVerified) {
+      navigate("/verify-email");
+      return;
+    }
+
+    if (userPlan === null) {
+      await fetchUserPlan();
+    }
+
+    if (userPlan === planNames.free || userPlan === planNames.noPlan) {
+      navigate("/subscribe-basic-plan");
     }
   }
 
