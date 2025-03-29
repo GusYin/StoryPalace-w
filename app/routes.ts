@@ -18,6 +18,10 @@ export default [
   layout("components/protected-route.tsx", [
     route("my-account", "routes/my-account/my-account.tsx"),
     route("upgrade-plan", "routes/my-account/upgrade-plan.tsx"),
+    route(
+      "subscribe-plan/:plan/:monthlyOrYearly",
+      "routes/my-account/subscribe-plan.tsx"
+    ),
     route("name-your-voice", "routes/add-a-voice/name-your-voice.tsx"),
     route("upload-voice", "routes/add-a-voice/upload-voice.tsx"),
     route("confirm-save-voice", "routes/add-a-voice/confirm-save-voice.tsx"),

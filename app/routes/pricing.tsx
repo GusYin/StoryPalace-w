@@ -20,7 +20,7 @@ export default function PricingPage() {
     return () => unsubscribe();
   }, []);
 
-  function handleCreateFreeAccount(): void {
+  const authGuard = () => {
     if (!user) {
       navigate("/signup");
       return;
@@ -30,6 +30,10 @@ export default function PricingPage() {
       navigate("/verify-email");
       return;
     }
+  };
+
+  function handleCreateFreeAccount(): void {
+    authGuard();
 
     navigate("/my-account");
   }
@@ -46,23 +50,27 @@ export default function PricingPage() {
     }
   };
 
-  async function subscribeBasicPlanMonthly(): Promise<void> {
-    if (!user) {
-      navigate("/signup");
-      return;
-    }
-
-    if (!user.emailVerified) {
-      navigate("/verify-email");
-      return;
-    }
+  async function subscribeBasicPlanYearly(): Promise<void> {
+    authGuard();
 
     if (userPlan === null) {
       await fetchUserPlan();
     }
 
     if (userPlan === planNames.free || userPlan === planNames.noPlan) {
-      navigate("/subscribe-basic-plan");
+      navigate("/subscribe-plan/basic/yearly");
+    }
+  }
+
+  async function subscribeBasicPlanMonthly(): Promise<void> {
+    authGuard();
+
+    if (userPlan === null) {
+      await fetchUserPlan();
+    }
+
+    if (userPlan === planNames.free || userPlan === planNames.noPlan) {
+      navigate("/subscribe-plan/basic/monthly");
     }
   }
 

@@ -18,6 +18,10 @@ type Params = {
   "/pricing": {};
   "/my-account": {};
   "/upgrade-plan": {};
+  "/subscribe-plan/:plan/:monthlyOrYearly": {
+    "plan": string;
+    "monthlyOrYearly": string;
+  };
   "/name-your-voice": {};
   "/upload-voice": {};
   "/confirm-save-voice": {};
