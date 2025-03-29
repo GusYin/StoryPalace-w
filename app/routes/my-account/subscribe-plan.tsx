@@ -4,7 +4,6 @@ import { getAuth, type User } from "firebase/auth";
 import { httpsCallable } from "firebase/functions";
 import { functions } from "~/firebase/firebase";
 import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import LoadingSpinner from "~/components/loading-spinner";
 
 type SubscriptionParams = {

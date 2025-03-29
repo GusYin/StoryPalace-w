@@ -4,3 +4,8 @@ export const planNames = {
   basic: "basic",
   premium: "premium",
 };
+
+export enum BillingCycle {
+  Monthly = "monthly",
+  Yearly = "yearly",
+}

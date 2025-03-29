@@ -4,7 +4,7 @@ import { useNavigate } from "react-router";
 import Footer from "~/components/footer";
 import Header from "~/components/header";
 import { auth } from "~/firebase/firebase";
-import { planNames } from "~/lib/constant";
+import { BillingCycle, planNames } from "~/lib/constant";
 
 export default function PricingPage() {
   const hasPremium = true;
@@ -20,6 +20,20 @@ export default function PricingPage() {
     return () => unsubscribe();
   }, []);
 
+  const fetchUserPlan = async () => {
+    if (auth.currentUser) {
+      const idTokenResult = await auth.currentUser.getIdTokenResult();
+
+      // when a user has signed up but not yet email verified,
+      // we set their plan to be noPlan.
+      const plan =
+        (idTokenResult.claims.plan as keyof typeof planNames) ||
+        planNames.noPlan;
+
+      setUserPlan(plan);
+    }
+  };
+
   const authGuard = () => {
     if (!user) {
       navigate("/signup");
@@ -30,47 +44,63 @@ export default function PricingPage() {
       navigate("/verify-email");
       return;
     }
+
+    return true;
+  };
+
+  const planGuard = async () => {
+    if (userPlan === null) {
+      await fetchUserPlan();
+      return;
+    }
+
+    // when a user has signed up but not yet email verified,
+    // we set their plan to be noPlan.
+    if (userPlan === planNames.noPlan) {
+      navigate("/verify-email");
+      return;
+    }
+
+    return true;
   };
 
   function handleCreateFreeAccount(): void {
-    authGuard();
+    if (authGuard() !== true) {
+      return;
+    }
 
     navigate("/my-account");
   }
 
-  const fetchUserPlan = async () => {
-    if (auth.currentUser) {
-      const idTokenResult = await auth.currentUser.getIdTokenResult();
-
-      const plan =
-        (idTokenResult.claims.plan as keyof typeof planNames) ||
-        planNames.noPlan;
-
-      setUserPlan(plan);
-    }
-  };
-
-  async function subscribeBasicPlanYearly(): Promise<void> {
-    authGuard();
-
-    if (userPlan === null) {
-      await fetchUserPlan();
+  async function subscribeBasicPlan(monthlyOrYearly: string): Promise<void> {
+    if (authGuard() !== true) {
+      return;
     }
 
-    if (userPlan === planNames.free || userPlan === planNames.noPlan) {
-      navigate("/subscribe-plan/basic/yearly");
+    const isPlanValid = await planGuard();
+
+    if (isPlanValid !== true) {
+      return;
+    }
+
+    if (userPlan === planNames.free) {
+      navigate(`/subscribe-plan/basic/${monthlyOrYearly}`);
     }
   }
 
-  async function subscribeBasicPlanMonthly(): Promise<void> {
-    authGuard();
-
-    if (userPlan === null) {
-      await fetchUserPlan();
+  async function subscribePremiumPlan(monthlyOrYearly: string): Promise<void> {
+    if (authGuard() !== true) {
+      return;
     }
 
-    if (userPlan === planNames.free || userPlan === planNames.noPlan) {
-      navigate("/subscribe-plan/basic/monthly");
+    const isPlanValid = await planGuard();
+
+    if (isPlanValid !== true) {
+      return;
+    }
+
+    if (userPlan === planNames.free || userPlan === planNames.basic) {
+      navigate(`/subscribe-plan/premium/${monthlyOrYearly}`);
     }
   }
 
@@ -159,7 +189,7 @@ export default function PricingPage() {
                     </p>
                   </div>
                   <button
-                    onClick={subscribeBasicPlanMonthly}
+                    onClick={() => subscribeBasicPlan(BillingCycle.Monthly)}
                     className="tracking-normal text-lg font-bold border-1 border-custom-stroke-grey w-full px-4 py-2 rounded-2xl hover:bg-white transition-colors"
                   >
                     Subscribe
@@ -192,7 +222,10 @@ export default function PricingPage() {
                         </span>
                       </p>
                     </div>
-                    <button className="tracking-normal text-lg font-bold border-1 border-custom-stroke-grey w-full px-4 py-2 rounded-2xl hover:bg-white transition-colors">
+                    <button
+                      onClick={() => subscribeBasicPlan(BillingCycle.Yearly)}
+                      className="tracking-normal text-lg font-bold border-1 border-custom-stroke-grey w-full px-4 py-2 rounded-2xl hover:bg-white transition-colors"
+                    >
                       Subscribe
                     </button>
                   </div>
@@ -254,7 +287,10 @@ export default function PricingPage() {
                         Cancel anytime
                       </p>
                     </div>
-                    <button className="tracking-normal text-lg font-bold border-1 border-custom-stroke-grey w-full px-4 py-2 rounded-2xl hover:bg-white transition-colors">
+                    <button
+                      onClick={() => subscribePremiumPlan(BillingCycle.Monthly)}
+                      className="tracking-normal text-lg font-bold border-1 border-custom-stroke-grey w-full px-4 py-2 rounded-2xl hover:bg-white transition-colors"
+                    >
                       Subscribe
                     </button>
                   </div>
@@ -285,7 +321,12 @@ export default function PricingPage() {
                           </span>
                         </p>
                       </div>
-                      <button className="tracking-normal text-lg font-bold border-1 border-custom-stroke-grey w-full px-4 py-2 rounded-2xl hover:bg-white transition-colors">
+                      <button
+                        onClick={() =>
+                          subscribePremiumPlan(BillingCycle.Yearly)
+                        }
+                        className="tracking-normal text-lg font-bold border-1 border-custom-stroke-grey w-full px-4 py-2 rounded-2xl hover:bg-white transition-colors"
+                      >
                         Subscribe
                       </button>
                     </div>
