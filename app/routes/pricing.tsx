@@ -4,13 +4,13 @@ import { useNavigate } from "react-router";
 import Footer from "~/components/footer";
 import Header from "~/components/header";
 import { auth } from "~/firebase/firebase";
-import { BillingCycle, planNames } from "~/lib/constant";
+import { BillingCycle, PricingPlan } from "~/lib/constant";
 
 export default function PricingPage() {
   const hasPremium = true;
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
-  const [userPlan, setUserPlan] = useState<keyof typeof planNames | null>(null);
+  const [userPlan, setUserPlan] = useState<PricingPlan | null>(null);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -27,8 +27,7 @@ export default function PricingPage() {
       // when a user has signed up but not yet email verified,
       // we set their plan to be noPlan.
       const plan =
-        (idTokenResult.claims.plan as keyof typeof planNames) ||
-        planNames.noPlan;
+        (idTokenResult.claims.plan as PricingPlan) || PricingPlan.NoPlan;
 
       setUserPlan(plan);
     }
@@ -56,7 +55,7 @@ export default function PricingPage() {
 
     // when a user has signed up but not yet email verified,
     // we set their plan to be noPlan.
-    if (userPlan === planNames.noPlan) {
+    if (userPlan === PricingPlan.NoPlan) {
       navigate("/verify-email");
       return;
     }
@@ -83,7 +82,7 @@ export default function PricingPage() {
       return;
     }
 
-    if (userPlan === planNames.free) {
+    if (userPlan === PricingPlan.Free) {
       navigate(`/subscribe-plan/basic/${monthlyOrYearly}`);
     }
   }
@@ -99,7 +98,7 @@ export default function PricingPage() {
       return;
     }
 
-    if (userPlan === planNames.free || userPlan === planNames.basic) {
+    if (userPlan === PricingPlan.Free || userPlan === PricingPlan.Basic) {
       navigate(`/subscribe-plan/premium/${monthlyOrYearly}`);
     }
   }

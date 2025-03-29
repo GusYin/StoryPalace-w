@@ -1,9 +1,9 @@
-export const planNames = {
-  noPlan: "noPlan",
-  free: "free",
-  basic: "basic",
-  premium: "premium",
-};
+export enum PricingPlan {
+  NoPlan = "noPlan",
+  Free = "free",
+  Basic = "basic",
+  Premium = "premium",
+}
 
 export enum BillingCycle {
   Monthly = "monthly",

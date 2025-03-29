@@ -10,8 +10,14 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   const navigate = useNavigate();
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (!user || !user.emailVerified) {
-        navigate("/");
+      if (!user) {
+        navigate("/login");
+        return;
+      }
+
+      if (!user.emailVerified) {
+        navigate("/verify-email");
+        return;
       }
     });
 

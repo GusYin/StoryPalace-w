@@ -10,7 +10,7 @@ import { useNavigate } from "react-router";
 import AuthHeader from "~/components/auth-header";
 import Footer from "~/components/footer";
 import { auth, logout } from "~/firebase/firebase";
-import { planNames } from "~/lib/constant";
+import { PricingPlan } from "~/lib/constant";
 
 const MyAccount: React.FC = () => {
   const navigate = useNavigate();
@@ -21,47 +21,36 @@ const MyAccount: React.FC = () => {
   const [showChangePassword, setShowChangePassword] = React.useState(false);
   const [error, setError] = React.useState("");
   const [success, setSuccess] = React.useState("");
+  const [userPlan, setUserPlan] = useState<PricingPlan | null>(null);
+  const [user, setUser] = useState<{
+    name?: string | null;
+    email?: string | null;
+  } | null>(null);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (!user || !user.emailVerified) {
-        navigate("/");
-      } else {
-        setUser({
-          name: user.displayName,
-          email: user.email,
-          plan: planNames.noPlan as keyof typeof planNames,
-        });
+      setUser({
+        name: user?.displayName,
+        email: user?.email,
+      });
+
+      if (user && userPlan === null) {
+        const fetchUserPlan = async () => {
+          const idTokenResult = await user.getIdTokenResult();
+
+          // when a user has signed up but not yet email verified,
+          // we set their plan to be noPlan.
+          const plan =
+            (idTokenResult?.claims.plan as PricingPlan) || PricingPlan.Free;
+
+          setUserPlan(plan);
+        };
+
+        fetchUserPlan();
       }
     });
 
     return () => unsubscribe();
-  }, []);
-
-  const [user, setUser] = useState({
-    name: auth.currentUser?.displayName,
-    email: auth.currentUser?.email,
-    plan: planNames.noPlan as keyof typeof planNames,
-  });
-
-  // Plans: free, basic, premium
-  React.useEffect(() => {
-    const fetchUserPlan = async () => {
-      if (auth.currentUser) {
-        const idTokenResult = await auth.currentUser.getIdTokenResult();
-        setUser((prevUser) => {
-          const plan =
-            (idTokenResult.claims.plan as keyof typeof planNames) ||
-            planNames.noPlan;
-          return {
-            ...prevUser,
-            plan,
-          };
-        });
-      }
-    };
-
-    fetchUserPlan();
   }, []);
 
   const doLogout = async () =>
@@ -131,7 +120,7 @@ const MyAccount: React.FC = () => {
         <div className="text-black tracking-[3%] bg-white p-6 space-y-5 mb-[46px] pl-0">
           <div className="text-xl font-medium">MY ACCOUNT</div>
           <h2 className="font-fraunces font-semibold text-4xl">
-            Welcome back{user.name ? `, ${user.name}` : ``}!
+            Welcome back{user?.name ? `, ${user.name}` : ``}!
           </h2>
         </div>
 
@@ -142,10 +131,10 @@ const MyAccount: React.FC = () => {
               YOUR PLAN
             </h3>
             <span className="text-black font-bold text-4xl">
-              Story Palace {planNames[user.plan]}
+              Story Palace {userPlan}
             </span>
           </div>
-          {user.plan === "premium" ? (
+          {userPlan === PricingPlan.Premium ? (
             <button className="w-full sm:w-auto md:w-80 bg-gray-600 text-white px-3 py-3 rounded-3xl hover:bg-gray-700 transition-colors">
               Manage Plan
             </button>
@@ -191,10 +180,10 @@ const MyAccount: React.FC = () => {
                 </div>
               ) : (
                 <div className="text-[#707978] mt-1 flex items-center gap-2">
-                  {user.name || "You don't have a name yet..."}
+                  {user?.name || "You don't have a name yet..."}
                   <button
                     onClick={() => {
-                      setNewName(user.name || "");
+                      setNewName(user?.name || "");
                       setEditingName(true);
                     }}
                     className="underline text-[#06846F] hover:text-blue-500"
@@ -206,7 +195,7 @@ const MyAccount: React.FC = () => {
             </div>
             <div className="text-xl">
               <label className="text-black block">Email Address</label>
-              <div className="text-[#707978] mt-1">{user.email}</div>
+              <div className="text-[#707978] mt-1">{user?.email}</div>
             </div>
             <div className="flex justify-between items-center mt-1">
               <div>
