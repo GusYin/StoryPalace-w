@@ -3,7 +3,7 @@ import Footer from "~/components/footer";
 import Header from "~/components/header";
 
 export default function PricingPage() {
-  const hasPremium = false;
+  const hasPremium = true;
   return (
     <div className="min-h-screen bg-white">
       <Header />
@@ -60,9 +60,9 @@ export default function PricingPage() {
               </div>
 
               <div
-                className={`mt-13 grid ${
+                className={`mt-13 gap-x-10 grid ${
                   hasPremium ? "xl:grid-cols-2" : "lg:grid-cols-2"
-                } gap-6`}
+                } gap-y-12`}
               >
                 {/* Monthly Plan */}
                 <div className="border-1 border-black pt-5 pb-3 px-3 rounded-2xl">
