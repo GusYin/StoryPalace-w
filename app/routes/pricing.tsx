@@ -1,9 +1,71 @@
-import React from "react";
+import type { User } from "firebase/auth";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 import Footer from "~/components/footer";
 import Header from "~/components/header";
+import { auth } from "~/firebase/firebase";
+
+const planNames = {
+  noPlan: "noPlan",
+  free: "Free",
+  basic: "Basic",
+  premium: "Premium",
+};
 
 export default function PricingPage() {
   const hasPremium = true;
+  const navigate = useNavigate();
+  const [user, setUser] = useState<User | null>(null);
+  const [userPlan, setUserPlan] = useState<keyof typeof planNames | null>(null);
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      setUser(user);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  function handleCreateFreeAccount(): void {
+    if (user) {
+      if (user.emailVerified) {
+        navigate("/my-account");
+      } else {
+        navigate("/verify-email");
+      }
+    } else {
+      navigate("/signup");
+    }
+  }
+
+  const fetchUserPlan = async () => {
+    if (auth.currentUser) {
+      const idTokenResult = await auth.currentUser.getIdTokenResult();
+
+      const plan =
+        (idTokenResult.claims.plan as keyof typeof planNames) ||
+        planNames.noPlan;
+
+      setUserPlan(plan);
+    }
+  };
+
+  async function subscribeBasicPlanMonthly(): Promise<void> {
+    if (user) {
+      if (user.emailVerified) {
+        if (userPlan === null) {
+          await fetchUserPlan();
+        }
+
+        if (userPlan === planNames.free) navigate("/subscribe-basic-plan");
+      } else {
+        navigate("/verify-email");
+      }
+    } else {
+      navigate("/signup");
+    }
+  }
+
   return (
     <div className="min-h-screen bg-white">
       <Header />
@@ -35,7 +97,10 @@ export default function PricingPage() {
                   This plan doesn't offer custom narrators.
                 </p>
               </div>
-              <button className="font-semibold text-xl w-full mt-13 px-4 py-2 border-1 border-custom-stroke-grey rounded-2xl hover:bg-gray-50 transition-colors">
+              <button
+                onClick={handleCreateFreeAccount}
+                className="font-semibold text-xl w-full mt-13 px-4 py-2 border-1 border-custom-stroke-grey rounded-2xl hover:bg-gray-50 transition-colors"
+              >
                 Create Free Account
               </button>
             </div>
@@ -80,7 +145,10 @@ export default function PricingPage() {
                       Cancel anytime
                     </p>
                   </div>
-                  <button className="tracking-normal text-lg font-bold border-1 border-custom-stroke-grey w-full px-4 py-2 rounded-2xl hover:bg-white transition-colors">
+                  <button
+                    onClick={subscribeBasicPlanMonthly}
+                    className="tracking-normal text-lg font-bold border-1 border-custom-stroke-grey w-full px-4 py-2 rounded-2xl hover:bg-white transition-colors"
+                  >
                     Subscribe
                   </button>
                 </div>

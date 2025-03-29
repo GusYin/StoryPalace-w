@@ -22,6 +22,7 @@ const MyAccount: React.FC = () => {
   const [success, setSuccess] = React.useState("");
 
   const planNames = {
+    noPlan: "noPlan",
     free: "Free",
     basic: "Basic",
     premium: "Premium",
