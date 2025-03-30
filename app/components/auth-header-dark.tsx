@@ -13,17 +13,15 @@ const AuthHeaderDark = () => {
         {/* Responsive Logo */}
         {/* Left-aligned Logo */}
         <button
-          className="cursor-pointer absolute top-1/2 -translate-y-1/2 left-4 md:left-8"
+          className="cursor-pointer absolute top-1/2 -translate-y-1/2 left-8"
           onClick={() => navigate("/")}
         >
-          {/* Mobile logo (visible on small screens) */}
-          <span className="block md:hidden">
-            <StoryPalaceLogoWhite className="h-8 w-auto" />
-          </span>
-
           {/* Desktop logo (visible on medium screens and up) */}
-          <span className="hidden md:block -ml-8">
-            <StoryPalaceLogoWhite className="h-8 w-auto" /> Story Palace
+          <span className="flex items-center">
+            <StoryPalaceLogoWhite className="h-8" />{" "}
+            <p className="hidden sm:block ml-2 tracking-tight font-fraunces text-2xl font-semibold">
+              Story Palace
+            </p>
           </span>
         </button>
 
@@ -38,7 +36,7 @@ const AuthHeaderDark = () => {
           <button
             type="button"
             onClick={() => navigate("/my-account")}
-            className="cursor-pointer text-black bg-grey-bg-lucile hover:bg-teal-700 focus:outline-hidden focus:ring-4 focus:ring-green-300 rounded-[30px] px-5 py-2.5 text-center me-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
+            className="cursor-pointer bg-[#172624] hover:bg-teal-700 focus:outline-hidden focus:ring-4 focus:ring-green-300 rounded-[30px] px-5 py-2.5 text-center me-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
           >
             My Account
           </button>
