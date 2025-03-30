@@ -21,8 +21,8 @@ export default function PricingPage() {
   }, []);
 
   const fetchUserPlan = async () => {
-    if (auth.currentUser) {
-      const idTokenResult = await auth.currentUser.getIdTokenResult();
+    if (user) {
+      const idTokenResult = await user.getIdTokenResult();
 
       // when a user has signed up but not yet email verified,
       // we set their plan to be noPlan.
