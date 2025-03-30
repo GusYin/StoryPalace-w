@@ -269,7 +269,7 @@ export default function PricingPage() {
                 <div
                   className={`gap-x-5 grid ${
                     hasPremium ? "xl:grid-cols-2" : "lg:grid-cols-2"
-                  } gap-y-10`}
+                  } gap-y-12`}
                 >
                   {/* Monthly Plan */}
                   <div className="border-1 border-black pt-5 pb-3 px-3 rounded-2xl">
