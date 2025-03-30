@@ -9,7 +9,7 @@ const Header = () => {
   useEffect(() => {
     // Listen for authentication state changes
     const unsubscribe = auth.onAuthStateChanged((user) => {
-      setIsLoggedIn(!user || !user.emailVerified);
+      setIsLoggedIn(user?.emailVerified === true);
     });
 
     // Cleanup subscription on unmount

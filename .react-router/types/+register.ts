@@ -22,6 +22,7 @@ type Params = {
     "plan": string;
     "monthlyOrYearly": string;
   };
+  "/library": {};
   "/name-your-voice": {};
   "/upload-voice": {};
   "/confirm-save-voice": {};

@@ -48,14 +48,22 @@ const UnauthHeader = () => {
 
         {/* Right-aligned Auth Buttons */}
         <div className="absolute right-8 top-1/2 -translate-y-1/2 flex space-x-9 items-center">
-          <button className="hover:text-blue-600">Library</button>
-          <button onClick={doLogin} className="hover:text-blue-600">
+          <button
+            onClick={() => navigate("/library")}
+            className="cursor-pointer hover:text-blue-600"
+          >
+            Library
+          </button>
+          <button
+            onClick={doLogin}
+            className="cursor-pointer hover:text-blue-600"
+          >
             Login
           </button>
           <button
             type="button"
             onClick={doGetStarted}
-            className="text-white bg-custom-teal hover:bg-teal-700 focus:outline-hidden focus:ring-4 focus:ring-green-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
+            className="cursor-pointer text-white bg-custom-teal hover:bg-teal-700 focus:outline-hidden focus:ring-4 focus:ring-green-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
           >
             Get started
           </button>
