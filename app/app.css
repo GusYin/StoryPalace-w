@@ -11,6 +11,7 @@
   --color-grey-bg-lucile: #f1f8f7;
   --color-custom-text-grey: #707978;
   --color-custom-stroke-grey: #829793;
+  --color-custom-bg-dark: #0d0d0d;
 }
 
 @layer utilities {

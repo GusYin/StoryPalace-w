@@ -1,5 +1,5 @@
-import { useState, ChangeEvent } from "react";
-import AuthHeader from "~/components/auth-header";
+import { useState, type ChangeEvent } from "react";
+import Header from "~/components/header";
 
 interface Story {
   title: string;
@@ -37,11 +37,12 @@ const LibraryPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <AuthHeader />
+    <div className="min-h-screen bg-custom-bg-dark">
+      <Header />
 
       {/* Main Content */}
-      <main className="max-w-6xl mx-auto p-4">
+      <main className="text-white max-w-6xl mx-auto p-4">
+        <h1 className="font-semibold text-4xl">Library</h1>
         {/* Search Bar */}
         <div className="mb-8">
           <input
