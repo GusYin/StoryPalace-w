@@ -1,14 +1,15 @@
 import { useNavigate } from "react-router";
 import { StoryPalaceLogoWithText } from "./icons/story-palace-logo";
 import { StoryPalaceLogoNoText } from "./icons/story-palace-logo-no-text";
+import { StoryPalaceLogoWhite } from "./icons/sp-logo-white";
 
-const AuthHeader = () => {
+const AuthHeaderDark = () => {
   const navigate = useNavigate();
 
   return (
     <>
       {/* Sticky Navigation Bar */}
-      <nav className="drop-shadow-[0_4px_20px_0_rgba(0,0,0,0.05)] sticky h-[64px] top-0 bg-white drop-shadow-sm z-50 relative font-dosis text-sm font-[700]">
+      <nav className="bg-custom-bg-dark text-white drop-shadow-[0_10px_25px_rgba(255,255,255,0.07)] sticky h-[64px] top-0 z-50 relative font-dosis text-sm font-[700]">
         {/* Responsive Logo */}
         {/* Left-aligned Logo */}
         <button
@@ -17,12 +18,12 @@ const AuthHeader = () => {
         >
           {/* Mobile logo (visible on small screens) */}
           <span className="block md:hidden">
-            <StoryPalaceLogoNoText className="h-8 w-auto" />
+            <StoryPalaceLogoWhite className="h-8 w-auto" />
           </span>
 
           {/* Desktop logo (visible on medium screens and up) */}
           <span className="hidden md:block -ml-8">
-            <StoryPalaceLogoWithText className="h-8 w-auto" />
+            <StoryPalaceLogoWhite className="h-8 w-auto" /> Story Palace
           </span>
         </button>
 
@@ -47,4 +48,4 @@ const AuthHeader = () => {
   );
 };
 
-export default AuthHeader;
+export default AuthHeaderDark;

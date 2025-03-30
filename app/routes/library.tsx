@@ -1,4 +1,5 @@
 import { useState, type ChangeEvent } from "react";
+import AuthHeaderDark from "~/components/auth-header-dark";
 import Header from "~/components/header";
 
 interface Story {
@@ -38,7 +39,7 @@ const LibraryPage = () => {
 
   return (
     <div className="min-h-screen bg-custom-bg-dark">
-      <Header />
+      <AuthHeaderDark />
 
       {/* Main Content */}
       <main className="text-white max-w-6xl mx-auto p-4">
