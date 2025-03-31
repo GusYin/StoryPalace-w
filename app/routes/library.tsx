@@ -1,6 +1,6 @@
 import { useState, type ChangeEvent } from "react";
 import AuthHeaderDark from "~/components/auth-header-dark";
-import Header from "~/components/header";
+import { SearchIcon } from "~/components/icons/search-icon";
 
 interface Story {
   title: string;
@@ -61,11 +61,14 @@ const LibraryPage = () => {
             <h1 className="font-fraunces font-semibold text-4xl text-center md:text-left">
               Library
             </h1>
-            <div className="w-full md:max-w-[350px] md:justify-self-end">
+            <div className="w-full md:max-w-[350px] md:justify-self-end relative">
+              <div className="absolute left-3 top-1/2 -translate-y-1/2">
+                <SearchIcon className="w-5 h-5 text-gray-400" />
+              </div>
               <input
                 type="text"
                 placeholder="Search"
-                className="w-full pl-5 pr-7 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full pl-[37px] pr-7 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 value={searchQuery}
                 onChange={handleSearchChange}
               />
