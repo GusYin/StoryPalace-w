@@ -54,16 +54,16 @@ const LibraryPage = () => {
       <AuthHeaderDark />
 
       {/* Main Content */}
-      <main className="px-8 lg:px-15 text-white flex flex-col items-center mt-15">
+      <main className="font-dosis px-8 lg:px-15 text-white flex flex-col items-center mt-15">
         {/* Search area */}
         <div className="w-full max-w-5xl mb-13">
-          <div className="grid grid-cols-[1fr_auto] items-center gap-4">
-            <h1 className="font-semibold text-4xl">Library</h1>
-            <div className="w-full max-w-md">
+          <div className="grid grid-cols-[auto_1fr] items-center gap-4">
+            <h1 className="font-fraunces font-semibold text-4xl">Library</h1>
+            <div className="w-full max-w-[350px] justify-self-end">
               <input
                 type="text"
                 placeholder="Search"
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full pl-5 pr-7 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 value={searchQuery}
                 onChange={handleSearchChange}
               />
