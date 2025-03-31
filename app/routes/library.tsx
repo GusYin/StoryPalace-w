@@ -57,9 +57,11 @@ const LibraryPage = () => {
       <main className="font-dosis px-8 lg:px-15 text-white flex flex-col items-center mt-15">
         {/* Search area */}
         <div className="w-full max-w-5xl mb-13">
-          <div className="grid grid-cols-[auto_1fr] items-center gap-4">
-            <h1 className="font-fraunces font-semibold text-4xl">Library</h1>
-            <div className="w-full max-w-[350px] justify-self-end">
+          <div className="grid grid-cols-1 md:grid-cols-[auto_1fr] items-center gap-4">
+            <h1 className="font-fraunces font-semibold text-4xl text-center md:text-left">
+              Library
+            </h1>
+            <div className="w-full md:max-w-[350px] md:justify-self-end">
               <input
                 type="text"
                 placeholder="Search"
