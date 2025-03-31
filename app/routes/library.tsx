@@ -68,7 +68,7 @@ const LibraryPage = () => {
               <input
                 type="text"
                 placeholder="Search"
-                className="w-full pl-[37px] pr-7 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="placeholder-white bg-[#121212] w-full pl-[37px] pr-7 py-2 rounded-xl border-1 border-custom-stroke-grey focus:outline-none focus:ring-2 focus:ring-blue-500"
                 value={searchQuery}
                 onChange={handleSearchChange}
               />
