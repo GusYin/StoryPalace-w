@@ -5,6 +5,7 @@ import { SearchIcon } from "~/components/icons/search-icon";
 interface Story {
   title: string;
   episodes: string;
+  imgSrc?: string;
   description: string;
 }
 
@@ -15,6 +16,7 @@ const LibraryPage = () => {
     {
       title: "Tales of Lily and Leo",
       episodes: "3+15 episodes",
+      imgSrc: "../images/Tales_of_Lily_and_Leo.svg",
       description:
         "Dive into the magical world of 'The Enchanted Forest', where every tree tells a story and every creature has a tale...",
     },
@@ -82,19 +84,21 @@ const LibraryPage = () => {
             {stories.map((story, index) => (
               <div
                 key={index}
-                className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow"
+                className="bg-[#161D1C] rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition-shadow"
               >
-                {/* Image Placeholder */}
-                <div className="h-48 bg-gray-200"></div>
-
-                <div className="p-6">
+                <div className="p-5">
                   <div className="mb-4">
-                    <h3 className="text-xl font-semibold text-gray-800">
-                      {story.title}
-                    </h3>
-                    <span className="text-sm text-gray-500">
-                      {story.episodes}
-                    </span>
+                    <h3 className="text-xl font-semibold">{story.title}</h3>
+                    <span className="text-sm">{story.episodes}</span>
+                  </div>
+
+                  {/* Image Placeholder */}
+                  <div className="h-48 bg-gray-200">
+                    <img
+                      src={story.imgSrc}
+                      alt={story.title}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
 
                   <p className="text-gray-600 text-sm mb-6 line-clamp-3">
