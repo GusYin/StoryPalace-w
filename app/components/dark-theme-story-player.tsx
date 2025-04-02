@@ -325,8 +325,8 @@ const DarkThemeStoryPlayer = () => {
 
 // Styled components
 const AppContainer = styled.div`
-  background: #faf1ee;
-  min-height: 100vh;
+  background: #161d1c;
+  //min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;

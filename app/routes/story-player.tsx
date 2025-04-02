@@ -16,24 +16,25 @@ const StoryPlayerPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-custom-bg-dark">
+    <div className="min-h-screen bg-custom-bg-dark font-dosis text-white">
       <AuthHeaderDark />
-      <div className="min-h-screen bg-[#0D1715] p-8 flex flex-col items-center">
-        {/* Back Navigation */}
-        <a
-          href="/library"
-          className="self-start text-[#F5EBDC] hover:text-[#E7D5C0] text-lg mb-8 transition-colors font-dosis"
-        >
-          ← Back to library
-        </a>
-
-        {/* Story Title */}
-        <h1 className="text-4xl text-[#F5EBDC] font-dosis mb-6 text-center">
-          Tales of Lily and Leo
-        </h1>
+      <div className="px-20 flex flex-col items-center mt-15">
+        <div className="w-full flex flex-col md:flex-row md:justify-between items-center">
+          {/* Back Navigation */}
+          <a
+            href="/library"
+            className="-ml-4 mb-4 md:mb-0 hover:text-[#E7D5C0] text-xl transition-colors"
+          >
+            ← Back to library
+          </a>
+        </div>
 
         {/* Narrator Selection */}
-        <div className="mb-8 flex flex-col items-center gap-4">
+        <div className="md:-mt-8 mb-8 flex flex-col items-center gap-4">
+          {/* Story Title */}
+          <h1 className="text-4xl text-[#F5EBDC] font-dosis text-start">
+            Tales of Lily and Leo
+          </h1>
           <h2 className="text-[#F5EBDC] text-xl font-dosis">
             Select your narrator:
           </h2>
