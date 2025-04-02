@@ -1,8 +1,7 @@
-import { useState, type ChangeEvent } from "react";
+import { useMemo, useState, type ChangeEvent } from "react";
 import AuthHeaderDark from "~/components/auth-header-dark";
 import { SearchIcon } from "~/components/icons/search-icon";
 import TalesOfLilyAndLeo from "../images/Tales_of_Lily_and_Leo.svg";
-import { PlayIcon } from "~/components/icons/play-icon";
 import { PlayIconWhite } from "~/components/icons/play";
 
 interface Story {
@@ -50,6 +49,18 @@ const LibraryPage = () => {
     // Add more stories as needed
   ];
 
+  // Use useMemo to optimize search filtering
+  const filteredStories = useMemo(() => {
+    if (!searchQuery) return stories;
+
+    const lowerQuery = searchQuery.toLowerCase();
+    return stories.filter(
+      (story) =>
+        story.title.toLowerCase().includes(lowerQuery) ||
+        story.description.toLowerCase().includes(lowerQuery)
+    );
+  }, [searchQuery, stories]);
+
   const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
   };
@@ -84,7 +95,7 @@ const LibraryPage = () => {
         {/* Stories Grid */}
         <div className="w-full max-w-5xl px-4 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 justify-items-center">
-            {stories.map((story, index) => (
+            {filteredStories.map((story, index) => (
               <div
                 key={index}
                 className="bg-[#161D1C] rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition-shadow"
