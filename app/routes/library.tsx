@@ -1,6 +1,9 @@
 import { useState, type ChangeEvent } from "react";
 import AuthHeaderDark from "~/components/auth-header-dark";
 import { SearchIcon } from "~/components/icons/search-icon";
+import TalesOfLilyAndLeo from "../images/Tales_of_Lily_and_Leo.svg";
+import { PlayIcon } from "~/components/icons/play-icon";
+import { PlayIconWhite } from "~/components/icons/play";
 
 interface Story {
   title: string;
@@ -16,7 +19,7 @@ const LibraryPage = () => {
     {
       title: "Tales of Lily and Leo",
       episodes: "3+15 episodes",
-      imgSrc: "../images/Tales_of_Lily_and_Leo.svg",
+      imgSrc: TalesOfLilyAndLeo,
       description:
         "Dive into the magical world of 'The Enchanted Forest', where every tree tells a story and every creature has a tale...",
     },
@@ -80,20 +83,22 @@ const LibraryPage = () => {
 
         {/* Stories Grid */}
         <div className="w-full max-w-5xl px-4 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 justify-items-center">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 justify-items-center">
             {stories.map((story, index) => (
               <div
                 key={index}
                 className="bg-[#161D1C] rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition-shadow"
               >
                 <div className="p-5">
-                  <div className="mb-4">
-                    <h3 className="text-xl font-semibold">{story.title}</h3>
+                  <div className="mb-2">
+                    <h3 className="text-xl font-semibold mb-2">
+                      {story.title}
+                    </h3>
                     <span className="text-sm">{story.episodes}</span>
                   </div>
 
                   {/* Image Placeholder */}
-                  <div className="h-48 bg-gray-200">
+                  <div className="h-48 bg-gray-500 mb-2">
                     <img
                       src={story.imgSrc}
                       alt={story.title}
@@ -101,12 +106,13 @@ const LibraryPage = () => {
                     />
                   </div>
 
-                  <p className="text-gray-600 text-sm mb-6 line-clamp-3">
+                  <p className="text-sm mb-2 line-clamp-4">
                     {story.description}
                   </p>
 
-                  <button className="w-full bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">
-                    Play this series
+                  <button className="flex items-center justify-center gap-2 cursor-pointer border-1 border-white text-white px-4 py-2 rounded-3xl hover:bg-custom-teal transition-colors">
+                    <PlayIconWhite />
+                    <span>Play this series</span>
                   </button>
                 </div>
               </div>
