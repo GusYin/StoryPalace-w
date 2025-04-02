@@ -3,8 +3,10 @@ import AuthHeaderDark from "~/components/auth-header-dark";
 import { SearchIcon } from "~/components/icons/search-icon";
 import TalesOfLilyAndLeo from "../images/Tales_of_Lily_and_Leo.svg";
 import { PlayIconWhite } from "~/components/icons/play";
+import { useNavigate } from "react-router";
 
 interface Story {
+  id: string;
   title: string;
   episodes: string;
   imgSrc?: string;
@@ -12,10 +14,12 @@ interface Story {
 }
 
 const LibraryPage = () => {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState<string>("");
 
   const stories: Story[] = [
     {
+      id: "1",
       title: "Tales of Lily and Leo",
       episodes: "3+15 episodes",
       imgSrc: TalesOfLilyAndLeo,
@@ -23,24 +27,28 @@ const LibraryPage = () => {
         "Dive into the magical world of 'The Enchanted Forest', where every tree tells a story and every creature has a tale...",
     },
     {
+      id: "2",
       title: "The Enchanted Forest",
       episodes: "3+15 episodes",
       description:
         "Dive into the magical world of 'The Enchanted Forest', where every tree tells a story and every creature has a tale...",
     },
     {
+      id: "3",
       title: "The Enchanted Forest",
       episodes: "3+15 episodes",
       description:
         "Dive into the magical world of 'The Enchanted Forest', where every tree tells a story and every creature has a tale...",
     },
     {
+      id: "4",
       title: "The Enchanted Forest",
       episodes: "3+15 episodes",
       description:
         "Dive into the magical world of 'The Enchanted Forest', where every tree tells a story and every creature has a tale...",
     },
     {
+      id: "5",
       title: "The Enchanted Forest",
       episodes: "3+15 episodes",
       description:
@@ -121,7 +129,15 @@ const LibraryPage = () => {
                     {story.description}
                   </p>
 
-                  <button className="flex items-center justify-center gap-2 cursor-pointer border-1 border-white text-white px-4 py-2 rounded-3xl hover:bg-custom-teal transition-colors">
+                  {/* Play button */}
+                  <button
+                    onClick={() =>
+                      navigate("/story-player", {
+                        state: { storyId: story.id },
+                      })
+                    }
+                    className="flex items-center justify-center gap-2 cursor-pointer border-1 border-white text-white px-4 py-2 rounded-3xl hover:bg-custom-teal transition-colors"
+                  >
                     <PlayIconWhite />
                     <span>Play this series</span>
                   </button>

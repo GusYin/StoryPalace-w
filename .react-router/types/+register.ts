@@ -23,6 +23,7 @@ type Params = {
     "monthlyOrYearly": string;
   };
   "/library": {};
+  "/story-player": {};
   "/name-your-voice": {};
   "/upload-voice": {};
   "/confirm-save-voice": {};

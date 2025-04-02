@@ -23,6 +23,7 @@ export default [
       "routes/my-account/subscribe-plan.tsx"
     ),
     route("library", "routes/library.tsx"),
+    route("story-player", "routes/story-player.tsx"),
     route("name-your-voice", "routes/add-a-voice/name-your-voice.tsx"),
     route("upload-voice", "routes/add-a-voice/upload-voice.tsx"),
     route("confirm-save-voice", "routes/add-a-voice/confirm-save-voice.tsx"),
