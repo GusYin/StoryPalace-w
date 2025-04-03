@@ -90,7 +90,7 @@ const RotationKnob = ({
 
     // Outer circle shadow effects
     ctx.save();
-    ctx.shadowColor = "rgba(255, 255, 255, 0.5)"; // #FFFFFF with 50% opacity
+    ctx.shadowColor = "rgba(255, 255, 255, .5)"; // #FFFFFF with 50% opacity
     ctx.shadowOffsetX = 3;
     ctx.shadowOffsetY = 3;
     ctx.shadowBlur = 8;
@@ -162,11 +162,11 @@ const RotationKnob = ({
     ctx.fill();
 
     // Draw inner circle stroke
-    // ctx.beginPath();
-    // ctx.arc(centerX, centerY, innerRadius, 0, Math.PI * 2);
-    // ctx.strokeStyle = "rgba(255, 255, 255, 0.2)";
-    // ctx.lineWidth = 0.2;
-    // ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, innerRadius, 0, Math.PI * 2);
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.2)";
+    ctx.lineWidth = 0.2;
+    ctx.stroke();
 
     // Draw indicator hand
     const indicatorAngle = ((angle - 90) * Math.PI) / 180; // Convert to radians and offset
@@ -245,8 +245,8 @@ const RotationKnob = ({
     <KnobContainer>
       <canvas
         ref={canvasRef}
-        width={426}
-        height={426}
+        width={320}
+        height={320}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
@@ -290,7 +290,7 @@ const DarkThemeStoryPlayer = () => {
         {stories[selectedIndex].title}
       </Title>
 
-      <div className="mt-12 mb-12">
+      <div className="mt-2 mb-2">
         <RotationKnob
           angle={rotationAngle}
           onRotate={setRotationAngle}
@@ -329,7 +329,6 @@ const DarkThemeStoryPlayer = () => {
 
 // Styled components
 const AppContainer = styled.div`
-  background: #161d1c;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -345,8 +344,8 @@ const Title = styled.h1`
 
 const KnobContainer = styled.div`
   position: relative;
-  width: 244px;
-  height: 244px;
+  width: 320px;
+  height: 320px;
   canvas {
     width: 100%;
     height: 100%;
