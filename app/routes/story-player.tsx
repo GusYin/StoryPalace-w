@@ -8,7 +8,11 @@ const StoryPlayerPage = () => {
   const { storyId } = location.state || {};
 
   // Dummy narrators and episodes data
-  const narrators = ["Jo", "Alex", "Sam"];
+  const narrators = [
+    { voiceName: "Jo", isReady: true },
+    { voiceName: "Mummy", isReady: false },
+    { voiceName: "Daddy", isReady: false },
+  ];
 
   if (!storyId) {
     navigate("/library");
@@ -30,29 +34,33 @@ const StoryPlayerPage = () => {
         </div>
 
         {/* Narrator Selection */}
-        <div className="md:-mt-8 mb-8 flex flex-col items-center gap-4">
-          {/* Story Title */}
-          <h1 className="text-4xl text-[#F5EBDC] font-dosis text-start">
-            Tales of Lily and Leo
-          </h1>
-          <h2 className="text-[#F5EBDC] text-xl font-dosis">
-            Select your narrator:
-          </h2>
-          <div className="flex gap-4">
-            {narrators.map((narrator) => (
-              <button
-                key={narrator}
-                className="px-6 py-2 border border-custom-teal rounded-full 
-                         hover:bg-custom-teal/20 transition-colors"
-              >
-                {narrator}
-              </button>
-            ))}
+        <div className="md:-mt-8 w-full md:max-w-[330px]">
+          <div className="mb-8 flex flex-col items-center gap-4">
+            {/* Story Title */}
+            <h1 className="text-3xl mb-5">Tales of Lily and Leo</h1>
+            <div className="bg-[#161D1C] rounded-2xl shadow-md overflow-hidden w-full p-5">
+              {" "}
+              <h2 className="text-md mb-3">Select your narrator:</h2>
+              <div className="flex gap-3">
+                {narrators.map((narrator) => (
+                  <button
+                    key={narrator.voiceName}
+                    className={`text-md px-4 py-1 ${
+                      narrator.isReady
+                        ? `bg-[#07C5A5] text-[#0D0D0D]`
+                        : `bg-[#172624] text-[#707978] hover:bg-custom-teal/20`
+                    } rounded-full transition-colors`}
+                  >
+                    {narrator.voiceName}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
-        </div>
 
-        {/* Directly use the DarkThemeStoryPlayer with episode data */}
-        <DarkThemeStoryPlayer />
+          {/* Directly use the DarkThemeStoryPlayer with episode data */}
+          <DarkThemeStoryPlayer />
+        </div>
       </div>
     </div>
   );
