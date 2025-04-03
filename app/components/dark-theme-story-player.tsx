@@ -90,20 +90,33 @@ const RotationKnob = ({
 
     // Outer circle shadow effects
     ctx.save();
-    ctx.shadowColor = "rgba(255, 255, 255, .5)"; // #FFFFFF with 50% opacity
+
+    // First shadow layer (white)
+    ctx.shadowColor = "rgba(255, 255, 255, 0.5)";
     ctx.shadowOffsetX = 3;
     ctx.shadowOffsetY = 3;
     ctx.shadowBlur = 8;
+    ctx.beginPath();
+    ctx.arc(intCenterX, intCenterY, intRadius - 1, 0, Math.PI * 2);
+    ctx.fill();
 
-    ctx.shadowColor = "rgba(142, 174, 169, 0.35)"; // #8EAEA9 with 35% opacity
+    // Second shadow layer (teal)
+    ctx.shadowColor = "rgba(142, 174, 169, 0.35)";
     ctx.shadowOffsetX = 0;
     ctx.shadowOffsetY = 8;
     ctx.shadowBlur = 35;
+    ctx.beginPath();
+    ctx.arc(intCenterX, intCenterY, intRadius - 1, 0, Math.PI * 2);
+    ctx.fill();
 
-    ctx.shadowColor = "rgba(0, 0, 0, 0.25)"; // #000000 with 25% opacity
+    // Third shadow layer (black)
+    ctx.shadowColor = "rgba(0, 0, 0, 0.25)";
     ctx.shadowOffsetX = 0;
     ctx.shadowOffsetY = 31;
     ctx.shadowBlur = 60;
+    ctx.beginPath();
+    ctx.arc(intCenterX, intCenterY, intRadius - 1, 0, Math.PI * 2);
+    ctx.fill();
 
     // Outer circle gradient
 
