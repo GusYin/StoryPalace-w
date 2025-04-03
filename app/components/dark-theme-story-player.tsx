@@ -98,7 +98,7 @@ const RotationKnob = ({
     ctx.shadowColor = "rgba(174, 150, 142, 0.5)"; // #AE968E with 50% opacity
     ctx.shadowOffsetX = 0;
     ctx.shadowOffsetY = 8;
-    ctx.shadowBlur = 8;
+    ctx.shadowBlur = 35;
 
     ctx.shadowColor = "rgba(0, 0, 0, 0.25)"; // #000000 with 25% opacity
     ctx.shadowOffsetX = 0;
@@ -117,8 +117,8 @@ const RotationKnob = ({
       intCenterX + intRadius * Math.cos(angle11oclock),
       intCenterY + intRadius * Math.sin(angle11oclock)
     );
-    outerGradient.addColorStop(0, "#EEE7E4");
-    outerGradient.addColorStop(1, "#F9F6F5");
+    outerGradient.addColorStop(0, "#516C67");
+    outerGradient.addColorStop(1, "#3B4A47");
 
     // Draw outer circle
     ctx.beginPath();
@@ -136,8 +136,8 @@ const RotationKnob = ({
       centerX + outerRadius * Math.cos(angle11oclock),
       centerY + outerRadius * Math.sin(angle11oclock)
     );
-    strokeGradient.addColorStop(0, "#FFFFFF");
-    strokeGradient.addColorStop(1, "#CDC3C0");
+    strokeGradient.addColorStop(0, "#666666");
+    strokeGradient.addColorStop(1, "#293331");
 
     ctx.beginPath();
     ctx.arc(centerX, centerY, strokeRadius, 0, Math.PI * 2);
@@ -153,8 +153,8 @@ const RotationKnob = ({
       centerX + innerRadius * Math.cos(angle11oclock),
       centerY + innerRadius * Math.sin(angle11oclock)
     );
-    innerGradient.addColorStop(0, "#FCFBFA");
-    innerGradient.addColorStop(1, "#E7DFDD");
+    innerGradient.addColorStop(0, "#546D69");
+    innerGradient.addColorStop(1, "#3A403F");
 
     ctx.beginPath();
     ctx.arc(centerX, centerY, innerRadius, 0, Math.PI * 2);
@@ -174,7 +174,7 @@ const RotationKnob = ({
     ctx.translate(centerX, centerY);
     ctx.rotate(indicatorAngle);
 
-    ctx.fillStyle = "#004D3D";
+    ctx.fillStyle = "#07C5A5";
     ctx.shadowColor = "rgba(0, 0, 0, 0.25)";
     ctx.shadowBlur = 4;
     ctx.shadowOffsetY = 4;
@@ -245,8 +245,8 @@ const RotationKnob = ({
     <KnobContainer>
       <canvas
         ref={canvasRef}
-        width={244}
-        height={244}
+        width={426}
+        height={426}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
@@ -364,7 +364,7 @@ const Controls = styled.div`
 const ControlButton = styled.button`
   background: none;
   border: none;
-  color: #004d3d;
+  color: #07c5a5;
   cursor: pointer;
   padding: 1rem;
 
