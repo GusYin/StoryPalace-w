@@ -117,8 +117,8 @@ const RotationKnob = ({
       intCenterX + intRadius * Math.cos(angle11oclock),
       intCenterY + intRadius * Math.sin(angle11oclock)
     );
-    outerGradient.addColorStop(0, "#516C67");
-    outerGradient.addColorStop(1, "#3B4A47");
+    outerGradient.addColorStop(0, "#3B4A47");
+    outerGradient.addColorStop(1, "#516C67");
 
     // Draw outer circle
     ctx.beginPath();
