@@ -43,16 +43,29 @@ const StoryPlayerPage = () => {
               <h2 className="text-md mb-3">Select your narrator:</h2>
               <div className="flex gap-3">
                 {narrators.map((narrator) => (
-                  <button
-                    key={narrator.voiceName}
-                    className={`text-md px-4 py-1 ${
-                      narrator.isReady
-                        ? `bg-[#07C5A5] text-[#0D0D0D]`
-                        : `bg-[#172624] text-[#707978] hover:bg-custom-teal/20`
-                    } rounded-full transition-colors`}
-                  >
-                    {narrator.voiceName}
-                  </button>
+                  <div key={narrator.voiceName} className="relative">
+                    <button
+                      className={`text-md px-4 py-1 relative ${
+                        narrator.isReady
+                          ? `bg-[#07C5A5] text-[#0D0D0D]`
+                          : `bg-[#172624] text-[#707978]`
+                      } rounded-full transition-colors`}
+                      disabled={!narrator.isReady}
+                    >
+                      {narrator.voiceName}
+
+                      {/* Blur overlay with spinner */}
+                      {!narrator.isReady && (
+                        <div
+                          className="absolute 
+                          inset-0 bg-black/50 backdrop-blur-[.7px] rounded-full 
+                          flex items-center justify-center"
+                        >
+                          <div className="animate-spin h-5 w-5 border-2 border-current border-t-transparent rounded-full"></div>
+                        </div>
+                      )}
+                    </button>
+                  </div>
                 ))}
               </div>
             </div>
