@@ -285,7 +285,7 @@ const DarkThemeStoryPlayer = () => {
   };
 
   return (
-    <AppContainer className="font-dosis py-3 px-10 rounded-2xl bg=[#161D1C] text-white">
+    <AppContainer className="h-full md:max-h-[500px] font-dosis py-3 px-10 rounded-2xl bg=[#161D1C] text-white">
       <Title className="text-xl font-medium">
         {stories[selectedIndex].title}
       </Title>
@@ -330,7 +330,6 @@ const DarkThemeStoryPlayer = () => {
 // Styled components
 const AppContainer = styled.div`
   background: #161d1c;
-  //min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
