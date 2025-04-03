@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef } from "react";
 import { Howl } from "howler";
 import { styled } from "styled-components";
-import { SkipNextIcon } from "./icons/skip-next-icon";
-import { SkipPreviousIcon } from "./icons/skip-previous-icon";
 import { PauseIcon } from "./icons/pause-icon";
-import { PlayIcon } from "./icons/play-icon";
+import { PlayWhiteIcon } from "./icons/play-white";
+import { SkipPrevious } from "./icons/skip-previous";
+import { SkipNext } from "./icons/skip-next";
+import { PauseCircle } from "./icons/pause-circle";
 
 // Story data model
 interface Story {
@@ -320,11 +321,11 @@ const DarkThemeStoryPlayer = () => {
           }
           aria-label="Previous story"
         >
-          <SkipPreviousIcon />
+          <SkipPrevious />
         </ControlButton>
 
         <ControlButton onClick={isPlaying ? pauseAudio : playAudio}>
-          {isPlaying ? <PlayIcon /> : <PauseIcon />}
+          {isPlaying ? <PlayWhiteIcon /> : <PauseCircle />}
         </ControlButton>
 
         <ControlButton
@@ -333,7 +334,7 @@ const DarkThemeStoryPlayer = () => {
           }
           aria-label="Next story"
         >
-          <SkipNextIcon />
+          <SkipNext />
         </ControlButton>
       </Controls>
     </AppContainer>
@@ -380,16 +381,16 @@ const ControlButton = styled.button`
   cursor: pointer;
   padding: 1rem;
 
-  i {
-    font-size: 2.5rem;
-  }
+  // i {
+  //   font-size: 2.5rem;
+  // }
 
   &:hover {
     opacity: 0.8;
   }
   svg {
-    width: 40px; // Control size through CSS
-    height: 40px;
+    // width: 40px; // Control size through CSS
+    // height: 40px;
     vertical-align: middle;
 
     /* Optional hover effects */
