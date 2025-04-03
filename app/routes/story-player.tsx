@@ -33,13 +33,13 @@ const StoryPlayerPage = () => {
           </a>
         </div>
 
-        {/* Narrator Selection */}
         <div className="md:-mt-8 w-full md:max-w-[330px]">
-          <div className="mb-8 flex flex-col items-center gap-4">
+          <div className="mb-8 flex flex-col items-center gap-5">
             {/* Story Title */}
-            <h1 className="text-3xl mb-5">Tales of Lily and Leo</h1>
+            <h1 className="text-3xl">Tales of Lily and Leo</h1>
             <div className="bg-[#161D1C] rounded-2xl shadow-md overflow-hidden w-full p-5">
               {" "}
+              {/* Narrator Selection */}
               <h2 className="text-md mb-3">Select your narrator:</h2>
               <div className="flex gap-3">
                 {narrators.map((narrator) => (

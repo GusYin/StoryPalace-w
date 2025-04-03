@@ -245,8 +245,8 @@ const RotationKnob = ({
     <KnobContainer>
       <canvas
         ref={canvasRef}
-        width={426}
-        height={426}
+        width={244}
+        height={244}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
@@ -285,14 +285,18 @@ const DarkThemeStoryPlayer = () => {
   };
 
   return (
-    <AppContainer>
-      <Title>{stories[selectedIndex].title}</Title>
+    <AppContainer className="font-dosis py-3 px-10 rounded-2xl bg=[#161D1C] text-white">
+      <Title className="text-xl font-medium">
+        {stories[selectedIndex].title}
+      </Title>
 
-      <RotationKnob
-        angle={rotationAngle}
-        onRotate={setRotationAngle}
-        storiesCount={stories.length}
-      />
+      <div className="mt-12 mb-12">
+        <RotationKnob
+          angle={rotationAngle}
+          onRotate={setRotationAngle}
+          storiesCount={stories.length}
+        />
+      </div>
 
       <Controls>
         <ControlButton
@@ -331,24 +335,19 @@ const AppContainer = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 2rem;
 `;
 
 const Title = styled.h1`
-  color: #004d3d;
   font-family: "Dosis", sans-serif;
-  font-size: 2rem;
-  margin-bottom: calc(116px - (426px - 244px) / 2); // 116px - container padding
+  //margin-bottom: calc(116px - (426px - 244px) / 2); // 116px - container padding
   text-align: center;
   max-width: 600px;
 `;
 
 const KnobContainer = styled.div`
   position: relative;
-  width: 426px;
-  height: 426px;
-  mmargin: 0 0 2rem 0; // Only bottom margin remains
-
+  width: 244px;
+  height: 244px;
   canvas {
     width: 100%;
     height: 100%;
@@ -358,9 +357,9 @@ const KnobContainer = styled.div`
 const Controls = styled.div`
   display: flex;
   gap: 2rem;
-  margin-top: calc(
-    103px - (426px - 244px) / 2
-  ); // Compensate for circle position
+  // margin-top: calc(
+  //   103px - (426px - 244px) / 2
+  // ); // Compensate for circle position
 `;
 
 const ControlButton = styled.button`
