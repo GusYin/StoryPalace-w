@@ -95,7 +95,7 @@ const RotationKnob = ({
     ctx.shadowOffsetY = 3;
     ctx.shadowBlur = 8;
 
-    ctx.shadowColor = "rgba(174, 150, 142, 0.5)"; // #AE968E with 50% opacity
+    ctx.shadowColor = "rgba(142, 174, 169, 0.35)"; // #8EAEA9 with 35% opacity
     ctx.shadowOffsetX = 0;
     ctx.shadowOffsetY = 8;
     ctx.shadowBlur = 35;
@@ -136,8 +136,8 @@ const RotationKnob = ({
       centerX + outerRadius * Math.cos(angle11oclock),
       centerY + outerRadius * Math.sin(angle11oclock)
     );
-    strokeGradient.addColorStop(0, "#666666");
-    strokeGradient.addColorStop(1, "#293331");
+    strokeGradient.addColorStop(0, "#293331");
+    strokeGradient.addColorStop(1, "#666666");
 
     ctx.beginPath();
     ctx.arc(centerX, centerY, strokeRadius, 0, Math.PI * 2);
@@ -162,11 +162,11 @@ const RotationKnob = ({
     ctx.fill();
 
     // Draw inner circle stroke
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, innerRadius, 0, Math.PI * 2);
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.2)";
-    ctx.lineWidth = 0.2;
-    ctx.stroke();
+    // ctx.beginPath();
+    // ctx.arc(centerX, centerY, innerRadius, 0, Math.PI * 2);
+    // ctx.strokeStyle = "rgba(255, 255, 255, 0.2)";
+    // ctx.lineWidth = 0.2;
+    // ctx.stroke();
 
     // Draw indicator hand
     const indicatorAngle = ((angle - 90) * Math.PI) / 180; // Convert to radians and offset
@@ -285,7 +285,7 @@ const DarkThemeStoryPlayer = () => {
   };
 
   return (
-    <AppContainer className="h-full md:max-h-[500px] font-dosis py-3 px-10 rounded-2xl bg=[#161D1C] text-white">
+    <AppContainer className="h-full md:max-h-[500px] font-dosis py-3 px-10 rounded-2xl bg-[#161D1C] text-white">
       <Title className="text-xl font-medium">
         {stories[selectedIndex].title}
       </Title>
