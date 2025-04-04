@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { StoryPalaceLogoWithText } from "~/components/icons/story-palace-logo";
-import UnauthHeader from "~/components/unauth-header";
+import UnauthHeader from "~/components/header-unauth";
 import { sendPasswordResetLinkToEmail } from "~/firebase/firebase";
 
 const ResetPasswordPage = () => {

@@ -7,7 +7,7 @@ import {
 } from "firebase/auth";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
-import AuthHeader from "~/components/auth-header";
+import AuthHeader from "~/components/header-auth";
 import Footer from "~/components/footer";
 import { auth, logout } from "~/firebase/firebase";
 import { PricingPlan } from "~/lib/constant";

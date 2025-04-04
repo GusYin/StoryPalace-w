@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import AuthHeader from "./auth-header";
-import UnauthHeader from "./unauth-header";
+import AuthHeader from "./header-auth";
+import UnauthHeader from "./header-unauth";
 import { auth } from "~/firebase/firebase";
 import SkeletonHeader from "./skeleton-header";
 

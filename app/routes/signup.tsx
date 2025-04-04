@@ -1,6 +1,6 @@
 import React, { useState, type FormEvent } from "react";
 import { useNavigate } from "react-router";
-import UnauthHeader from "~/components/unauth-header";
+import UnauthHeader from "~/components/header-unauth";
 import { createUserWithEmailAndPw } from "~/firebase/firebase";
 
 const SignUpPage = () => {
