@@ -117,8 +117,11 @@ const LibraryPage = () => {
                       <span className="text-sm">{story.episodes}</span>
                     </div>
 
-                    {/* Image Placeholder */}
-                    <div className="h-48 bg-gray-500 mb-2">
+                    {/* Story image
+                    The aspect ratio 3/4 (0.75) is commonly used for book covers, 
+                    but we can adjust the ratio in aspect-[X/Y] to match 
+                    specific image requirements if needed. */}
+                    <div className="aspect-[3/4] bg-gray-500 mb-2 w-full overflow-hidden">
                       <img
                         src={story.imgSrc}
                         alt={story.title}
