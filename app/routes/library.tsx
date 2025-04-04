@@ -78,72 +78,74 @@ const LibraryPage = () => {
       <AuthHeaderDark />
 
       {/* Main Content */}
-      <main className="font-dosis px-8 lg:px-15 text-white flex flex-col items-center mt-15">
-        {/* Search area */}
-        <div className="w-full max-w-5xl mb-13">
-          <div className="grid grid-cols-1 md:grid-cols-[auto_1fr] items-center gap-4">
-            <h1 className="font-fraunces font-semibold text-4xl text-center md:text-left">
-              Library
-            </h1>
-            <div className="w-full md:max-w-[350px] md:justify-self-end relative">
-              <div className="absolute left-3 top-1/2 -translate-y-1/2">
-                <SearchIcon className="w-5 h-5 text-gray-400" />
+      <main className="font-dosis px-4 sm:px-6 lg:px-8 text-white flex flex-col items-center mt-15">
+        <div className="max-w-7xl mx-auto">
+          {/* Search area */}
+          <div className="mb-13">
+            <div className="grid grid-cols-1 md:grid-cols-[auto_1fr] items-center gap-4">
+              <h1 className="font-fraunces font-semibold text-4xl text-center md:text-left">
+                Library
+              </h1>
+              <div className="w-full md:max-w-[350px] md:justify-self-end relative">
+                <div className="absolute left-3 top-1/2 -translate-y-1/2">
+                  <SearchIcon className="w-5 h-5 text-gray-400" />
+                </div>
+                <input
+                  type="text"
+                  placeholder="Search"
+                  className="placeholder-white bg-[#121212] w-full pl-[37px] pr-7 py-2 rounded-xl border-1 border-custom-stroke-grey focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                />
               </div>
-              <input
-                type="text"
-                placeholder="Search"
-                className="placeholder-white bg-[#121212] w-full pl-[37px] pr-7 py-2 rounded-xl border-1 border-custom-stroke-grey focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={searchQuery}
-                onChange={handleSearchChange}
-              />
             </div>
           </div>
-        </div>
 
-        {/* Stories Grid */}
-        <div className="w-full max-w-5xl px-4 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 justify-items-center">
-            {filteredStories.map((story, index) => (
-              <div
-                key={index}
-                className="bg-[#161D1C] rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition-shadow"
-              >
-                <div className="p-5">
-                  <div className="mb-2">
-                    <h3 className="text-xl font-semibold mb-2">
-                      {story.title}
-                    </h3>
-                    <span className="text-sm">{story.episodes}</span>
+          {/* Stories Grid */}
+          <div className="">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-12 justify-items-center">
+              {filteredStories.map((story, index) => (
+                <div
+                  key={index}
+                  className="bg-[#161D1C] rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition-shadow"
+                >
+                  <div className="p-5">
+                    <div className="mb-2">
+                      <h3 className="text-xl font-semibold mb-2">
+                        {story.title}
+                      </h3>
+                      <span className="text-sm">{story.episodes}</span>
+                    </div>
+
+                    {/* Image Placeholder */}
+                    <div className="h-48 bg-gray-500 mb-2">
+                      <img
+                        src={story.imgSrc}
+                        alt={story.title}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+
+                    <p className="text-sm mb-2 line-clamp-4">
+                      {story.description}
+                    </p>
+
+                    {/* Play button */}
+                    <button
+                      onClick={() =>
+                        navigate("/story-player", {
+                          state: { storyId: story.id },
+                        })
+                      }
+                      className="flex items-center justify-center gap-2 cursor-pointer border-1 border-white text-white px-4 py-2 rounded-3xl hover:bg-custom-teal transition-colors"
+                    >
+                      <PlayIconWhite />
+                      <span>Play this series</span>
+                    </button>
                   </div>
-
-                  {/* Image Placeholder */}
-                  <div className="h-48 bg-gray-500 mb-2">
-                    <img
-                      src={story.imgSrc}
-                      alt={story.title}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-
-                  <p className="text-sm mb-2 line-clamp-4">
-                    {story.description}
-                  </p>
-
-                  {/* Play button */}
-                  <button
-                    onClick={() =>
-                      navigate("/story-player", {
-                        state: { storyId: story.id },
-                      })
-                    }
-                    className="flex items-center justify-center gap-2 cursor-pointer border-1 border-white text-white px-4 py-2 rounded-3xl hover:bg-custom-teal transition-colors"
-                  >
-                    <PlayIconWhite />
-                    <span>Play this series</span>
-                  </button>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </main>
