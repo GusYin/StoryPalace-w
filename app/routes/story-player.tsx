@@ -1,6 +1,7 @@
 import { useLocation, useNavigate } from "react-router";
 import AuthHeaderDark from "~/components/dark-theme-auth-header";
 import DarkThemeStoryPlayer from "~/components/dark-theme-story-player";
+import Footer from "~/components/footer";
 
 const StoryPlayerPage = () => {
   const navigate = useNavigate();
@@ -76,6 +77,7 @@ const StoryPlayerPage = () => {
           <DarkThemeStoryPlayer />
         </div>
       </div>
+      <Footer />
     </div>
   );
 };
