@@ -1,6 +1,4 @@
 import { useNavigate } from "react-router";
-import { StoryPalaceLogoWithText } from "./icons/story-palace-logo";
-import { StoryPalaceLogoNoText } from "./icons/story-palace-logo-no-text";
 import { StoryPalaceLogoWhite } from "./icons/sp-logo-white";
 
 const AuthHeaderDark = () => {
@@ -9,7 +7,7 @@ const AuthHeaderDark = () => {
   return (
     <>
       {/* Sticky Navigation Bar */}
-      <nav className="bg-custom-bg-dark text-white drop-shadow-[0_10px_25px_rgba(255,255,255,0.07)] sticky h-[64px] top-0 z-50 relative font-dosis text-sm font-[700]">
+      <nav className="bg-custom-bg-dark text-white drop-shadow-[0_10px_25px_rgba(255,255,255,0.07)] sticky h-[64px] top-0 z-50 relative font-dosis text-lg font-semibold">
         {/* Responsive Logo */}
         {/* Left-aligned Logo */}
         <button
@@ -19,7 +17,7 @@ const AuthHeaderDark = () => {
           {/* logo */}
           <span className="flex items-center">
             <StoryPalaceLogoWhite className="h-8" />{" "}
-            <p className="hidden sm:block ml-2 tracking-tight font-fraunces text-2xl font-semibold">
+            <p className="hidden md:block ml-2 tracking-tight font-fraunces text-2xl font-semibold">
               Story Palace
             </p>
           </span>

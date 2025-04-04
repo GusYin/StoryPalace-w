@@ -29,25 +29,23 @@ const UnauthHeader = () => {
   return (
     <>
       {/* Sticky Navigation Bar */}
-      <nav className="pr-8 shadow-[0_4px_20px_0_rgba(0,0,0,0.05)] font-dosis text-sm font-[700] sticky h-[64px] top-0 bg-white shadow-xs z-50 relative">
+      <nav className="drop-shadow-[0_4px_20px_0_rgba(0,0,0,0.05)] font-dosis text-lg font-semibold sticky h-[64px] top-0 bg-white drop-shadow-sm z-50 relative">
         {/* Left-aligned Logo */}
         <button
-          className="cursor-pointer absolute top-1/2 -translate-y-1/2 left-4 md:left-8"
+          className="cursor-pointer absolute top-1/2 -translate-y-1/2 left-4 sm:left-6 lg:left-8"
           onClick={() => navigate("/")}
         >
-          {/* Mobile logo (visible on small screens) */}
-          <span className="block md:hidden">
-            <StoryPalaceLogoNoText className="h-8 w-auto" />
-          </span>
-
-          {/* Desktop logo (visible on medium screens and up) */}
-          <span className="hidden md:block -ml-8">
-            <StoryPalaceLogoWithText className="h-8 w-auto" />
+          {/* logo */}
+          <span className="flex items-center">
+            <StoryPalaceLogoNoText className="h-8" />{" "}
+            <p className="hidden md:block ml-2 tracking-tight font-fraunces text-2xl font-semibold">
+              Story Palace
+            </p>
           </span>
         </button>
 
         {/* Right-aligned Auth Buttons */}
-        <div className="absolute right-8 top-1/2 -translate-y-1/2 flex space-x-9 items-center">
+        <div className="absolute right-4 sm:right-6 lg:right-8 top-1/2 -translate-y-1/2 flex space-x-4 items-center">
           <button
             onClick={() => navigate("/library")}
             className="cursor-pointer hover:text-blue-600"
@@ -63,7 +61,7 @@ const UnauthHeader = () => {
           <button
             type="button"
             onClick={doGetStarted}
-            className="cursor-pointer text-white bg-custom-teal hover:bg-teal-700 focus:outline-hidden focus:ring-4 focus:ring-green-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
+            className="cursor-pointer text-white bg-custom-teal hover:bg-teal-700 focus:outline-hidden focus:ring-4 focus:ring-green-300 font-medium rounded-full px-5 py-2.5 text-center dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
           >
             Get started
           </button>

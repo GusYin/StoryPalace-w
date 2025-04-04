@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import AuthHeader from "./header-auth";
 import UnauthHeader from "./header-unauth";
 import { auth } from "~/firebase/firebase";
-import SkeletonHeader from "./skeleton-header";
+import SkeletonHeader from "./header-skeleton";
 
 const Header = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
