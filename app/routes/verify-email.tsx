@@ -1,6 +1,5 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { useNavigate } from "react-router";
-import { StoryPalaceLogoWithText } from "~/components/icons/story-palace-logo";
 import UnauthHeader from "~/components/header-unauth";
 import { auth, verifyEmail } from "~/firebase/firebase";
 

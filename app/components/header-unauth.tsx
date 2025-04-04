@@ -1,5 +1,4 @@
 import { useNavigate } from "react-router";
-import { StoryPalaceLogoWithText } from "./icons/story-palace-logo";
 import { getAuth } from "firebase/auth";
 import { StoryPalaceLogoNoText } from "./icons/story-palace-logo-no-text";
 

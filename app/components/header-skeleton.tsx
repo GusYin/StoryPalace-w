@@ -1,5 +1,4 @@
 import { useNavigate } from "react-router";
-import { StoryPalaceLogoWithText } from "./icons/story-palace-logo";
 import { StoryPalaceLogoNoText } from "./icons/story-palace-logo-no-text";
 
 const SkeletonHeader = () => {
