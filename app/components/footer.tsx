@@ -7,7 +7,7 @@ const Footer = () => {
 
   return (
     <footer className="font-dosis w-full bg-grey-bg-lucile py-12">
-      <div className="px-4 sm:px-6 lg:px-20 ">
+      <div className="px-4 sm:px-6 lg:px-20">
         {/* Main container with 2 columns on desktop */}
         <div className="mx-auto flex flex-col md:flex-row md:justify-between gap-8">
           {/* Left Column (Logo + Social) */}

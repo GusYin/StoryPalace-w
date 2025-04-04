@@ -105,7 +105,7 @@ const MyAccount: React.FC = () => {
   return (
     <div className="min-h-screen bg-white">
       <AuthHeader />
-      <div className="font-dosis w-full mx-auto space-y-8 mt-14 px-20">
+      <div className="font-dosis w-full mx-auto space-y-8 mt-14 px-4 sm:px-6 lg:px-20">
         {/* Success/Error Messages */}
         {error && (
           <div className="text-red-500 p-3 bg-red-50 rounded-lg">{error}</div>
