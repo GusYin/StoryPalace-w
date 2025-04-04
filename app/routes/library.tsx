@@ -1,5 +1,5 @@
 import { useMemo, useState, type ChangeEvent } from "react";
-import AuthHeaderDark from "~/components/auth-header-dark";
+import AuthHeaderDark from "~/components/dark-theme-auth-header";
 import { SearchIcon } from "~/components/icons/search-icon";
 import TalesOfLilyAndLeo from "../images/Tales_of_Lily_and_Leo.svg";
 import { PlayIconWhite } from "~/components/icons/play";

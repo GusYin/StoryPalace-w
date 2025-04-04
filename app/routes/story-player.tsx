@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router";
-import AuthHeaderDark from "~/components/auth-header-dark";
+import AuthHeaderDark from "~/components/dark-theme-auth-header";
 import DarkThemeStoryPlayer from "~/components/dark-theme-story-player";
 
 const StoryPlayerPage = () => {
