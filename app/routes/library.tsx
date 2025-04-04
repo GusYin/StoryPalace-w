@@ -103,7 +103,7 @@ const LibraryPage = () => {
 
           {/* Stories Grid */}
           <div className="">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-12 justify-items-center">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-7 lg:gap-12 justify-items-center">
               {filteredStories.map((story, index) => (
                 <div
                   key={index}
