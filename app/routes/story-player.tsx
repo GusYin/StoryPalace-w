@@ -10,7 +10,7 @@ const StoryPlayerPage = () => {
 
   // Dummy narrators and episodes data
   const narrators = [
-    { voiceName: "Jo", isReady: true },
+    { voiceName: "Jokkkkkkkkkkkkkkkkkkkkkkkkkkkkkk", isReady: true },
     { voiceName: "Mummy", isReady: false },
     { voiceName: "Daddy", isReady: false },
   ];
@@ -47,11 +47,12 @@ const StoryPlayerPage = () => {
                 {narrators.map((narrator) => (
                   <div key={narrator.voiceName} className="relative">
                     <button
-                      className={`text-md px-4 py-1 relative ${
-                        narrator.isReady
-                          ? `bg-[#07C5A5] text-[#0D0D0D]`
-                          : `bg-[#172624] text-[#707978]`
-                      } rounded-full transition-colors`}
+                      className={`max-w-20 overflow-hidden whitespace-nowrap text-ellipsis
+                        text-md px-4 py-1 relative ${
+                          narrator.isReady
+                            ? `bg-[#07C5A5] text-[#0D0D0D]`
+                            : `bg-[#172624] text-[#707978]`
+                        } rounded-full transition-colors`}
                       disabled={!narrator.isReady}
                     >
                       {narrator.voiceName}
