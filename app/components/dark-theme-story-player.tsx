@@ -299,12 +299,12 @@ const DarkThemeStoryPlayer = () => {
   };
 
   return (
-    <AppContainer className="h-full md:max-h-[500px] font-dosis py-3 px-10 rounded-2xl bg-[#161D1C] text-white">
-      <Title className="text-xl font-medium">
+    <AppContainer className="h-full md:max-h-[500px] font-dosis py-3 md:px-10 rounded-2xl bg-[#161D1C] text-white">
+      <Title className="md:text-xl font-medium">
         {stories[selectedIndex].title}
       </Title>
 
-      <div className="mt-2 mb-2">
+      <div className="md:mt-2 md:mb-2">
         <RotationKnob
           angle={rotationAngle}
           onRotate={setRotationAngle}
@@ -312,7 +312,7 @@ const DarkThemeStoryPlayer = () => {
         />
       </div>
 
-      <Controls>
+      <Controls className="gap-15">
         <ControlButton
           onClick={() =>
             setSelectedIndex(
@@ -351,7 +351,6 @@ const AppContainer = styled.div`
 
 const Title = styled.h1`
   font-family: "Dosis", sans-serif;
-  //margin-bottom: calc(116px - (426px - 244px) / 2); // 116px - container padding
   text-align: center;
   max-width: 600px;
 `;
@@ -368,7 +367,7 @@ const KnobContainer = styled.div`
 
 const Controls = styled.div`
   display: flex;
-  gap: 2rem;
+  //gap: 2rem;
   // margin-top: calc(
   //   103px - (426px - 244px) / 2
   // ); // Compensate for circle position
@@ -379,11 +378,7 @@ const ControlButton = styled.button`
   border: none;
   color: #07c5a5;
   cursor: pointer;
-  padding: 1rem;
-
-  // i {
-  //   font-size: 2.5rem;
-  // }
+  //padding: 1rem;
 
   &:hover {
     opacity: 0.8;

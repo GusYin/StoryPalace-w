@@ -37,8 +37,8 @@ const StoryPlayerPage = () => {
         <div className="md:-mt-8 w-full md:max-w-[330px]">
           <div className="mb-2 md:mb-8 gap-2 md:gap-5 flex flex-col items-center">
             {/* Story Title */}
-            <h1 className="md:text-3xl">Tales of Lily and Leo</h1>
-            <div className="bg-[#161D1C] rounded-2xl shadow-md overflow-hidden w-full p-5">
+            <h1 className="text-lg md:text-3xl">Tales of Lily and Leo</h1>
+            <div className="p-2 md:p-5 bg-[#161D1C] rounded-2xl shadow-md overflow-hidden w-full">
               {" "}
               {/* Narrator Selection */}
               <h2 className="text-md mb-3">Select your narrator:</h2>
