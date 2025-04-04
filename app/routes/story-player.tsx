@@ -20,9 +20,10 @@ const StoryPlayerPage = () => {
   }
 
   return (
+    // md (medium screens (768px) is the breakpoint the audio play
     <div className="min-h-screen bg-custom-bg-dark font-dosis text-white">
       <AuthHeaderDark />
-      <div className="px-5 md:px-20 flex flex-col items-center mt-15">
+      <div className="px-4 sm:px-6 md:px-20 mt-2 md:mt-15 flex flex-col items-center">
         <div className="w-full flex flex-col md:flex-row md:justify-between items-center">
           {/* Back Navigation */}
           <a
@@ -34,7 +35,7 @@ const StoryPlayerPage = () => {
         </div>
 
         <div className="md:-mt-8 w-full md:max-w-[330px]">
-          <div className="mb-8 flex flex-col items-center gap-5">
+          <div className="mb-2 md:mb-8 gap-2 md:gap-5 flex flex-col items-center">
             {/* Story Title */}
             <h1 className="text-3xl">Tales of Lily and Leo</h1>
             <div className="bg-[#161D1C] rounded-2xl shadow-md overflow-hidden w-full p-5">
