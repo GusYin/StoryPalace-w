@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router";
-import { StoryPalaceLogoNoText } from "./icons/story-palace-logo-no-text";
+import { StoryPalaceLogoBlack } from "./icons/story-palace-logo-black";
 
 const AuthHeader = () => {
   const navigate = useNavigate();
@@ -16,7 +16,7 @@ const AuthHeader = () => {
         >
           {/* logo */}
           <span className="flex items-center">
-            <StoryPalaceLogoNoText className="h-8" />{" "}
+            <StoryPalaceLogoBlack className="h-8" />{" "}
             <p className="hidden md:block ml-2 tracking-tight font-fraunces text-2xl font-semibold">
               Story Palace
             </p>

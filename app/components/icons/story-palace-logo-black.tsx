@@ -1,4 +1,4 @@
-export const StoryPalaceLogoNoText = ({
+export const StoryPalaceLogoBlack = ({
   className,
   ...props
 }: React.SVGProps<SVGSVGElement>) => (

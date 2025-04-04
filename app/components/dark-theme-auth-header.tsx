@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router";
-import { StoryPalaceLogoWhite } from "./icons/sp-logo-white";
+import { StoryPalaceLogoWhite } from "./icons/story-palace-logo-white";
 
 const AuthHeaderDark = () => {
   const navigate = useNavigate();
