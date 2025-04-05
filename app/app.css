@@ -87,3 +87,24 @@
   mask-size: cover;
   -webkit-mask-size: cover;
 }
+
+/* For mobile spacing adjustments */
+@media (max-width: 767px) and (min-height: 700px) {
+  .tall-mobile-margin-bottom {
+    margin-bottom: 1rem !important;
+  }
+
+  .tall-mobile-margin-top {
+    margin-top: 1rem !important;
+  }
+}
+
+@media (max-width: 767px) and (min-height: 800px) {
+  .tall-mobile-margin-bottom {
+    margin-bottom: 2rem !important;
+  }
+
+  .tall-mobile-margin-top {
+    margin-top: 2rem !important;
+  }
+}

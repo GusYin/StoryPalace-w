@@ -299,7 +299,7 @@ const DarkThemeStoryPlayer = () => {
   };
 
   return (
-    <AppContainer className="h-full md:max-h-[500px] font-dosis py-3 md:px-10 rounded-2xl bg-[#161D1C] text-white">
+    <AppContainer className="mb-5 h-full md:max-h-[500px] font-dosis py-3 md:px-10 rounded-2xl bg-[#161D1C] text-white">
       <Title className="md:text-xl font-medium">
         {stories[selectedIndex].title}
       </Title>

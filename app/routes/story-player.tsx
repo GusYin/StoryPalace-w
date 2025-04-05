@@ -24,7 +24,7 @@ const StoryPlayerPage = () => {
     <div className="min-h-screen bg-custom-bg-dark font-dosis text-white">
       <AuthHeaderDark />
       <div className="px-4 sm:px-6 md:px-20 mt-2 md:mt-15 flex flex-col items-center">
-        <div className="w-full flex flex-col md:flex-row md:justify-between items-center">
+        <div className="tall-mobile-margin-bottom w-full flex flex-col md:flex-row md:justify-between items-center">
           {/* Back Navigation */}
           <a
             href="/library"
@@ -37,8 +37,10 @@ const StoryPlayerPage = () => {
         <div className="md:-mt-8 w-full md:max-w-[330px]">
           <div className="mb-2 md:mb-8 gap-2 md:gap-5 flex flex-col items-center">
             {/* Story Title */}
-            <h1 className="text-lg md:text-3xl">Tales of Lily and Leo</h1>
-            <div className="p-2 md:p-5 bg-[#161D1C] rounded-2xl shadow-md overflow-hidden w-full">
+            <h1 className="tall-mobile-margin-bottom text-lg md:text-3xl">
+              Tales of Lily and Leo
+            </h1>
+            <div className="tall-mobile-margin-bottom p-2 md:p-5 bg-[#161D1C] rounded-2xl shadow-md overflow-hidden w-full">
               {" "}
               {/* Narrator Selection */}
               <h2 className="text-md mb-3">Select your narrator:</h2>
@@ -73,7 +75,6 @@ const StoryPlayerPage = () => {
             </div>
           </div>
 
-          {/* Directly use the DarkThemeStoryPlayer with episode data */}
           <DarkThemeStoryPlayer />
         </div>
       </div>
