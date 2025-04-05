@@ -28,7 +28,7 @@ const StoryPlayerPage = () => {
           {/* Back Navigation */}
           <a
             href="/library"
-            className="-ml-4 mb-4 md:mb-0 hover:text-[#E7D5C0] md:text-xl transition-colors"
+            className="-ml-4 mb-4 md:mb-0 hover:text-[#E7D5C0] tall-mobile-font-size md:text-xl transition-colors"
           >
             ← Back to library
           </a>
@@ -37,7 +37,7 @@ const StoryPlayerPage = () => {
         <div className="md:-mt-8 w-full md:max-w-[330px]">
           <div className="mb-2 md:mb-8 gap-2 md:gap-5 flex flex-col items-center">
             {/* Story Title */}
-            <h1 className="tall-mobile-margin-bottom text-lg md:text-3xl">
+            <h1 className="tall-mobile-margin-bottom tall-mobile-font-size-3 text-lg md:text-3xl">
               Tales of Lily and Leo
             </h1>
             <div className="tall-mobile-margin-bottom p-2 md:p-5 bg-[#161D1C] rounded-2xl shadow-md overflow-hidden w-full">
