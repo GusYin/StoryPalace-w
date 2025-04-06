@@ -1,13 +1,22 @@
 import { useNavigate } from "react-router";
-import { getAuth } from "firebase/auth";
+import { type User } from "firebase/auth";
 import { StoryPalaceLogoBlack } from "./icons/story-palace-logo-black";
+import { useEffect, useState } from "react";
+import { auth } from "~/firebase/firebase";
 
 const UnauthHeader = () => {
+  const [user, setUser] = useState<User | null>(null);
   const navigate = useNavigate();
 
-  const doGetStarted = () => {
-    const user = getAuth().currentUser;
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      setUser(user);
+    });
 
+    return () => unsubscribe();
+  }, []);
+
+  const doGetStarted = () => {
     if (user) {
       if (user.emailVerified) navigate("/my-account");
       else navigate("/verify-email");
@@ -17,8 +26,6 @@ const UnauthHeader = () => {
   };
 
   const doLogin = () => {
-    const user = getAuth().currentUser;
-
     if (user) {
       if (user.emailVerified) navigate("/my-account");
       else navigate("/verify-email");

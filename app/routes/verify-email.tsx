@@ -8,9 +8,14 @@ const VerifyEmailPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    !auth.currentUser && navigate("/login");
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user?.emailVerified) {
+        navigate("/my-account");
+        return;
+      }
+    });
 
-    auth.currentUser?.emailVerified && navigate("/my-account");
+    return () => unsubscribe();
   }, []);
 
   async function resendVerifyEmail(e: FormEvent) {
