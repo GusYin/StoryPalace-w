@@ -1,7 +1,10 @@
 import { CallableRequest, HttpsError } from "firebase-functions/v2/https";
 
-export const throwIfUnauthenticated = (r: CallableRequest) => {
-  if (!r.auth?.uid) {
-    throw new HttpsError("unauthenticated", "Authentication required");
+export const throwIfUnauthenticated = (request: CallableRequest) => {
+  if (!request.auth?.uid || !request.auth?.token?.email_verified) {
+    throw new HttpsError(
+      "unauthenticated",
+      "Authentication and email verified required"
+    );
   }
 };

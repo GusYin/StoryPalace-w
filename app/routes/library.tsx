@@ -1,9 +1,11 @@
-import { useMemo, useState, type ChangeEvent } from "react";
+import { useEffect, useMemo, useState, type ChangeEvent } from "react";
 import AuthHeaderDark from "~/components/dark-theme-auth-header";
 import { SearchIcon } from "~/components/icons/search-icon";
 import TalesOfLilyAndLeo from "../images/Tales_of_Lily_and_Leo.svg";
 import { PlayIconWhite } from "~/components/icons/play";
 import { useNavigate } from "react-router";
+import { httpsCallable } from "firebase/functions";
+import { functions, app } from "~/firebase/firebase";
 
 interface Story {
   id: string;
@@ -11,53 +13,65 @@ interface Story {
   episodes: string;
   imgSrc?: string;
   description: string;
+  isFree?: boolean;
 }
+
+type UserPlan = "free" | "basic" | "premium";
 
 const LibraryPage = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [stories, setStories] = useState<Story[]>([]);
+  const [userPlan, setUserPlan] = useState<UserPlan>("free");
+  const [trialEndDate, setTrialEndDate] = useState<Date | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const stories: Story[] = [
-    {
-      id: "1",
-      title: "Tales of Lily and Leo",
-      episodes: "3+15 episodes",
-      imgSrc: TalesOfLilyAndLeo,
-      description:
-        "Dive into the magical world of 'The Enchanted Forest', where every tree tells a story and every creature has a tale...",
-    },
-    {
-      id: "2",
-      title: "The Enchanted Forest",
-      episodes: "3+15 episodes",
-      description:
-        "Dive into the magical world of 'The Enchanted Forest', where every tree tells a story and every creature has a tale...",
-    },
-    {
-      id: "3",
-      title: "The Enchanted Forest",
-      episodes: "3+15 episodes",
-      description:
-        "Dive into the magical world of 'The Enchanted Forest', where every tree tells a story and every creature has a tale...",
-    },
-    {
-      id: "4",
-      title: "The Enchanted Forest",
-      episodes: "3+15 episodes",
-      description:
-        "Dive into the magical world of 'The Enchanted Forest', where every tree tells a story and every creature has a tale...",
-    },
-    {
-      id: "5",
-      title: "The Enchanted Forest",
-      episodes: "3+15 episodes",
-      description:
-        "Dive into the magical world of 'The Enchanted Forest', where every tree tells a story and every creature has a tale...",
-    },
-    // Add more stories as needed
-  ];
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const getUserPlan = httpsCallable<
+          {},
+          { plan: UserPlan; trialEndDate?: string }
+        >(functions, "getUserPlan");
 
-  // Use useMemo to optimize search filtering
+        const result = await getUserPlan({});
+
+        setUserPlan(result.data.plan);
+
+        if (result.data.trialEndDate) {
+          setTrialEndDate(new Date(result.data.trialEndDate));
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+        setUserPlan("free");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
+  useEffect(() => {
+    const fetchStories = async () => {
+      try {
+        const getStories = httpsCallable<{}, { stories: Story[] }>(
+          functions,
+          "getStories"
+        );
+        const result = await getStories({});
+        setStories(result.data.stories);
+      } catch (error) {
+        console.error("Error fetching stories:", error);
+        setStories([]);
+      }
+    };
+
+    if (!loading) {
+      fetchStories();
+    }
+  }, [loading]);
+
   const filteredStories = useMemo(() => {
     if (!searchQuery) return stories;
 
@@ -72,6 +86,15 @@ const LibraryPage = () => {
   const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-custom-bg-dark">
+        <div className="animate-spin h-5 w-5 border-2 border-current border-t-transparent rounded-full"></div>
+        Loading...
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-custom-bg-dark">
