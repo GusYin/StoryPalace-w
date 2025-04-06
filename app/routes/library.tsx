@@ -144,7 +144,7 @@ const LibraryPage = () => {
                       <h3 className="text-xl font-semibold mb-2">
                         {story.title}
                       </h3>
-                      <span className="text-sm">{story.episodes}</span>
+                      <span className="text-sm">{story.episodeSeries}</span>
                     </div>
 
                     {/* Story image
