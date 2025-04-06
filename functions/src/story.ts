@@ -1,45 +1,10 @@
 import * as functions from "firebase-functions/v2";
 import * as admin from "firebase-admin";
 
-admin.initializeApp();
-
 interface UserData {
   plan?: "free" | "basic" | "premium";
   trialEndDate?: admin.firestore.Timestamp;
 }
-
-export const getUserPlan = functions.https.onCall(async (request) => {
-  if (!request.auth?.uid || !request.auth?.token?.email_verified) {
-    throw new functions.https.HttpsError(
-      "unauthenticated",
-      "Authentication and email verified required"
-    );
-  }
-
-  try {
-    const userDoc = await admin
-      .firestore()
-      .collection("users")
-      .doc(request.auth.uid)
-      .get();
-
-    if (!userDoc.exists) {
-      throw new functions.https.HttpsError("not-found", "User not found");
-    }
-
-    const userData = userDoc.data() as UserData;
-    return {
-      plan: userData.plan || "free",
-      trialEndDate: userData.trialEndDate?.toDate().toISOString(),
-    };
-  } catch (error) {
-    functions.logger.error("Error fetching user plan:", error);
-    throw new functions.https.HttpsError(
-      "internal",
-      "Failed to fetch user plan"
-    );
-  }
-});
 
 interface Story {
   id: string;
