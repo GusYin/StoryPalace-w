@@ -173,12 +173,17 @@ export const getStories = functions.https.onCall(async (request) => {
           })
         );
 
+        // Get episode content
+        const [contentBuffer] = await bucket
+          .file(`${episodeFolder.name}content.txt`)
+          .download();
+
         episodes.push({
           id: episodeId,
           title: episodeTitle,
-          contentUrl: `data:text/plain;base64,${(
-            await bucket.file(`${episodeFolder.name}content.txt`).download()
-          )[0].toString("base64")}`,
+          contentUrl: `data:text/plain;base64,${contentBuffer.toString(
+            "base64"
+          )}`,
           audioUrls,
         });
       }
