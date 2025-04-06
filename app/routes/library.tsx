@@ -5,15 +5,22 @@ import TalesOfLilyAndLeo from "../images/Tales_of_Lily_and_Leo.svg";
 import { PlayIconWhite } from "~/components/icons/play";
 import { useNavigate } from "react-router";
 import { httpsCallable } from "firebase/functions";
-import { functions, app } from "~/firebase/firebase";
+import { functions } from "~/firebase/firebase";
 
 interface Story {
   id: string;
   title: string;
-  episodes: string;
+  episodeSeries: string; // For example, "3+ | 5 episodes"
+  episodes: Episode[];
   imgSrc?: string;
   description: string;
-  isFree?: boolean;
+}
+
+interface Episode {
+  id: string;
+  title: string;
+  contentUrl: string;
+  audioUrls: string[]; // each episode can have multiple audio URLs
 }
 
 type UserPlan = "free" | "basic" | "premium";
@@ -55,12 +62,12 @@ const LibraryPage = () => {
   useEffect(() => {
     const fetchStories = async () => {
       try {
-        const getStories = httpsCallable<{}, { stories: Story[] }>(
-          functions,
-          "getStories"
-        );
-        const result = await getStories({});
-        setStories(result.data.stories);
+        const getStories = httpsCallable<
+          {},
+          { stories: Story[]; nextPageToken?: string }
+        >(functions, "getStories");
+        const firstPageResult = await getStories({});
+        setStories(firstPageResult.data.stories);
       } catch (error) {
         console.error("Error fetching stories:", error);
         setStories([]);

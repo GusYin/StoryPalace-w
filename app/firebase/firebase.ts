@@ -14,6 +14,7 @@ import { getAnalytics, isSupported } from "firebase/analytics";
 import { getFunctions, connectFunctionsEmulator } from "firebase/functions";
 import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
 import { connectStorageEmulator, getStorage } from "firebase/storage";
+import { initializeAppCheck, ReCaptchaV3Provider } from "firebase/app-check";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -33,6 +34,15 @@ const firebaseConfig = {
 // Initialize Firebase
 export const app = initializeApp(firebaseConfig);
 const analytics = isSupported().then((yes) => (yes ? getAnalytics(app) : null));
+
+// For development/testing with the emulator:
+//self.FIREBASE_APPCHECK_DEBUG_TOKEN = true; // Set this before initializing App Check
+
+// For production:
+// initializeAppCheck(app, {
+//   provider: new ReCaptchaV3Provider("YOUR_RECAPTCHA_SITE_KEY"),
+//   isTokenAutoRefreshEnabled: true, // Optional: auto refresh tokens
+// });
 
 // Initialize Firebase clound functions
 export const functions = getFunctions(app);
@@ -57,18 +67,18 @@ if (process.env.NODE_ENV === "development") {
 export const createUserWithEmailAndPw = async (
   email: string,
   password: string,
-  username?: string
+  username: string
 ) => {
   const user = await createUserWithEmailAndPassword(auth, email, password);
 
   // swallow errors because we don't want to block the user from signing up
   try {
-    auth.currentUser &&
-      updateProfile(auth.currentUser, {
+    if (auth.currentUser) {
+      await updateProfile(auth.currentUser, {
         displayName: username,
       });
-
-    auth.currentUser && sendEmailVerification(auth.currentUser);
+      await sendEmailVerification(auth.currentUser);
+    }
   } catch (err) {
     console.error(err);
   }

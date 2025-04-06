@@ -17,7 +17,7 @@ const SignUpPage = () => {
     setError("");
 
     try {
-      const user = await createUserWithEmailAndPw(email, password);
+      const user = await createUserWithEmailAndPw(email, password, userName);
 
       if (user.user.emailVerified) {
         navigate("/my-account");
