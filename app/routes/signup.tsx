@@ -9,10 +9,31 @@ const SignUpPage = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [invalidFields, setInvalidFields] = useState({
+    userName: false,
+    email: false,
+    password: false,
+  });
   const navigate = useNavigate();
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
+
+    // Reset invalid fields
+    setInvalidFields({
+      userName: !userName.trim(),
+      email: !email.trim(),
+      password: !password.trim(),
+    });
+
+    // Check if any fields are invalid
+    const hasErrors = Object.values(invalidFields).some(Boolean);
+
+    if (!userName.trim() || !email.trim() || !password.trim()) {
+      setError("Please fill in all required fields");
+      return;
+    }
+
     setIsLoading(true);
     setError("");
 
@@ -30,6 +51,24 @@ const SignUpPage = () => {
       setIsLoading(false);
     }
   }
+
+  // Handle input changes and remove invalid state
+  const handleInputChange =
+    (field: keyof typeof invalidFields) =>
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setInvalidFields((prev) => ({ ...prev, [field]: false }));
+      switch (field) {
+        case "userName":
+          setUserName(e.target.value);
+          break;
+        case "email":
+          setEmail(e.target.value);
+          break;
+        case "password":
+          setPassword(e.target.value);
+          break;
+      }
+    };
 
   return (
     <div className="min-h-screen bg-white">
@@ -52,27 +91,44 @@ const SignUpPage = () => {
           </div>
 
           {/* Sign Up Form */}
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} noValidate>
             <div className="mt-12 space-y-4">
               <input
                 type="text"
-                className="font-dosis font-medium text-xl placeholder-black bg-[#F3F7F7] mt-1 block w-full rounded-xl border border-[#829793] px-5 py-3 focus:outline-hidden focus:ring-2 focus:ring-blue-500"
+                required
+                className={`font-dosis font-medium text-xl placeholder-black
+                 bg-[#F3F7F7] mt-1 block w-full rounded-xl border px-5 py-3 
+                 focus:outline-hidden focus:ring-2 ${
+                   invalidFields.userName
+                     ? "border-red-500 ring-red-500"
+                     : "border-[#829793] focus:ring-blue-500"
+                 }`}
                 placeholder="Your name"
-                onChange={(e) => setUserName(e.target.value)}
+                onChange={handleInputChange("userName")}
               />
 
               <input
                 type="email"
-                className="font-dosis font-medium text-xl placeholder-black bg-[#F3F7F7] mt-1 block w-full rounded-xl border border-[#829793] px-5 py-3 focus:outline-hidden focus:ring-2 focus:ring-blue-500"
+                required
+                className={`font-dosis font-medium text-xl placeholder-black bg-[#F3F7F7] mt-1 block w-full rounded-xl border px-5 py-3 focus:outline-hidden focus:ring-2 ${
+                  invalidFields.email
+                    ? "border-red-500 ring-red-500"
+                    : "border-[#829793] focus:ring-blue-500"
+                }`}
                 placeholder="Email address"
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={handleInputChange("email")}
               />
 
               <input
                 type="password"
-                className="font-dosis font-medium text-xl placeholder-black bg-[#F3F7F7]  mt-1 block w-full rounded-xl border border-[#829793] px-5 py-3 focus:outline-hidden focus:ring-2 focus:ring-blue-500"
+                required
+                className={`font-dosis font-medium text-xl placeholder-black bg-[#F3F7F7] mt-1 block w-full rounded-xl border px-5 py-3 focus:outline-hidden focus:ring-2 ${
+                  invalidFields.password
+                    ? "border-red-500 ring-red-500"
+                    : "border-[#829793] focus:ring-blue-500"
+                }`}
                 placeholder="Password"
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={handleInputChange("password")}
               />
             </div>
 
