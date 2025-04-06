@@ -69,22 +69,15 @@ stories/
     cover.jpg
     episodes/
       episode-001/
-        id: "episode-001"
-        title: "Episode 1"
+        metadata.json  # Contains { "title": "Episode 1" }
         content.txt
         audios/
           part-1.mp3
-          part-2.mp3
       episode-002/
-        id: "episode-002"
-        title: "Episode 2"
+        metadata.json
         content.txt
         audios/
           part-1.mp3
-  story-002/
-    metadata.json
-    cover.jpg
-    episodes/
       ...
  */
 
@@ -136,7 +129,7 @@ export const getStories = functions.https.onCall(async (request) => {
         .file(`${folder.name}cover.jpg`)
         .getSignedUrl({
           action: "read",
-          expires: Date.now() + 5 * 60 * 1000, // 5 minutes from now
+          expires: Date.now() + 5 * 60 * 1000,
         });
 
       // Process episodes
@@ -147,10 +140,23 @@ export const getStories = functions.https.onCall(async (request) => {
       });
 
       for (const episodeFolder of episodeFolders) {
-        // Get episode content
-        const [content] = await bucket
-          .file(`${episodeFolder.name}content.txt`)
-          .download();
+        // Get episode metadata
+        const episodeId = episodeFolder.name.split("/").pop() || "";
+        let episodeTitle = "Untitled Episode";
+
+        try {
+          const [epMetadata] = await bucket
+            .file(`${episodeFolder.name}metadata.json`)
+            .download();
+          const episodeMeta = JSON.parse(epMetadata.toString());
+          episodeTitle = episodeMeta.title || episodeTitle;
+        } catch (error) {
+          // Fallback to content.txt first line if metadata missing
+          const [content] = await bucket
+            .file(`${episodeFolder.name}content.txt`)
+            .download();
+          episodeTitle = content.toString().split("\n")[0] || episodeTitle;
+        }
 
         // Get audio files
         const [audioFiles] = await bucket.getFiles({
@@ -161,16 +167,18 @@ export const getStories = functions.https.onCall(async (request) => {
           audioFiles.map(async (file) => {
             const [url] = await file.getSignedUrl({
               action: "read",
-              expires: Date.now() + 5 * 60 * 1000, // 5 minutes from now,
+              expires: Date.now() + 5 * 60 * 1000,
             });
             return url;
           })
         );
 
         episodes.push({
-          id: episodeFolder.name.split("/").pop() || "",
-          title: content.toString().split("\n")[0] || "Untitled Episode",
-          contentUrl: `data:text/plain;base64,${content.toString("base64")}`,
+          id: episodeId,
+          title: episodeTitle,
+          contentUrl: `data:text/plain;base64,${(
+            await bucket.file(`${episodeFolder.name}content.txt`).download()
+          )[0].toString("base64")}`,
           audioUrls,
         });
       }
