@@ -11,6 +11,8 @@ import AuthHeader from "~/components/header-auth";
 import Footer from "~/components/footer";
 import { auth, logout } from "~/firebase/firebase";
 import { PricingPlan } from "~/lib/constant";
+import { httpsCallable } from "firebase/functions";
+import { functions } from "~/firebase/firebase";
 
 const MyAccount: React.FC = () => {
   const navigate = useNavigate();
@@ -21,7 +23,9 @@ const MyAccount: React.FC = () => {
   const [showChangePassword, setShowChangePassword] = React.useState(false);
   const [error, setError] = React.useState("");
   const [success, setSuccess] = React.useState("");
-  const [userPlan, setUserPlan] = useState<PricingPlan | null>(null);
+  const [userPlan, setUserPlan] = useState<string | null>(null);
+  const [trialEndDate, setTrialEndDate] = useState<Date | null>(null);
+
   const [user, setUser] = useState<{
     name?: string | null;
     email?: string | null;
@@ -29,28 +33,34 @@ const MyAccount: React.FC = () => {
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
-      setUser({
-        name: user?.displayName,
-        email: user?.email,
-      });
-
-      if (user && userPlan === null) {
-        const fetchUserPlan = async () => {
-          const idTokenResult = await user.getIdTokenResult();
-
-          // when a user has signed up but not yet email verified,
-          // we set their plan to be noPlan.
-          const plan =
-            (idTokenResult?.claims.plan as PricingPlan) || PricingPlan.Free;
-
-          setUserPlan(plan);
-        };
-
-        fetchUserPlan();
-      }
+      setUser({ name: user?.displayName, email: user?.email });
     });
 
     return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const getUserPlan = httpsCallable<
+          {},
+          { plan: "free" | "basic" | "premium"; trialEndDate?: string }
+        >(functions, "getUserPlan");
+
+        const result = await getUserPlan({});
+
+        setUserPlan(result.data.plan);
+
+        if (result.data.trialEndDate) {
+          setTrialEndDate(new Date(result.data.trialEndDate));
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+        setUserPlan("free");
+      }
+    };
+
+    fetchUserData();
   }, []);
 
   const doLogout = async () =>
