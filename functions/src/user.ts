@@ -11,14 +11,20 @@ interface UserData {
 }
 
 export const onUserCreate = functionsV1.auth.user().onCreate(async (user) => {
-  const userData: UserData = {
-    plan: "free",
-    email: user.email || "",
-    displayName: user.displayName || "",
-    createdAt: admin.firestore.FieldValue.serverTimestamp(),
-  };
+  try {
+    const userData: UserData = {
+      plan: "free",
+      email: user.email || "", // Handle undefined email
+      displayName: user.displayName || "Anonymous",
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    };
 
-  await admin.firestore().collection("users").doc(user.uid).set(userData);
+    await admin.firestore().collection("users").doc(user.uid).set(userData);
+    console.log(`User ${user.uid} document created successfully.`);
+  } catch (error) {
+    console.error("Error creating user document:", error);
+    throw error; // Ensures the function retries on failure
+  }
 });
 
 interface PlanResponse {
