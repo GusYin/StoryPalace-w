@@ -14,7 +14,7 @@ export const onUserCreate = functionsV1.auth.user().onCreate(async (user) => {
   try {
     const userData: UserData = {
       plan: "free",
-      email: user.email || "", // Handle undefined email
+      email: user.email || "",
       displayName: user.displayName || "Anonymous",
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
     };
@@ -23,7 +23,7 @@ export const onUserCreate = functionsV1.auth.user().onCreate(async (user) => {
     console.log(`User ${user.uid} document created successfully.`);
   } catch (error) {
     console.error("Error creating user document:", error);
-    throw error; // Ensures the function retries on failure
+    throw error;
   }
 });
 
