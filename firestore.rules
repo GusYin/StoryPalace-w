@@ -13,12 +13,12 @@ service cloud.firestore {
     // all client requests to your Firestore database will be denied until you Update
     // your rules
     match /users/{userId} {
-      allow read: request.auth != null && request.auth.uid == userId;
-      allow create: request.auth != null && request.auth.uid == userId;
-      allow update: request.auth != null && 
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow create: if request.auth != null && request.auth.uid == userId;
+      allow update: if request.auth != null && 
                    request.auth.uid == userId && 
                    !request.resource.data.keys().hasAny(['plan']);
-      allow delete: request.auth != null && request.auth.uid == userId;
+      allow delete: if request.auth != null && request.auth.uid == userId;
     }
   }
 }
