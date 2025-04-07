@@ -26,14 +26,14 @@ const MyAccount: React.FC = () => {
   const [userPlan, setUserPlan] = useState<string | null>(null);
   const [trialEndDate, setTrialEndDate] = useState<Date | null>(null);
 
-  const [user, setUser] = useState<{
+  const [userDisplay, setUserDisplay] = useState<{
     name?: string | null;
     email?: string | null;
   } | null>(null);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
-      setUser({ name: user?.displayName, email: user?.email });
+      setUserDisplay({ name: user?.displayName, email: user?.email });
     });
 
     return () => unsubscribe();
@@ -72,7 +72,7 @@ const MyAccount: React.FC = () => {
   const handleUpdateName = async () => {
     try {
       await updateProfile(auth.currentUser!, { displayName: newName });
-      setUser((prev) => ({ ...prev, name: newName }));
+      setUserDisplay((prev) => ({ ...prev, name: newName }));
       setEditingName(false);
       setSuccess("Name updated successfully");
     } catch (error) {
@@ -130,7 +130,7 @@ const MyAccount: React.FC = () => {
         <div className="text-black tracking-[3%] bg-white p-6 space-y-5 mb-[46px] pl-0">
           <div className="text-xl font-medium">MY ACCOUNT</div>
           <h2 className="font-fraunces font-semibold text-4xl">
-            Welcome back{user?.name ? `, ${user.name}` : ``}!
+            Welcome back{userDisplay?.name ? `, ${userDisplay.name}` : ``}!
           </h2>
         </div>
 
@@ -190,10 +190,10 @@ const MyAccount: React.FC = () => {
                 </div>
               ) : (
                 <div className="text-[#707978] mt-1 flex items-center gap-2">
-                  {user?.name || "You don't have a name yet..."}
+                  {userDisplay?.name || "You don't have a name yet..."}
                   <button
                     onClick={() => {
-                      setNewName(user?.name || "");
+                      setNewName(userDisplay?.name || "");
                       setEditingName(true);
                     }}
                     className="underline text-[#06846F] hover:text-blue-500"
@@ -205,7 +205,7 @@ const MyAccount: React.FC = () => {
             </div>
             <div className="text-xl">
               <label className="text-black block">Email Address</label>
-              <div className="text-[#707978] mt-1">{user?.email}</div>
+              <div className="text-[#707978] mt-1">{userDisplay?.email}</div>
             </div>
             <div className="flex justify-between items-center mt-1">
               <div>
