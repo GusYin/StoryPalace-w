@@ -26,6 +26,11 @@ const MyAccount: React.FC = () => {
   const [userPlan, setUserPlan] = useState<string | null>(null);
   const [trialEndDate, setTrialEndDate] = useState<Date | null>(null);
 
+  // Add these new states for delete account flow
+  const [showDeleteAccountModal, setShowDeleteAccountModal] =
+    React.useState(false);
+  const [deleteAccountPassword, setDeleteAccountPassword] = React.useState("");
+
   const [userDisplay, setUserDisplay] = useState<{
     name?: string | null;
     email?: string | null;
@@ -98,17 +103,31 @@ const MyAccount: React.FC = () => {
   };
 
   const handleDeleteAccount = async () => {
-    if (
-      window.confirm(
-        "Are you sure you want to permanently delete your account?"
-      )
-    ) {
-      try {
-        await deleteUser(auth.currentUser!);
-        navigate("/");
-      } catch (error) {
-        setError("Error deleting account. Please reauthenticate.");
+    setShowDeleteAccountModal(true);
+  };
+
+  const handleConfirmDeleteAccount = async () => {
+    try {
+      const user = auth.currentUser;
+      if (!user || !user.email) {
+        setError("No authenticated user found");
+        return;
       }
+
+      // Reauthenticate user
+      const credential = EmailAuthProvider.credential(
+        user.email,
+        deleteAccountPassword
+      );
+      await reauthenticateWithCredential(user, credential);
+
+      // If reauthentication succeeds, delete user
+      await deleteUser(user);
+      navigate("/");
+    } catch (error) {
+      setError("Error deleting account. Please check your password.");
+      setShowDeleteAccountModal(false);
+      setDeleteAccountPassword("");
     }
   };
 
@@ -227,7 +246,7 @@ const MyAccount: React.FC = () => {
         {/* Change Password Modal */}
         {showChangePassword && (
           <div className="fixed inset-0 bg-black bg-black/50 flex items-center justify-center">
-            <div className="bg-white p-6 rounded-lg space-y-4">
+            <div className="bg-white p-6 rounded-xl space-y-4">
               <h3 className="text-xl font-bold">Change Password</h3>
               <input
                 type="password"
@@ -252,6 +271,39 @@ const MyAccount: React.FC = () => {
                 </button>
                 <button
                   onClick={() => setShowChangePassword(false)}
+                  className="text-base border border-[#829793] px-3 py-3 rounded-3xl w-auto bg-white text-black hover:text-blue-600 transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Add Delete Account Modal */}
+        {showDeleteAccountModal && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
+            <div className="bg-white p-6 rounded-xl space-y-4 w-80">
+              <h3 className="text-xl font-bold">Confirm Account Deletion</h3>
+              <input
+                type="password"
+                placeholder="Enter your password to confirm"
+                value={deleteAccountPassword}
+                onChange={(e) => setDeleteAccountPassword(e.target.value)}
+                className="font-dosis bg-[#F3F7F7] border border-[#829793] p-2 w-full rounded-xl transition-colors"
+              />
+              <div className="flex gap-2">
+                <button
+                  onClick={handleConfirmDeleteAccount}
+                  className="text-base w-auto text-[#EF4444] hover:text-red-700 hover:bg-red-50 border border-[#EF4444] px-5 py-3 rounded-3xl transition-colors"
+                >
+                  Delete
+                </button>
+                <button
+                  onClick={() => {
+                    setShowDeleteAccountModal(false);
+                    setDeleteAccountPassword("");
+                  }}
                   className="text-base border border-[#829793] px-3 py-3 rounded-3xl w-auto bg-white text-black hover:text-blue-600 transition-colors"
                 >
                   Cancel
