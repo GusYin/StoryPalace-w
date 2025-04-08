@@ -34,14 +34,24 @@ interface PlanResponse {
 
 export const getUserPlan = functionsV2.https.onCall(
   async (request): Promise<PlanResponse> => {
-    if (!request.auth?.uid || !request.auth?.token?.email_verified) {
+    if (!request.auth?.uid) {
       throw new functionsV2.https.HttpsError(
         "unauthenticated",
-        "Authentication and email verified required"
+        "Authentication required"
       );
     }
 
     try {
+      // Get fresh user record from Firebase Auth
+      const authUser = await admin.auth().getUser(request.auth.uid);
+
+      if (!authUser.emailVerified) {
+        throw new functionsV2.https.HttpsError(
+          "unauthenticated",
+          "Email verification required"
+        );
+      }
+
       const userDoc = await admin
         .firestore()
         .collection("users")

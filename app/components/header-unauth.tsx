@@ -42,6 +42,14 @@ const UnauthHeader = () => {
     } else navigate("/login");
   };
 
+  const gotoLibrary = async () => {
+    if (user) {
+      await user.reload();
+      if (user.emailVerified) navigate("/library");
+      else navigate("/verify-email");
+    } else navigate("/login");
+  };
+
   return (
     <>
       {/* Sticky Navigation Bar */}
