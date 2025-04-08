@@ -13,11 +13,20 @@ const UnauthHeader = () => {
       setUser(user);
     });
 
-    return () => unsubscribe();
+    // Add additional listener for token changes
+    const unsubscribeToken = auth.onIdTokenChanged((user) => {
+      setUser(user);
+    });
+
+    return () => {
+      unsubscribe();
+      unsubscribeToken();
+    };
   }, []);
 
-  const doGetStarted = () => {
+  const doGetStarted = async () => {
     if (user) {
+      await user.reload();
       if (user.emailVerified) navigate("/my-account");
       else navigate("/verify-email");
     }
@@ -25,8 +34,9 @@ const UnauthHeader = () => {
     // If no user, we stay on this page.
   };
 
-  const doLogin = () => {
+  const doLogin = async () => {
     if (user) {
+      await user.reload();
       if (user.emailVerified) navigate("/my-account");
       else navigate("/verify-email");
     } else navigate("/login");
