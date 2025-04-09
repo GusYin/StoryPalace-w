@@ -110,7 +110,7 @@ export const createVoiceClone = functions.https.onCall(async (request) => {
 
     // 4. Check global slots (original 30-voice limit)
     // 11labs Creator plan
-    const voiceOperationMonthlyQuota = 95;
+    // const voiceOperationMonthlyQuota = 95;
     const voiceSlotsLimit = 30;
     const totalVoices = (await voiceClonesRef.count().get()).data().count;
 
