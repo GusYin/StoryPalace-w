@@ -82,7 +82,8 @@ export const processVoiceSample = functions.storage.onObjectFinalized(
       // Add to Firestore
       await db.collection("voiceSamples").add(voiceSampleDoc);
 
-      // Here you would add processing logic (e.g., audio analysis, duration detection)
+      // Here you would add processing logic (e.g., audio analysis,
+      // duration detection)
       // For now, we'll just update the status to completed
       await db.collection("voiceSamples").doc().update({
         status: "completed",

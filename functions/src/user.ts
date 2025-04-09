@@ -101,18 +101,17 @@ export const upgradePlan = functionsV2.https.onCall(async (request) => {
     );
   }
 
+  const sevenDayFromNow = admin.firestore.Timestamp.fromDate(
+    new Date(Date.now() + 7 * 86400000)
+  );
+
   await admin
     .firestore()
     .collection("users")
     .doc(request.auth.uid)
     .update({
       plan,
-      trialEndDate:
-        plan === "basic"
-          ? admin.firestore.Timestamp.fromDate(
-              new Date(Date.now() + 7 * 86400000)
-            )
-          : null,
+      trialEndDate: plan === "basic" ? sevenDayFromNow : null,
     });
 
   return { status: "success", newPlan: plan };

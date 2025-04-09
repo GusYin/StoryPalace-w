@@ -17,6 +17,7 @@
   "dependencies": {
     "axios": "^1.8.2",
     "elevenlabs": "^1.54.0",
+    "firebase": "^11.6.0",
     "firebase-admin": "^13.2.0",
     "firebase-functions": "^6.3.2",
     "form-data": "^4.0.2"
