@@ -46,23 +46,23 @@ const analytics = isSupported().then((yes) => (yes ? getAnalytics(app) : null));
 
 // Initialize Firebase clound functions
 export const functions = getFunctions(app);
-if (process.env.NODE_ENV === "development") {
-  connectFunctionsEmulator(functions, "localhost", 5001);
-}
+// if (process.env.NODE_ENV === "development") {
+//   connectFunctionsEmulator(functions, "localhost", 5001);
+// }
 
 // Initialize Firebase Firestore
 export const db = getFirestore();
-if (process.env.NODE_ENV === "development") {
-  connectFirestoreEmulator(db, "127.0.0.1", 8080);
-}
+// if (process.env.NODE_ENV === "development") {
+//   connectFirestoreEmulator(db, "127.0.0.1", 8080);
+// }
 
 export const auth = getAuth(app);
 
 export const storage = getStorage(app);
-if (process.env.NODE_ENV === "development") {
-  // Point to the Storage emulator running on localhost.
-  connectStorageEmulator(storage, "127.0.0.1", 9199);
-}
+// if (process.env.NODE_ENV === "development") {
+//   // Point to the Storage emulator running on localhost.
+//   connectStorageEmulator(storage, "127.0.0.1", 9199);
+// }
 
 export const createUserWithEmailAndPw = async (
   email: string,

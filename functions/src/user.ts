@@ -12,10 +12,13 @@ interface UserData {
 
 export const onUserCreate = functionsV1.auth.user().onCreate(async (user) => {
   try {
+    // Get fresh user record from Firebase Auth
+    const authUser = await admin.auth().getUser(user.uid);
+
     const userData: UserData = {
       plan: "free",
       email: user.email || "",
-      displayName: user.displayName || "Anonymous",
+      displayName: authUser.displayName || "Anonymous",
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
     };
 
