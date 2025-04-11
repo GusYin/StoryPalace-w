@@ -41,10 +41,12 @@ export const onUserCreate = functionsV1.auth.user().onCreate(async (user) => {
       displayName: displayName,
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
       status: isReturningUser ? "reactivated" : "active",
-      reactivatedAt: isReturningUser
-        ? admin.firestore.FieldValue.serverTimestamp()
-        : undefined,
     };
+
+    // Add reactivation timestamp if returning
+    if (isReturningUser) {
+      userData.reactivatedAt = admin.firestore.FieldValue.serverTimestamp();
+    }
 
     // Create/update the user document
     await usersRef.doc(user.uid).set(userData);
