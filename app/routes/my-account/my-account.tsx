@@ -159,7 +159,7 @@ const MyAccount: React.FC = () => {
             <h3 className="text-[#707978] font-medium text-xl mb-4">
               YOUR PLAN
             </h3>
-            <span className="text-black font-bold text-4xl">
+            <span className="capitalize-plan text-black font-bold text-4xl">
               Story Palace {userPlan}
             </span>
           </div>
