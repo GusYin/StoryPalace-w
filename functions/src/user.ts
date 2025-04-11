@@ -61,6 +61,8 @@ export const onUserCreate = functionsV1.auth.user().onCreate(async (user) => {
 // Handle user deletion
 export const onUserDelete = functionsV1.auth.user().onDelete(async (user) => {
   try {
+    // if user is not in db, below line will create a new document
+    // under users collection and set the status to deleted
     const userDoc = admin.firestore().collection("users").doc(user.uid);
 
     // Mark as deleted but keep the document
