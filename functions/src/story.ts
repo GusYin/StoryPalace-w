@@ -1,10 +1,7 @@
 import * as functions from "firebase-functions/v2";
 import * as admin from "firebase-admin";
-
-interface UserData {
-  plan?: "free" | "basic" | "premium";
-  trialEndDate?: admin.firestore.Timestamp;
-}
+import { getUserPlanDocument } from "./user";
+import { isUserAuthenticatedAndEmailVerified } from "./util";
 
 interface Story {
   id: string;
@@ -22,12 +19,7 @@ interface Episode {
   audioUrls: string[]; // each episode can have multiple audio URLs
 }
 
-interface UserData {
-  plan?: "free" | "basic" | "premium";
-  trialEndDate?: admin.firestore.Timestamp;
-}
-
-/*
+/* bucket structure
 stories/
   story-001/
     metadata.json
@@ -47,28 +39,17 @@ stories/
  */
 
 export const getStories = functions.https.onCall(async (request) => {
-  if (!request.auth?.uid || !request.auth?.token?.email_verified) {
-    throw new functions.https.HttpsError(
-      "unauthenticated",
-      "Authentication and email verified required"
-    );
-  }
+  await isUserAuthenticatedAndEmailVerified(request);
 
   try {
-    // Get user plan
-    const userDoc = await admin
-      .firestore()
-      .collection("users")
-      .doc(request.auth.uid)
-      .get();
-    const userData = userDoc.data() as UserData;
-    const plan = userData?.plan || "free";
+    const planDoc = await getUserPlanDocument(request.auth?.uid);
 
     const bucket = admin.storage().bucket();
     const storagePath = "stories/";
     const maxFreeStories = 3;
-    const pageSize = plan === "free" ? maxFreeStories : 10;
-    const pageToken = plan === "free" ? undefined : request.data.pageToken;
+    const pageSize = planDoc.plan === "free" ? maxFreeStories : 10;
+    const pageToken =
+      planDoc.plan === "free" ? undefined : request.data.pageToken;
 
     // Get paginated list of story folders
     const [storyFolders, nextPageToken] = await bucket.getFiles({
@@ -82,7 +63,7 @@ export const getStories = functions.https.onCall(async (request) => {
     // Process stories
     const stories: Story[] = [];
     for (const folder of storyFolders) {
-      if (stories.length >= maxFreeStories && plan === "free") break;
+      if (stories.length >= maxFreeStories && planDoc.plan === "free") break;
 
       // Get story metadata
       const metadataFile = bucket.file(`${folder.name}metadata.json`);
@@ -165,7 +146,7 @@ export const getStories = functions.https.onCall(async (request) => {
 
     return {
       stories: stories,
-      nextPageToken: plan === "free" ? null : nextPageToken,
+      nextPageToken: planDoc.plan === "free" ? null : nextPageToken,
     };
   } catch (error) {
     throw new functions.https.HttpsError(

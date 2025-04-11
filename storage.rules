@@ -2,20 +2,55 @@ rules_version = '2';
 
 service firebase.storage {
   match /b/{bucket}/o {
+    // Existing rules for voice samples and TTS
     match /users/{userId}/voice-samples/{voiceName}/{fileName} {
-      // Allow write only if the user is authenticated, their UID matches, and their email is verified
       allow write: if request.auth != null 
                    && request.auth.uid == userId 
-                   && request.auth.token.email_verified == true;
-      
-      allow read: if request.auth != null
+                   && request.auth.token.email_verified;
+      allow read: if request.auth != null 
                   && request.auth.uid == userId 
-                  && request.auth.token.email_verified == true;
+                  && request.auth.token.email_verified;
     }
+
     match /tts/{userId}/{allPaths=**} {
       allow read, write: if request.auth != null 
-        && request.auth.uid == userId 
-        && request.auth.token.email_verified == true;
+                         && request.auth.uid == userId 
+                         && request.auth.token.email_verified;
+    }
+
+    // New rules for story content
+    match /stories/{storyId}/{allPaths=**} {
+      // Allow public read access since we're using signed URLs
+      // but restrict write access to admin-only
+      allow read: if true;
+      allow write: if request.auth.token.admin == true; // Requires custom admin claim
+    }
+
+    match /stories/{storyId}/metadata.json {
+      // Additional validation for metadata files
+      allow write: if request.auth.token.admin == true
+                   && request.resource.contentType.matches('application/json');
+    }
+
+    match /stories/{storyId}/cover.jpg {
+      // Validate cover image properties
+      allow write: if request.auth.token.admin == true
+                   && request.resource.contentType.matches('image/jpeg')
+                   && request.resource.size < 5 * 1024 * 1024; // 5MB max
+    }
+
+    match /stories/{storyId}/episodes/{episodeId}/content.txt {
+      // Validate text content
+      allow write: if request.auth.token.admin == true
+                   && request.resource.contentType.matches('text/plain')
+                   && request.resource.size < 1 * 1024 * 1024; // 1MB max
+    }
+
+    match /stories/{storyId}/episodes/{episodeId}/audios/{audioFile} {
+      // Validate audio files
+      allow write: if request.auth.token.admin == true
+                   && request.resource.contentType.matches('audio/mp3')
+                   && request.resource.size < 10 * 1024 * 1024; // 10MB max
     }
   }
 }

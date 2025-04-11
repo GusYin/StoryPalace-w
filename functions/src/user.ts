@@ -1,15 +1,16 @@
 import * as functionsV2 from "firebase-functions/v2";
 import * as admin from "firebase-admin";
 import * as functionsV1 from "firebase-functions/v1";
+import { isUserAuthenticatedAndEmailVerified } from "./util";
 
-interface UserData {
+export interface UserData {
   plan: string;
   trialEndDate?: admin.firestore.Timestamp;
   email: string;
   displayName: string;
-  createdAt: admin.firestore.FieldValue;
   status: string;
   reactivatedAt?: admin.firestore.FieldValue;
+  createdAt: admin.firestore.FieldValue;
   deletedAt?: admin.firestore.FieldValue;
 }
 
@@ -86,48 +87,37 @@ interface PlanResponse {
   trialEndDate?: admin.firestore.Timestamp;
 }
 
+export const getUserPlanDocument = async (uid?: string) => {
+  try {
+    const userDoc = await admin
+      .firestore()
+      .collection("users")
+      .doc(uid || "")
+      .get();
+
+    if (!userDoc.exists) {
+      throw new functionsV2.https.HttpsError("not-found", "User not found");
+    }
+
+    const userData = userDoc.data() as UserData;
+    return {
+      plan: userData.plan,
+      trialEndDate: userData.trialEndDate,
+    };
+  } catch (error) {
+    functionsV2.logger.error("Error fetching user plan:", error);
+    throw new functionsV2.https.HttpsError(
+      "internal",
+      "Failed to fetch user plan"
+    );
+  }
+};
+
 export const getUserPlan = functionsV2.https.onCall(
   async (request): Promise<PlanResponse> => {
-    if (!request.auth?.uid) {
-      throw new functionsV2.https.HttpsError(
-        "unauthenticated",
-        "Authentication required"
-      );
-    }
+    await isUserAuthenticatedAndEmailVerified(request);
 
-    try {
-      // Get fresh user record from Firebase Auth
-      const authUser = await admin.auth().getUser(request.auth.uid);
-
-      if (!authUser.emailVerified) {
-        throw new functionsV2.https.HttpsError(
-          "unauthenticated",
-          "Email verification required"
-        );
-      }
-
-      const userDoc = await admin
-        .firestore()
-        .collection("users")
-        .doc(request.auth.uid)
-        .get();
-
-      if (!userDoc.exists) {
-        throw new functionsV2.https.HttpsError("not-found", "User not found");
-      }
-
-      const userData = userDoc.data() as UserData;
-      return {
-        plan: userData.plan || "free",
-        trialEndDate: userData.trialEndDate,
-      };
-    } catch (error) {
-      functionsV2.logger.error("Error fetching user plan:", error);
-      throw new functionsV2.https.HttpsError(
-        "internal",
-        "Failed to fetch user plan"
-      );
-    }
+    return await getUserPlanDocument();
   }
 );
 
