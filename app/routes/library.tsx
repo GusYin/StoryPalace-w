@@ -108,11 +108,7 @@ const LibraryPage = () => {
       return result.data;
     } catch (error) {
       console.error("Error fetching stories:", error);
-      let errorMessage = "Failed to load stories";
-      if (error instanceof Error) {
-        errorMessage += `: ${error.message}`;
-      }
-      toast.error(errorMessage);
+
       throw error; // Re-throw for handling in calling functions
     }
   };
@@ -135,7 +131,8 @@ const LibraryPage = () => {
           >
             Retry
           </button>
-        </div>
+        </div>,
+        { autoClose: false }
       );
       setStories([]);
     } finally {
@@ -172,12 +169,17 @@ const LibraryPage = () => {
 
   useEffect(() => {
     const handleScroll = () => {
+      // 1. Guard clauses to prevent unnecessary checks
       if (!containerRef.current || loading) return;
 
+      // 2. Get scroll position measurements
       const { scrollTop, scrollHeight, clientHeight } =
         document.documentElement;
+
+      // 3. Calculate if user is near bottom (with 500px threshold)
       const isNearBottom = scrollTop + clientHeight >= scrollHeight - 500;
 
+      // 4. Conditions to trigger loading more content
       if (isNearBottom && hasMore && !isFetchingMore) {
         loadMoreStories();
       }
@@ -209,6 +211,20 @@ const LibraryPage = () => {
   return (
     <div className="min-h-screen bg-custom-bg-dark">
       <AuthHeaderDark />
+
+      <ToastContainer
+        position="bottom-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+        toastClassName="bg-gray-800 text-white"
+      />
 
       {/* Main Content */}
       <main className="font-dosis px-4 sm:px-6 lg:px-8 text-white flex flex-col items-center mt-15">
