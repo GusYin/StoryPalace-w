@@ -64,7 +64,7 @@ const LibraryPage = () => {
     };
 
     fetchStories();
-  }, [loading]);
+  }, []);
 
   const filteredStories = useMemo(() => {
     if (!searchQuery) return stories;
@@ -81,14 +81,19 @@ const LibraryPage = () => {
     setSearchQuery(e.target.value);
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-custom-bg-dark">
-        <div className="animate-spin h-5 w-5 border-2 border-current border-t-transparent rounded-full"></div>
-        Loading...
-      </div>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <div className="min-h-screen bg-custom-bg-dark">
+  //       <div
+  //         className="absolute
+  //                         inset-0 bg-black/50 backdrop-blur-[.7px] rounded-full
+  //                         flex items-center justify-center"
+  //       >
+  //         <div className="animate-spin h-5 w-5 border-2 border-current border-t-transparent rounded-full"></div>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="min-h-screen bg-custom-bg-dark">
@@ -120,54 +125,60 @@ const LibraryPage = () => {
 
           {/* Stories Grid */}
           <div className="">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-7 lg:gap-12 justify-items-center">
-              {filteredStories.map((story, index) => (
-                <div
-                  key={index}
-                  className="bg-[#161D1C] rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition-shadow"
-                >
-                  <div className="p-5">
-                    <div className="mb-2">
-                      <h3 className="text-xl font-semibold mb-2">
-                        {story.metadata.title}
-                      </h3>
-                      <span className="text-sm">
-                        {story.metadata.episodeSeries}
-                      </span>
-                    </div>
+            {loading ? (
+              <div className="absolute inset-0 bg-black/50 backdrop-blur-[.7px] rounded-full flex items-center justify-center">
+                <div className="animate-spin h-5 w-5 border-2 border-current border-t-transparent rounded-full"></div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-7 lg:gap-12 justify-items-center">
+                {filteredStories.map((story, index) => (
+                  <div
+                    key={index}
+                    className="bg-[#161D1C] rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition-shadow"
+                  >
+                    <div className="p-5">
+                      <div className="mb-2">
+                        <h3 className="text-xl font-semibold mb-2">
+                          {story.metadata.title}
+                        </h3>
+                        <span className="text-sm">
+                          {story.metadata.episodeSeries}
+                        </span>
+                      </div>
 
-                    {/* Story image
+                      {/* Story image
                     The aspect ratio 3/4 (0.75) is commonly used for book covers, 
                     but we can adjust the ratio in aspect-[X/Y] to match 
                     specific image requirements if needed. */}
-                    <div className="aspect-[4/4] bg-gray-500 mb-2 w-full overflow-hidden">
-                      <img
-                        src={story.imgSrc}
-                        alt={story.metadata.title}
-                        className="w-full h-full object-cover"
-                      />
+                      <div className="aspect-[4/4] bg-gray-500 mb-2 w-full overflow-hidden">
+                        <img
+                          src={story.imgSrc}
+                          alt={story.metadata.title}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+
+                      <p className="text-sm mb-2 line-clamp-4">
+                        {story.metadata.description}
+                      </p>
+
+                      {/* Play button */}
+                      <button
+                        onClick={() =>
+                          navigate("/story-player", {
+                            state: { storyId: story.id },
+                          })
+                        }
+                        className="flex items-center justify-center gap-2 cursor-pointer border-1 border-white text-white px-4 py-2 rounded-3xl hover:bg-custom-teal transition-colors"
+                      >
+                        <PlayIconWhite />
+                        <span>Play this series</span>
+                      </button>
                     </div>
-
-                    <p className="text-sm mb-2 line-clamp-4">
-                      {story.metadata.description}
-                    </p>
-
-                    {/* Play button */}
-                    <button
-                      onClick={() =>
-                        navigate("/story-player", {
-                          state: { storyId: story.id },
-                        })
-                      }
-                      className="flex items-center justify-center gap-2 cursor-pointer border-1 border-white text-white px-4 py-2 rounded-3xl hover:bg-custom-teal transition-colors"
-                    >
-                      <PlayIconWhite />
-                      <span>Play this series</span>
-                    </button>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </main>
