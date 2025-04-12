@@ -1,3 +1,6 @@
+# Ignore .sample folder
+.story-sample/
+
 .firebase 
 dataconnect/.dataconnect
 dataconnect-generated
