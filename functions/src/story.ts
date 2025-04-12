@@ -135,14 +135,18 @@ export const getStories = functions.https.onCall(async (request) => {
           prefix: `${episodePrefix}audios/`,
         });
 
+        functions.logger.info("episode audios:", audioFiles);
+
         const audioUrls = await Promise.all(
-          audioFiles.map((file) =>
-            file.getSignedUrl({
+          audioFiles.map((file) => {
+            functions.logger.info("episode audio:", file);
+
+            return file.getSignedUrl({
               action: "read",
               expires: Date.now() + 5 * 60 * 1000,
               version: "v4",
-            })
-          )
+            });
+          })
         );
 
         functions.logger.info("audio urls:", audioUrls);
@@ -167,7 +171,7 @@ export const getStories = functions.https.onCall(async (request) => {
         id: storyPrefix.split("/").filter(Boolean).pop() || "",
         metadata: storyMeta,
         imgSrc: await bucket
-          .file(`${storyPrefix}cover.jpg`)
+          .file(`${storyPrefix}cover.svg`)
           .getSignedUrl({
             action: "read",
             expires: Date.now() + 5 * 60 * 1000,

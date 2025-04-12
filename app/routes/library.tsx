@@ -44,35 +44,7 @@ const LibraryPage = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [stories, setStories] = useState<Story[]>([]);
-  const [userPlan, setUserPlan] = useState<UserPlan>("free");
-  const [trialEndDate, setTrialEndDate] = useState<Date | null>(null);
   const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const getUserPlan = httpsCallable<
-          {},
-          { plan: UserPlan; trialEndDate?: string }
-        >(functions, "getUserPlan");
-
-        const result = await getUserPlan({});
-
-        setUserPlan(result.data.plan);
-
-        if (result.data.trialEndDate) {
-          setTrialEndDate(new Date(result.data.trialEndDate));
-        }
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-        setUserPlan("free");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUserData();
-  }, []);
 
   useEffect(() => {
     const fetchStories = async () => {
@@ -86,12 +58,12 @@ const LibraryPage = () => {
       } catch (error) {
         console.error("Error fetching stories:", error);
         setStories([]);
+      } finally {
+        setLoading(false);
       }
     };
 
-    if (!loading) {
-      fetchStories();
-    }
+    fetchStories();
   }, [loading]);
 
   const filteredStories = useMemo(() => {
