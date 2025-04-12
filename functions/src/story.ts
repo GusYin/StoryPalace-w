@@ -68,6 +68,10 @@ const parseEpisodeMetadata = (data: string): EpisodeMetadata => {
 };
 
 export const getStories = functions.https.onCall(async (request) => {
+  // Log the service account email
+  const [serviceAccount] = await admin.storage().bucket().getMetadata();
+  functions.logger.log("Using service account:", serviceAccount);
+
   await isUserAuthenticatedAndEmailVerified(request);
 
   try {
@@ -79,93 +83,97 @@ export const getStories = functions.https.onCall(async (request) => {
     const pageToken =
       planDoc.plan === "free" ? undefined : request.data.pageToken;
 
-    // Get paginated list of story folders
-    const [storyFolders, nextPageToken] = await bucket.getFiles({
+    // 1. Get story folders using prefix/delimiter
+    const [, , storyApiResponse] = (await bucket.getFiles({
       prefix: storagePath,
       delimiter: "/",
       maxResults: pageSize,
       pageToken: pageToken,
       autoPaginate: false,
-    });
+    })) as [any, any, { prefixes?: string[]; nextPageToken?: string }];
+
+    const storyFolderPrefixes =
+      storyApiResponse?.prefixes?.filter((p) => p !== storagePath) || [];
+    const nextPageToken = storyApiResponse?.nextPageToken;
+
+    functions.logger.info("story folder prefixes:", storyFolderPrefixes);
 
     const stories: Story[] = [];
-    for (const folder of storyFolders) {
+    for (const storyPrefix of storyFolderPrefixes) {
+      functions.logger.info("story folder:", storyPrefix);
+
       if (stories.length >= maxFreeStories && planDoc.plan === "free") break;
 
-      // Process story metadata
-      const metadataFile = bucket.file(`${folder.name}metadata.json`);
-      const [metadata] = await metadataFile.download();
+      // 2. Process story metadata
+      const [metadata] = await bucket
+        .file(`${storyPrefix}metadata.json`)
+        .download();
       const storyMeta = parseStoryMetadata(metadata.toString());
 
-      // Get cover image URL
-      const [coverUrl] = await bucket
-        .file(`${folder.name}cover.jpg`)
-        .getSignedUrl({
-          action: "read",
-          //URLs expire in 5 minutes (300000ms)
-          expires: Date.now() + 5 * 60 * 1000,
-        });
-
-      // Process episodes
-      const episodes: Episode[] = [];
-      const [episodeFolders] = await bucket.getFiles({
-        prefix: `${folder.name}episodes/`,
+      // 3. Process episodes for this story
+      const [, , episodeApiResponse] = (await bucket.getFiles({
+        prefix: `${storyPrefix}episodes/`,
         delimiter: "/",
-      });
+      })) as [any, any, { prefixes?: string[] }];
 
-      for (const episodeFolder of episodeFolders) {
-        const episodeId = episodeFolder.name.split("/").pop() || "";
-        let episodeMeta: EpisodeMetadata = { title: "Untitled Episode" };
+      const episodePrefixes = episodeApiResponse?.prefixes || [];
+      const episodes: Episode[] = [];
 
-        try {
-          const [epMetadata] = await bucket
-            .file(`${episodeFolder.name}metadata.json`)
-            .download();
-          episodeMeta = parseEpisodeMetadata(epMetadata.toString());
-        } catch (error) {
-          // Fallback to content.txt first line
-          const [content] = await bucket
-            .file(`${episodeFolder.name}content.txt`)
-            .download();
-          episodeMeta.title =
-            content.toString().split("\n")[0] || "Untitled Episode";
-        }
+      for (const episodePrefix of episodePrefixes) {
+        functions.logger.info("episode folder:", episodePrefix);
 
-        // Process audio files
+        // 4. Process episode metadata
+        const [epMetadata] = await bucket
+          .file(`${episodePrefix}metadata.json`)
+          .download();
+        const episodeMeta = parseEpisodeMetadata(epMetadata.toString());
+
+        functions.logger.info("episode metadata:", episodeMeta);
+
+        // 5. Process audio files
         const [audioFiles] = await bucket.getFiles({
-          prefix: `${episodeFolder.name}audios/`,
+          prefix: `${episodePrefix}audios/`,
         });
 
         const audioUrls = await Promise.all(
-          audioFiles.map(async (file) => {
-            const [url] = await file.getSignedUrl({
+          audioFiles.map((file) =>
+            file.getSignedUrl({
               action: "read",
-              //URLs expire in 5 minutes (300000ms)
               expires: Date.now() + 5 * 60 * 1000,
-            });
-            return url;
-          })
+              version: "v4",
+            })
+          )
         );
 
-        // Process content
+        functions.logger.info("audio urls:", audioUrls);
+
+        // 6. Process content
         const [contentBuffer] = await bucket
-          .file(`${episodeFolder.name}content.txt`)
+          .file(`${episodePrefix}content.txt`)
           .download();
 
         episodes.push({
-          id: episodeId,
+          id: episodePrefix.split("/").filter(Boolean).pop() || "",
           metadata: episodeMeta,
           contentUrl: `data:text/plain;base64,${contentBuffer.toString(
             "base64"
           )}`,
-          audioUrls,
+          audioUrls: audioUrls.map(([url]) => url),
         });
       }
 
+      // 7. Add completed story
       stories.push({
-        id: folder.name.split("/").filter(Boolean).pop() || "",
+        id: storyPrefix.split("/").filter(Boolean).pop() || "",
         metadata: storyMeta,
-        imgSrc: coverUrl,
+        imgSrc: await bucket
+          .file(`${storyPrefix}cover.jpg`)
+          .getSignedUrl({
+            action: "read",
+            expires: Date.now() + 5 * 60 * 1000,
+            version: "v4",
+          })
+          .then(([url]) => url),
         episodes,
       });
     }
@@ -175,10 +183,10 @@ export const getStories = functions.https.onCall(async (request) => {
       nextPageToken: planDoc.plan === "free" ? null : nextPageToken,
     };
   } catch (error) {
+    functions.logger.error("Error fetching stories:", error);
     throw new functions.https.HttpsError(
       "internal",
-      "Error retrieving stories",
-      error instanceof Error ? error.message : "Unknown error"
+      "Error retrieving stories"
     );
   }
 });

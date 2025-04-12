@@ -117,7 +117,7 @@ export const getUserPlan = functionsV2.https.onCall(
   async (request): Promise<PlanResponse> => {
     await isUserAuthenticatedAndEmailVerified(request);
 
-    return await getUserPlanDocument();
+    return await getUserPlanDocument(request.auth?.uid);
   }
 );
 
