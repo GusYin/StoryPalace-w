@@ -1,0 +1,25 @@
+{
+  "title": "The Garden Prank",
+  "description": "A magical tale of sibling teamwork and mischievous pixies, where a simple gardening project becomes a lesson in patience and perseverance.",
+  "episodeSeries": "1 | 5 episodes",
+  "language": "en-US",
+  "recommendedAge": "5-8",
+  "categories": ["friendship", "gardening", "magic"],
+  "durationMinutes": 15
+}
+
+{
+  "title": "The Garden Prank",
+  "order": 1,
+  "durationSeconds": 600,
+  "keywords": [
+    "teamwork", 
+    "pixies", 
+    "gardening", 
+    "patience",
+    "magic",
+    "siblings",
+    "growth",
+    "kindness"
+  ]
+}

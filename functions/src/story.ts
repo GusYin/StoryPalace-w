@@ -3,47 +3,75 @@ import * as admin from "firebase-admin";
 import { getUserPlanDocument } from "./user";
 import { isUserAuthenticatedAndEmailVerified } from "./util";
 
+// Type Definitions
+interface StoryMetadata {
+  title: string;
+  description: string;
+  episodeSeries: string;
+  language?: string;
+  recommendedAge?: string;
+  categories?: string[];
+  author?: string;
+  durationMinutes?: number;
+}
+
+interface EpisodeMetadata {
+  title: string;
+  order?: number;
+  durationSeconds?: number;
+  keywords?: string[];
+}
+
 interface Story {
   id: string;
-  title: string;
-  episodeSeries: string; // For example, "3+ | 5 episodes"
+  metadata: StoryMetadata;
   episodes: Episode[];
   imgSrc?: string;
-  description: string;
 }
 
 interface Episode {
   id: string;
-  title: string;
+  metadata: EpisodeMetadata;
   contentUrl: string;
-  audioUrls: string[]; // each episode can have multiple audio URLs
+  audioUrls: string[];
 }
 
-/* bucket structure
-stories/
-  story-001/
-    metadata.json
-    cover.jpg
-    episodes/
-      episode-001/
-        metadata.json  # Contains { "title": "Episode 1" }
-        content.txt
-        audios/
-          part-1.mp3
-      episode-002/
-        metadata.json
-        content.txt
-        audios/
-          part-1.mp3
-      ...
- */
+// Validation Functions
+const parseStoryMetadata = (data: string): StoryMetadata => {
+  const raw = JSON.parse(data);
+
+  if (!raw.title || !raw.description || !raw.episodeSeries) {
+    throw new Error("Invalid story metadata: Missing required fields");
+  }
+
+  return {
+    title: raw.title,
+    description: raw.description,
+    episodeSeries: raw.episodeSeries,
+    language: raw.language || "en-US",
+    recommendedAge: raw.recommendedAge,
+    categories: raw.categories || [],
+    author: raw.author,
+    durationMinutes: raw.durationMinutes,
+  };
+};
+
+const parseEpisodeMetadata = (data: string): EpisodeMetadata => {
+  const raw = JSON.parse(data);
+
+  return {
+    title: raw.title || "Untitled Episode",
+    order: raw.order,
+    durationSeconds: raw.durationSeconds,
+    keywords: raw.keywords || [],
+  };
+};
 
 export const getStories = functions.https.onCall(async (request) => {
   await isUserAuthenticatedAndEmailVerified(request);
 
   try {
     const planDoc = await getUserPlanDocument(request.auth?.uid);
-
     const bucket = admin.storage().bucket();
     const storagePath = "stories/";
     const maxFreeStories = 3;
@@ -60,21 +88,21 @@ export const getStories = functions.https.onCall(async (request) => {
       autoPaginate: false,
     });
 
-    // Process stories
     const stories: Story[] = [];
     for (const folder of storyFolders) {
       if (stories.length >= maxFreeStories && planDoc.plan === "free") break;
 
-      // Get story metadata
+      // Process story metadata
       const metadataFile = bucket.file(`${folder.name}metadata.json`);
       const [metadata] = await metadataFile.download();
-      const storyMeta = JSON.parse(metadata.toString());
+      const storyMeta = parseStoryMetadata(metadata.toString());
 
-      // Get cover image
+      // Get cover image URL
       const [coverUrl] = await bucket
         .file(`${folder.name}cover.jpg`)
         .getSignedUrl({
           action: "read",
+          //URLs expire in 5 minutes (300000ms)
           expires: Date.now() + 5 * 60 * 1000,
         });
 
@@ -86,25 +114,24 @@ export const getStories = functions.https.onCall(async (request) => {
       });
 
       for (const episodeFolder of episodeFolders) {
-        // Get episode metadata
         const episodeId = episodeFolder.name.split("/").pop() || "";
-        let episodeTitle = "Untitled Episode";
+        let episodeMeta: EpisodeMetadata = { title: "Untitled Episode" };
 
         try {
           const [epMetadata] = await bucket
             .file(`${episodeFolder.name}metadata.json`)
             .download();
-          const episodeMeta = JSON.parse(epMetadata.toString());
-          episodeTitle = episodeMeta.title || episodeTitle;
+          episodeMeta = parseEpisodeMetadata(epMetadata.toString());
         } catch (error) {
-          // Fallback to content.txt first line if metadata missing
+          // Fallback to content.txt first line
           const [content] = await bucket
             .file(`${episodeFolder.name}content.txt`)
             .download();
-          episodeTitle = content.toString().split("\n")[0] || episodeTitle;
+          episodeMeta.title =
+            content.toString().split("\n")[0] || "Untitled Episode";
         }
 
-        // Get audio files
+        // Process audio files
         const [audioFiles] = await bucket.getFiles({
           prefix: `${episodeFolder.name}audios/`,
         });
@@ -113,20 +140,21 @@ export const getStories = functions.https.onCall(async (request) => {
           audioFiles.map(async (file) => {
             const [url] = await file.getSignedUrl({
               action: "read",
+              //URLs expire in 5 minutes (300000ms)
               expires: Date.now() + 5 * 60 * 1000,
             });
             return url;
           })
         );
 
-        // Get episode content
+        // Process content
         const [contentBuffer] = await bucket
           .file(`${episodeFolder.name}content.txt`)
           .download();
 
         episodes.push({
           id: episodeId,
-          title: episodeTitle,
+          metadata: episodeMeta,
           contentUrl: `data:text/plain;base64,${contentBuffer.toString(
             "base64"
           )}`,
@@ -136,9 +164,7 @@ export const getStories = functions.https.onCall(async (request) => {
 
       stories.push({
         id: folder.name.split("/").filter(Boolean).pop() || "",
-        title: storyMeta.title,
-        description: storyMeta.description,
-        episodeSeries: storyMeta.episodeSeries,
+        metadata: storyMeta,
         imgSrc: coverUrl,
         episodes,
       });
@@ -152,7 +178,7 @@ export const getStories = functions.https.onCall(async (request) => {
     throw new functions.https.HttpsError(
       "internal",
       "Error retrieving stories",
-      error
+      error instanceof Error ? error.message : "Unknown error"
     );
   }
 });

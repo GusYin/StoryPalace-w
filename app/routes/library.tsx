@@ -6,20 +6,36 @@ import { useNavigate } from "react-router";
 import { httpsCallable } from "firebase/functions";
 import { functions } from "~/firebase/firebase";
 
+interface StoryMetadata {
+  title: string;
+  description: string;
+  episodeSeries: string;
+  language?: string;
+  recommendedAge?: string;
+  categories?: string[];
+  author?: string;
+  durationMinutes?: number;
+}
+
+interface EpisodeMetadata {
+  title: string;
+  order?: number;
+  durationSeconds?: number;
+  keywords?: string[];
+}
+
 interface Story {
   id: string;
-  title: string;
-  episodeSeries: string; // For example, "3+ | 5 episodes"
+  metadata: StoryMetadata;
   episodes: Episode[];
   imgSrc?: string;
-  description: string;
 }
 
 interface Episode {
   id: string;
-  title: string;
+  metadata: EpisodeMetadata;
   contentUrl: string;
-  audioUrls: string[]; // each episode can have multiple audio URLs
+  audioUrls: string[];
 }
 
 type UserPlan = "free" | "basic" | "premium";
@@ -84,8 +100,8 @@ const LibraryPage = () => {
     const lowerQuery = searchQuery.toLowerCase();
     return stories.filter(
       (story) =>
-        story.title.toLowerCase().includes(lowerQuery) ||
-        story.description.toLowerCase().includes(lowerQuery)
+        story.metadata.title.toLowerCase().includes(lowerQuery) ||
+        story.metadata.description.toLowerCase().includes(lowerQuery)
     );
   }, [searchQuery, stories]);
 
@@ -141,9 +157,11 @@ const LibraryPage = () => {
                   <div className="p-5">
                     <div className="mb-2">
                       <h3 className="text-xl font-semibold mb-2">
-                        {story.title}
+                        {story.metadata.title}
                       </h3>
-                      <span className="text-sm">{story.episodeSeries}</span>
+                      <span className="text-sm">
+                        {story.metadata.episodeSeries}
+                      </span>
                     </div>
 
                     {/* Story image
@@ -153,13 +171,13 @@ const LibraryPage = () => {
                     <div className="aspect-[4/4] bg-gray-500 mb-2 w-full overflow-hidden">
                       <img
                         src={story.imgSrc}
-                        alt={story.title}
+                        alt={story.metadata.title}
                         className="w-full h-full object-cover"
                       />
                     </div>
 
                     <p className="text-sm mb-2 line-clamp-4">
-                      {story.description}
+                      {story.metadata.description}
                     </p>
 
                     {/* Play button */}
