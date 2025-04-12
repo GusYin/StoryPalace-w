@@ -38,7 +38,42 @@ interface Episode {
   audioUrls: string[];
 }
 
-type UserPlan = "free" | "basic" | "premium";
+// Helper component for the image with loading state
+const ImageWithLoader = ({
+  src,
+  alt,
+  onLoad,
+}: {
+  src?: string;
+  alt: string;
+  onLoad?: () => void;
+}) => {
+  const [loading, setLoading] = useState(true);
+
+  return (
+    <div className="relative w-full h-full">
+      {loading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-gray-700">
+          <div className="animate-spin h-6 w-6 border-2 border-current border-t-transparent rounded-full"></div>
+        </div>
+      )}
+      {src && (
+        <img
+          src={src}
+          alt={alt}
+          className={`w-full h-full object-cover ${
+            loading ? "opacity-0" : "opacity-100"
+          }`}
+          onLoad={() => {
+            setLoading(false);
+            onLoad && onLoad();
+          }}
+          onError={() => setLoading(false)}
+        />
+      )}
+    </div>
+  );
+};
 
 const LibraryPage = () => {
   const navigate = useNavigate();
@@ -80,20 +115,6 @@ const LibraryPage = () => {
   const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
   };
-
-  // if (loading) {
-  //   return (
-  //     <div className="min-h-screen bg-custom-bg-dark">
-  //       <div
-  //         className="absolute
-  //                         inset-0 bg-black/50 backdrop-blur-[.7px] rounded-full
-  //                         flex items-center justify-center"
-  //       >
-  //         <div className="animate-spin h-5 w-5 border-2 border-current border-t-transparent rounded-full"></div>
-  //       </div>
-  //     </div>
-  //   );
-  // }
 
   return (
     <div className="min-h-screen bg-custom-bg-dark">
@@ -151,10 +172,9 @@ const LibraryPage = () => {
                     but we can adjust the ratio in aspect-[X/Y] to match 
                     specific image requirements if needed. */}
                       <div className="aspect-[4/4] bg-gray-500 mb-2 w-full overflow-hidden">
-                        <img
+                        <ImageWithLoader
                           src={story.imgSrc}
                           alt={story.metadata.title}
-                          className="w-full h-full object-cover"
                         />
                       </div>
 

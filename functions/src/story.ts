@@ -68,10 +68,6 @@ const parseEpisodeMetadata = (data: string): EpisodeMetadata => {
 };
 
 export const getStories = functions.https.onCall(async (request) => {
-  // Log the service account email
-  const [serviceAccount] = await admin.storage().bucket().getMetadata();
-  functions.logger.log("Using service account:", serviceAccount);
-
   await isUserAuthenticatedAndEmailVerified(request);
 
   try {
@@ -79,7 +75,8 @@ export const getStories = functions.https.onCall(async (request) => {
     const bucket = admin.storage().bucket();
     const storagePath = "stories/";
     const maxFreeStories = 3;
-    const pageSize = planDoc.plan === "free" ? maxFreeStories : 10;
+    const defaultPageSize = 20;
+    const pageSize = planDoc.plan === "free" ? maxFreeStories : defaultPageSize;
     const pageToken =
       planDoc.plan === "free" ? undefined : request.data.pageToken;
 
