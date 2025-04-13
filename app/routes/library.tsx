@@ -97,7 +97,7 @@ const LibraryPage = () => {
 
       // Add timeout handling
       const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("Request timed out")), 5000)
+        setTimeout(() => reject(new Error("Request timed out")), 10000)
       );
 
       const result = (await Promise.race([
