@@ -173,6 +173,13 @@ const LibraryPage = () => {
       if (!containerRef.current || loading) return;
 
       // 2. Get scroll position measurements
+      /*
+        scrollTop: How far the user has scrolled from the top (px)
+
+        scrollHeight: Total height of the scrollable content (px)
+
+        clientHeight: Visible viewport height (px) 
+      */
       const { scrollTop, scrollHeight, clientHeight } =
         document.documentElement;
 
