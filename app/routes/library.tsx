@@ -5,11 +5,10 @@ import { PlayIconWhite } from "~/components/icons/play";
 import { useNavigate } from "react-router";
 import { httpsCallable } from "firebase/functions";
 import { functions } from "~/firebase/firebase";
-import { toast } from "react-toastify";
-import { ToastContainer } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-interface StoryMetadata {
+export interface StoryMetadata {
   title: string;
   description: string;
   episodeSeries: string;
@@ -20,21 +19,21 @@ interface StoryMetadata {
   durationMinutes?: number;
 }
 
-interface EpisodeMetadata {
+export interface EpisodeMetadata {
   title: string;
   order?: number;
   durationSeconds?: number;
   keywords?: string[];
 }
 
-interface Story {
+export interface Story {
   id: string;
   metadata: StoryMetadata;
   episodes: Episode[];
   imgSrc?: string;
 }
 
-interface Episode {
+export interface Episode {
   id: string;
   metadata: EpisodeMetadata;
   contentUrl: string;

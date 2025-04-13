@@ -1,11 +1,19 @@
 import { useLocation, useNavigate } from "react-router";
 import AuthHeaderDark from "~/components/dark-theme-auth-header";
 import DarkThemeStoryPlayer from "~/components/dark-theme-story-player";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useEffect, useState } from "react";
+import type { Story } from "./library";
+import { httpsCallable } from "firebase/functions";
+import { functions } from "~/firebase/firebase";
 
 const StoryPlayerPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { storyId } = location.state || {};
+  const [story, setStory] = useState<Story | null>(null);
+  const [loading, setLoading] = useState(true);
 
   // Dummy narrators and episodes data
   const narrators = [
@@ -13,6 +21,43 @@ const StoryPlayerPage = () => {
     { voiceName: "Mummy", isReady: false },
     { voiceName: "Daddy", isReady: false },
   ];
+
+  useEffect(() => {
+    if (!storyId) {
+      navigate("/library");
+      return;
+    }
+
+    const fetchStory = async () => {
+      try {
+        setLoading(true);
+        const getStory = httpsCallable<{ storyId: string }, { story: Story }>(
+          functions,
+          "getStory"
+        );
+        const result = await getStory({ storyId });
+        setStory(result.data.story);
+      } catch (err) {
+        console.error("Error fetching story:", err);
+        toast.error(
+          <div>
+            Failed to load story.
+            <button
+              onClick={fetchStory}
+              className="ml-2 px-2 py-1 text-sm bg-white/10 hover:bg-white/20 rounded"
+            >
+              Retry
+            </button>
+          </div>,
+          { autoClose: false }
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStory();
+  }, [storyId, navigate]);
 
   if (!storyId) {
     navigate("/library");
@@ -23,6 +68,19 @@ const StoryPlayerPage = () => {
     // md (medium screens (768px) is the breakpoint the audio play
     <div className="min-h-screen bg-custom-bg-dark font-dosis text-white">
       <AuthHeaderDark />
+      <ToastContainer
+        position="bottom-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+        toastClassName="bg-gray-800 text-white"
+      />
       <div className="px-4 sm:px-6 md:px-20 mt-2 md:mt-15 flex flex-col items-center">
         <div className="tall-mobile-margin-bottom w-full flex flex-col md:flex-row md:justify-between items-center">
           {/* Back Navigation */}
@@ -38,7 +96,11 @@ const StoryPlayerPage = () => {
           <div className="mb-2 md:mb-8 gap-2 md:gap-5 flex flex-col items-center">
             {/* Story Title */}
             <h1 className="tall-mobile-margin-bottom tall-mobile-font-size-3 text-lg md:text-3xl">
-              Tales of Lily and Leo
+              {loading ? (
+                <div className="animate-spin h-5 w-5 border-2 border-current border-t-transparent rounded-full"></div>
+              ) : (
+                story?.metadata.title
+              )}
             </h1>
             <div className="tall-mobile-margin-bottom p-2 md:p-5 bg-[#161D1C] rounded-2xl shadow-md overflow-hidden w-full">
               {" "}
