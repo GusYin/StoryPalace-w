@@ -40,6 +40,18 @@ export interface Episode {
   audioUrls: string[];
 }
 
+interface LightweightStory {
+  id: string;
+  metadata: StoryMetadata;
+  imgSrc?: string;
+  episodes: LightweightEpisode[];
+}
+
+interface LightweightEpisode {
+  id: string;
+  metadata: EpisodeMetadata;
+}
+
 // Helper component for the image with loading state
 const ImageWithLoader = ({
   src,
@@ -80,42 +92,40 @@ const ImageWithLoader = ({
 const LibraryPage = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [stories, setStories] = useState<Story[]>([]);
+  const [stories, setStories] = useState<LightweightStory[]>([]);
   const [loading, setLoading] = useState(true);
   const [nextPageToken, setNextPageToken] = useState<string | undefined>();
   const [isFetchingMore, setIsFetchingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const fetchStories = async (pageToken?: string) => {
+  const fetchStoriesMetadata = async (pageToken?: string) => {
     try {
-      const getStories = httpsCallable<
+      const getStoriesMeta = httpsCallable<
         { pageToken?: string },
-        { stories: Story[]; nextPageToken?: string }
-      >(functions, "getStories");
+        { stories: LightweightStory[]; nextPageToken?: string }
+      >(functions, "getStoriesMetadata");
 
-      // Add timeout handling
       const timeoutPromise = new Promise((_, reject) =>
         setTimeout(() => reject(new Error("Request timed out")), 10000)
       );
 
       const result = (await Promise.race([
-        getStories({ pageToken }),
+        getStoriesMeta({ pageToken }),
         timeoutPromise,
-      ])) as Awaited<ReturnType<typeof getStories>>;
+      ])) as Awaited<ReturnType<typeof getStoriesMeta>>;
 
       return result.data;
     } catch (error) {
-      console.error("Error fetching stories:", error);
-
-      throw error; // Re-throw for handling in calling functions
+      console.error("Error fetching stories metadata:", error);
+      throw error;
     }
   };
 
   const loadInitialStories = async () => {
     try {
       setLoading(true);
-      const firstPage = await fetchStories();
+      const firstPage = await fetchStoriesMetadata();
       setStories(firstPage.stories);
       setNextPageToken(firstPage.nextPageToken);
       setHasMore(!!firstPage.nextPageToken);
@@ -144,7 +154,7 @@ const LibraryPage = () => {
 
     try {
       setIsFetchingMore(true);
-      const nextPage = await fetchStories(nextPageToken);
+      const nextPage = await fetchStoriesMetadata(nextPageToken);
       setStories((prev) => [...prev, ...nextPage.stories]);
       setNextPageToken(nextPage.nextPageToken);
       setHasMore(!!nextPage.nextPageToken);

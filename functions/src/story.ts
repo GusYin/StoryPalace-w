@@ -37,6 +37,18 @@ interface Episode {
   audioUrls: string[];
 }
 
+interface LightweightStory {
+  id: string;
+  metadata: StoryMetadata;
+  imgSrc?: string;
+  episodes: LightweightEpisode[];
+}
+
+interface LightweightEpisode {
+  id: string;
+  metadata: EpisodeMetadata;
+}
+
 // Validation Functions
 const parseStoryMetadata = (data: string): StoryMetadata => {
   const raw = JSON.parse(data);
@@ -125,6 +137,97 @@ const getValidAudioUrls = async (
 
   return audioUrls;
 };
+
+// Returns lightweight metadata
+export const getStoriesMetadata = functions.https.onCall(async (request) => {
+  await isUserAuthenticatedAndEmailVerified(request);
+
+  try {
+    const planDoc = await getUserPlanDocument(request.auth?.uid);
+    const bucket = admin.storage().bucket();
+    const storagePath = "stories/";
+    const maxFreeStories = 3;
+    const defaultPageSize = 20;
+    const pageSize = planDoc.plan === "free" ? maxFreeStories : defaultPageSize;
+    const pageToken =
+      planDoc.plan === "free" ? undefined : request.data.pageToken;
+
+    // 1. Get story folders using prefix/delimiter
+    const [, , storyApiResponse] = (await bucket.getFiles({
+      prefix: storagePath,
+      delimiter: "/",
+      maxResults: pageSize,
+      pageToken: pageToken,
+      autoPaginate: false,
+    })) as [any, any, { prefixes?: string[]; nextPageToken?: string }];
+
+    const storyFolderPrefixes =
+      storyApiResponse?.prefixes?.filter((p) => p !== storagePath) || [];
+    const nextPageToken = storyApiResponse?.nextPageToken;
+
+    const stories: Array<LightweightStory> = [];
+
+    for (const storyPrefix of storyFolderPrefixes) {
+      if (stories.length >= maxFreeStories && planDoc.plan === "free") break;
+
+      // 2. Process story metadata
+      const [metadata] = await bucket
+        .file(`${storyPrefix}metadata.json`)
+        .download();
+      const storyMeta = parseStoryMetadata(metadata.toString());
+
+      // 3. Get cover image URL
+      const imgSrc = await getCoverImageUrl(bucket, storyPrefix);
+
+      // 4. Process episodes metadata
+      const [, , episodeApiResponse] = (await bucket.getFiles({
+        prefix: `${storyPrefix}episodes/`,
+        delimiter: "/",
+      })) as [any, any, { prefixes?: string[] }];
+
+      const episodePrefixes = episodeApiResponse?.prefixes || [];
+      const episodes: Array<LightweightEpisode> = [];
+
+      for (const episodePrefix of episodePrefixes) {
+        try {
+          const [epMetadata] = await bucket
+            .file(`${episodePrefix}metadata.json`)
+            .download();
+          const episodeMeta = parseEpisodeMetadata(epMetadata.toString());
+
+          episodes.push({
+            id: episodePrefix.split("/").filter(Boolean).pop() || "",
+            metadata: episodeMeta,
+          });
+        } catch (error) {
+          functions.logger.error(
+            `Error processing episode metadata in ${episodePrefix}:`,
+            error
+          );
+        }
+      }
+
+      // 5. Add story with metadata only
+      stories.push({
+        id: storyPrefix.split("/").filter(Boolean).pop() || "",
+        metadata: storyMeta,
+        imgSrc,
+        episodes,
+      });
+    }
+
+    return {
+      stories,
+      nextPageToken: planDoc.plan === "free" ? null : nextPageToken,
+    };
+  } catch (error) {
+    functions.logger.error("Error fetching stories metadata:", error);
+    throw new functions.https.HttpsError(
+      "internal",
+      "Error retrieving stories metadata"
+    );
+  }
+});
 
 export const getStories = functions.https.onCall(async (request) => {
   await isUserAuthenticatedAndEmailVerified(request);
