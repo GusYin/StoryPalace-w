@@ -88,6 +88,44 @@ const getCoverImageUrl = async (bucket: Bucket, storyPrefix: string) => {
   return undefined;
 };
 
+// Helper function to filter valid audio files
+const getValidAudioUrls = async (
+  bucket: Bucket,
+  prefix: string
+): Promise<string[]> => {
+  const [audioFiles] = await bucket.getFiles({ prefix });
+  const validExtensions = [".mp3", ".wav", ".aac"];
+
+  // Filter valid audio files
+  const validAudioFiles = audioFiles.filter((file) => {
+    const name = file.name.toLowerCase();
+    // Skip directory placeholders (ends with '/')
+    if (name.endsWith("/")) return false;
+    // Only include files with valid audio extensions
+    return validExtensions.some((ext) => name.endsWith(ext));
+  });
+
+  functions.logger.info(
+    `Valid audio files for ${prefix}:`,
+    validAudioFiles.map((f) => f.name)
+  );
+
+  // Generate signed URLs for valid files
+  const audioUrls = await Promise.all(
+    validAudioFiles.map((file) =>
+      file
+        .getSignedUrl({
+          action: "read",
+          expires: Date.now() + 5 * 60 * 1000,
+          version: "v4",
+        })
+        .then(([url]) => url)
+    )
+  );
+
+  return audioUrls;
+};
+
 export const getStories = functions.https.onCall(async (request) => {
   await isUserAuthenticatedAndEmailVerified(request);
 
@@ -149,22 +187,9 @@ export const getStories = functions.https.onCall(async (request) => {
         functions.logger.info("episode metadata:", episodeMeta);
 
         // 5. Process audio files
-        const [audioFiles] = await bucket.getFiles({
-          prefix: `${episodePrefix}audios/`,
-        });
-
-        functions.logger.info("episode audios:", audioFiles);
-
-        const audioUrls = await Promise.all(
-          audioFiles.map((file) => {
-            functions.logger.info("episode audio:", file);
-
-            return file.getSignedUrl({
-              action: "read",
-              expires: Date.now() + 5 * 60 * 1000,
-              version: "v4",
-            });
-          })
+        const audioUrls = await getValidAudioUrls(
+          bucket,
+          `${episodePrefix}audios/`
         );
 
         functions.logger.info("audio urls:", audioUrls);
@@ -258,18 +283,9 @@ export const getStory = functions.https.onCall(async (request) => {
         .download();
 
       // 5. Process audio files
-      const [audioFiles] = await bucket.getFiles({
-        prefix: `${episodePrefix}audios/`,
-      });
-
-      const audioUrls = await Promise.all(
-        audioFiles.map((file) =>
-          file.getSignedUrl({
-            action: "read",
-            expires: Date.now() + 5 * 60 * 1000,
-            version: "v4",
-          })
-        )
+      const audioUrls = await getValidAudioUrls(
+        bucket,
+        `${episodePrefix}audios/`
       );
 
       episodes.push({

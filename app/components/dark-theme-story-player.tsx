@@ -1,45 +1,31 @@
 import { useState, useEffect, useRef } from "react";
 import { Howl } from "howler";
 import { styled } from "styled-components";
-import { PauseIcon } from "./icons/pause-icon";
 import { PlayWhiteIcon } from "./icons/play-white";
 import { SkipPrevious } from "./icons/skip-previous";
 import { SkipNext } from "./icons/skip-next";
 import { PauseCircle } from "./icons/pause-circle";
+import type { Episode } from "~/routes/library";
 
-// Story data model
-interface Story {
-  title: string;
-  audioUrl: string;
+interface DarkThemeStoryPlayerProps {
+  episodes: Episode[] | [];
 }
-
-const stories: Story[] = [
-  { title: "The Adventure of the Lost City", audioUrl: "/audio/lost_city.mp3" },
-  {
-    title: "The Mystery of the Hidden Treasure",
-    audioUrl: "/audio/hidden_treasure.mp3",
-  },
-  {
-    title: "The Journey to the Enchanted Forest",
-    audioUrl: "/audio/enchanted_forest.mp3",
-  },
-];
 
 const RotationKnob = ({
   angle,
   onRotate,
-  storiesCount,
+  episodesCount,
 }: {
   angle: number;
   onRotate: (angle: number) => void;
-  storiesCount: number;
+  episodesCount: number;
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const dragStartAngle = useRef(0);
   const dragStartRotation = useRef(0);
   const currentAngle = useRef(angle);
-  const step = 360 / storiesCount;
+  const step = 360 / episodesCount;
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -270,27 +256,100 @@ const RotationKnob = ({
   );
 };
 
-const DarkThemeStoryPlayer = () => {
+const DarkThemeStoryPlayer = ({ episodes }: DarkThemeStoryPlayerProps) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [rotationAngle, setRotationAngle] = useState(0);
   const soundRef = useRef<Howl | null>(null);
+  const [currentAudioIndex, setCurrentAudioIndex] = useState(0);
+  const currentAudioIndexRef = useRef(0);
 
   useEffect(() => {
-    const step = 360 / stories.length;
-    const newIndex = Math.round(rotationAngle / step) % stories.length;
-    setSelectedIndex(newIndex < 0 ? stories.length + newIndex : newIndex);
-  }, [rotationAngle]);
+    const step = 360 / episodes.length;
+    const newIndex = Math.round(rotationAngle / step) % episodes.length;
+    setSelectedIndex(newIndex < 0 ? episodes.length + newIndex : newIndex);
+  }, [rotationAngle, episodes.length]);
+
+  useEffect(() => {
+    // Cleanup audio when changing episodes or unmounting
+    // Reset audio when episode changes
+    currentAudioIndexRef.current = 0;
+    setCurrentAudioIndex(0);
+    if (soundRef.current) {
+      soundRef.current.stop();
+      soundRef.current.unload();
+      soundRef.current = null;
+    }
+
+    return () => {
+      currentAudioIndexRef.current = 0;
+      setCurrentAudioIndex(0);
+      if (soundRef.current) {
+        soundRef.current.stop();
+        soundRef.current.unload();
+        soundRef.current = null;
+      }
+    };
+  }, [selectedIndex]);
 
   const playAudio = () => {
-    if (!soundRef.current) {
-      soundRef.current = new Howl({
-        src: [stories[selectedIndex].audioUrl],
-        onend: () => setIsPlaying(false),
-      });
+    const episode = episodes[selectedIndex];
+    if (!episode || !episode.audioUrls.length) {
+      return;
     }
-    soundRef.current.play();
-    setIsPlaying(true);
+
+    // Resume if paused
+    if (soundRef.current?.playing()) {
+      soundRef.current.play();
+      return;
+    }
+
+    try {
+      // Start from current audio index
+      const audioUrl = encodeURI(
+        episode.audioUrls[currentAudioIndexRef.current]
+      );
+
+      // Create new Howl instance for each play to ensure fresh connection
+      soundRef.current = new Howl({
+        src: [audioUrl],
+        html5: true, // Important for Firebase signed URLs
+        format: ["mp3", "wav", "aac"], // Add appropriate formats
+        onend: () => {
+          if (currentAudioIndexRef.current < episode.audioUrls.length - 1) {
+            // Play next audio
+            currentAudioIndexRef.current += 1;
+            setCurrentAudioIndex((prev) => prev + 1);
+            playAudio();
+          } else {
+            // All audios played, stop playback
+            setIsPlaying(false);
+            setCurrentAudioIndex(0);
+            soundRef.current?.unload();
+            soundRef.current = null;
+            currentAudioIndexRef.current = 0;
+          }
+        },
+        onplay: () => setIsPlaying(true),
+        onpause: () => setIsPlaying(false),
+        onstop: () => setIsPlaying(false),
+        onplayerror: () => {
+          setIsPlaying(false);
+
+          soundRef.current?.unload();
+        },
+        onloaderror: (soundId, err) => {
+          setIsPlaying(false);
+          console.error("Audio initialization error:", err);
+
+          soundRef.current?.unload();
+        },
+      });
+
+      soundRef.current.play();
+    } catch (error) {
+      console.error("Audio initialization error:", error);
+    }
   };
 
   const pauseAudio = () => {
@@ -298,17 +357,19 @@ const DarkThemeStoryPlayer = () => {
     setIsPlaying(false);
   };
 
+  const currentEpisode = episodes[selectedIndex];
+
   return (
     <AppContainer className="mb-5 h-full md:max-h-[500px] font-dosis py-3 md:px-10 rounded-2xl bg-[#161D1C] text-white">
       <Title className="tall-mobile-font-size-2 md:text-xl font-medium">
-        {stories[selectedIndex].title}
+        {currentEpisode?.metadata.title}
       </Title>
 
       <div className="md:mt-2 md:mb-2">
         <RotationKnob
           angle={rotationAngle}
           onRotate={setRotationAngle}
-          storiesCount={stories.length}
+          episodesCount={episodes.length}
         />
       </div>
 
@@ -316,7 +377,7 @@ const DarkThemeStoryPlayer = () => {
         <ControlButton
           onClick={() =>
             setSelectedIndex(
-              (prev) => (prev - 1 + stories.length) % stories.length
+              (prev) => (prev - 1 + episodes.length) % episodes.length
             )
           }
           aria-label="Previous story"
@@ -330,7 +391,7 @@ const DarkThemeStoryPlayer = () => {
 
         <ControlButton
           onClick={() =>
-            setSelectedIndex((prev) => (prev + 1) % stories.length)
+            setSelectedIndex((prev) => (prev + 1) % episodes.length)
           }
           aria-label="Next story"
         >

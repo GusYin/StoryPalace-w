@@ -137,7 +137,7 @@ const StoryPlayerPage = () => {
             </div>
           </div>
 
-          <DarkThemeStoryPlayer />
+          <DarkThemeStoryPlayer episodes={story?.episodes || []} />
         </div>
       </div>
     </div>
