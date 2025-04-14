@@ -306,10 +306,7 @@ const DarkThemeStoryPlayer = ({ episodes }: DarkThemeStoryPlayerProps) => {
 
     try {
       // Start from current audio index
-      const audioUrl = encodeURI(
-        episode.audioUrls[currentAudioIndexRef.current]
-      );
-
+      const audioUrl = episode.audioUrls[currentAudioIndexRef.current];
       // Create new Howl instance for each play to ensure fresh connection
       soundRef.current = new Howl({
         src: [audioUrl],

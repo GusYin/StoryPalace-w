@@ -205,7 +205,7 @@ export const getStories = functions.https.onCall(async (request) => {
           contentUrl: `data:text/plain;base64,${contentBuffer.toString(
             "base64"
           )}`,
-          audioUrls: audioUrls.map(([url]) => url),
+          audioUrls,
         });
       }
 
@@ -294,7 +294,7 @@ export const getStory = functions.https.onCall(async (request) => {
         contentUrl: `data:text/plain;base64,${contentBuffer.toString(
           "base64"
         )}`,
-        audioUrls: audioUrls.map(([url]) => url),
+        audioUrls,
       });
     }
 
