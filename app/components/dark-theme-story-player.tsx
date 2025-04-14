@@ -383,7 +383,7 @@ const DarkThemeStoryPlayer = ({ episodes }: DarkThemeStoryPlayerProps) => {
         </ControlButton>
 
         <ControlButton onClick={isPlaying ? pauseAudio : playAudio}>
-          {isPlaying ? <PlayWhiteIcon /> : <PauseCircle />}
+          {isPlaying ? <PauseCircle /> : <PlayWhiteIcon />}
         </ControlButton>
 
         <ControlButton
