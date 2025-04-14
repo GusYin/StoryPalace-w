@@ -299,7 +299,7 @@ const DarkThemeStoryPlayer = ({ episodes }: DarkThemeStoryPlayerProps) => {
     }
 
     // Resume if paused
-    if (soundRef.current?.playing()) {
+    if (soundRef.current) {
       soundRef.current.play();
       return;
     }
@@ -314,6 +314,11 @@ const DarkThemeStoryPlayer = ({ episodes }: DarkThemeStoryPlayerProps) => {
         format: ["mp3", "wav", "aac"], // Add appropriate formats
         onend: () => {
           if (currentAudioIndexRef.current < episode.audioUrls.length - 1) {
+            // Unload current instance before creating next
+            if (soundRef.current) {
+              soundRef.current.unload();
+              soundRef.current = null;
+            }
             // Play next audio
             currentAudioIndexRef.current += 1;
             setCurrentAudioIndex((prev) => prev + 1);
@@ -332,14 +337,14 @@ const DarkThemeStoryPlayer = ({ episodes }: DarkThemeStoryPlayerProps) => {
         onstop: () => setIsPlaying(false),
         onplayerror: () => {
           setIsPlaying(false);
-
+          soundRef.current?.unload();
           soundRef.current?.unload();
         },
         onloaderror: (soundId, err) => {
-          setIsPlaying(false);
           console.error("Audio initialization error:", err);
-
+          setIsPlaying(false);
           soundRef.current?.unload();
+          soundRef.current = null;
         },
       });
 
