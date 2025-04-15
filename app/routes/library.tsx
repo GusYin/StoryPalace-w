@@ -7,6 +7,7 @@ import { httpsCallable } from "firebase/functions";
 import { functions } from "~/firebase/firebase";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import localforage from "localforage";
 
 export interface StoryMetadata {
   title: string;
@@ -100,7 +101,21 @@ const LibraryPage = () => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const fetchStoriesMetadata = async (pageToken?: string) => {
+    const cacheKey = `stories_${pageToken || "initial"}`;
+    const ttl = 60 * 60 * 1000; // Cache for 1 hour
+
     try {
+      // Check cache first
+      const cachedData = await localforage.getItem<{
+        data: { stories: LightweightStory[]; nextPageToken?: string };
+        timestamp: number;
+      }>(cacheKey);
+
+      if (cachedData && Date.now() - cachedData.timestamp < ttl) {
+        return cachedData.data;
+      }
+
+      // If no valid cache, fetch from Firebase
       const getStoriesMeta = httpsCallable<
         { pageToken?: string },
         { stories: LightweightStory[]; nextPageToken?: string }
@@ -115,7 +130,15 @@ const LibraryPage = () => {
         timeoutPromise,
       ])) as Awaited<ReturnType<typeof getStoriesMeta>>;
 
-      return result.data;
+      const data = result.data;
+
+      // Update cache with fresh data
+      await localforage.setItem(cacheKey, {
+        data,
+        timestamp: Date.now(),
+      });
+
+      return data;
     } catch (error) {
       console.error("Error fetching stories metadata:", error);
       throw error;
