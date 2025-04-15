@@ -8,6 +8,8 @@ import { functions } from "~/firebase/firebase";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import localforage from "localforage";
+import { getStorage, ref, getDownloadURL } from "firebase/storage";
+import { storage } from "~/firebase/firebase";
 
 export interface StoryMetadata {
   title: string;
@@ -64,6 +66,52 @@ const ImageWithLoader = ({
   onLoad?: () => void;
 }) => {
   const [loading, setLoading] = useState(true);
+  const [imgSrc, setImgSrc] = useState<string | undefined>();
+
+  useEffect(() => {
+    if (!src) {
+      setLoading(false);
+      return;
+    }
+
+    const fetchAndCacheImage = async () => {
+      try {
+        const cacheKey = `image_${src}`;
+        const ttl = 24 * 60 * 60 * 1000; // 24 hours
+
+        // Check cache first
+        const cached = await localforage.getItem<{
+          url: string;
+          timestamp: number;
+        }>(cacheKey);
+
+        if (cached && Date.now() - cached.timestamp < ttl) {
+          setImgSrc(cached.url);
+          setLoading(false);
+          return;
+        }
+
+        // Get Firebase download URL
+        const storageRef = ref(storage, src);
+        const downloadURL = await getDownloadURL(storageRef);
+
+        // Cache the download URL
+        await localforage.setItem(cacheKey, {
+          url: downloadURL,
+          timestamp: Date.now(),
+        });
+
+        setImgSrc(downloadURL);
+      } catch (error) {
+        console.error("Image load failed:", error);
+        setImgSrc(src); // Fallback to original src
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAndCacheImage();
+  }, [src]);
 
   return (
     <div className="relative w-full h-full">
@@ -72,15 +120,14 @@ const ImageWithLoader = ({
           <div className="animate-spin h-6 w-6 border-2 border-current border-t-transparent rounded-full"></div>
         </div>
       )}
-      {src && (
+      {imgSrc && (
         <img
-          src={src}
+          src={imgSrc}
           alt={alt}
           className={`w-full h-full object-cover ${
             loading ? "opacity-0" : "opacity-100"
           }`}
           onLoad={() => {
-            setLoading(false);
             onLoad && onLoad();
           }}
           onError={() => setLoading(false)}
