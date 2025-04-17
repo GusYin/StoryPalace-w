@@ -6,10 +6,36 @@ import {
   Scripts,
   ScrollRestoration,
 } from "react-router";
-
+import localforage from "localforage";
 import type { Route } from "./+types/root";
 import stylesheet from "./app.css?url";
 import "react-toastify/dist/ReactToastify.css";
+import { useEffect } from "react";
+
+localforage.config({
+  name: "story-palace",
+  storeName: "app_cache_v1",
+  version: 1.0,
+  description: "Application cache for stories and media",
+});
+
+// Cache cleanup function
+const cleanExpiredCache = async () => {
+  try {
+    const keys = await localforage.keys();
+    const now = Date.now();
+    const TTL = 24 * 60 * 60 * 1000; // 24 hours
+
+    for (const key of keys) {
+      const item = await localforage.getItem<{ timestamp: number }>(key);
+      if (item && now - item.timestamp > TTL) {
+        await localforage.removeItem(key);
+      }
+    }
+  } catch (error) {
+    console.error("Cache cleanup failed:", error);
+  }
+};
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -26,6 +52,29 @@ export const links: Route.LinksFunction = () => [
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
+  useEffect(() => {
+    // Initialize cache cleanup
+    const initializeCache = async () => {
+      try {
+        await localforage.ready();
+        console.log("LocalForage initialized");
+        await cleanExpiredCache();
+
+        // Set up periodic cleanup (every 6 hours)
+        const cleanupInterval = setInterval(
+          cleanExpiredCache,
+          6 * 60 * 60 * 1000 // Every 6 hours
+        );
+
+        return () => clearInterval(cleanupInterval);
+      } catch (error) {
+        console.error("LocalForage initialization failed:", error);
+      }
+    };
+
+    initializeCache();
+  }, []);
+
   return (
     <html lang="en">
       <head>

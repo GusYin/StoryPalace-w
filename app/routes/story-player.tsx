@@ -7,6 +7,9 @@ import { useEffect, useState } from "react";
 import type { Story } from "./library";
 import { httpsCallable } from "firebase/functions";
 import { functions } from "~/firebase/firebase";
+import localforage from "localforage";
+
+const STORY_TTL = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 
 const StoryPlayerPage = () => {
   const navigate = useNavigate();
@@ -15,11 +18,43 @@ const StoryPlayerPage = () => {
   const [story, setStory] = useState<Story | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Get cache key for story
+  const getStoryCacheKey = (id: string) => `story_${id}`;
+
+  // Cache story data
+  const cacheStory = async (storyData: Story) => {
+    try {
+      await localforage.setItem(getStoryCacheKey(storyData.id), {
+        data: storyData,
+        timestamp: Date.now(),
+      });
+    } catch (error) {
+      console.error("Failed to cache story:", error);
+    }
+  };
+
+  // Get cached story
+  const getCachedStory = async (id: string) => {
+    try {
+      const cached = await localforage.getItem<{
+        data: Story;
+        timestamp: number;
+      }>(getStoryCacheKey(id));
+
+      if (cached && Date.now() - cached.timestamp < STORY_TTL) {
+        return cached.data;
+      }
+    } catch (error) {
+      console.error("Failed to read cache:", error);
+    }
+    return null;
+  };
+
   // Dummy narrators and episodes data
   const narrators = [
     { voiceName: "Jokkkkkkkkkkkkkkkkkkkkkkkkkkkkkk", isReady: true },
-    { voiceName: "Mummy", isReady: false },
-    { voiceName: "Daddy", isReady: false },
+    // { voiceName: "Mummy", isReady: false },
+    // { voiceName: "Daddy", isReady: false },
   ];
 
   useEffect(() => {
@@ -31,12 +66,25 @@ const StoryPlayerPage = () => {
     const fetchStory = async () => {
       try {
         setLoading(true);
+
+        // Check cache first
+        const cachedStory = await getCachedStory(storyId);
+        if (cachedStory) {
+          setStory(cachedStory);
+          setLoading(false);
+          return;
+        }
+
         const getStory = httpsCallable<{ storyId: string }, { story: Story }>(
           functions,
           "getStory"
         );
         const result = await getStory({ storyId });
-        setStory(result.data.story);
+        const freshStory = result.data.story;
+
+        // Update state and cache
+        setStory(freshStory);
+        await cacheStory(freshStory);
       } catch (err) {
         console.error("Error fetching story:", err);
         toast.error(

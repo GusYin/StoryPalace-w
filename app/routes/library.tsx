@@ -8,7 +8,7 @@ import { functions } from "~/firebase/firebase";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import localforage from "localforage";
-import { getStorage, ref, getDownloadURL } from "firebase/storage";
+import { ref, getDownloadURL } from "firebase/storage";
 import { storage } from "~/firebase/firebase";
 
 export interface StoryMetadata {
