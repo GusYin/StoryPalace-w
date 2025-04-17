@@ -9,6 +9,7 @@ import type { Episode } from "~/routes/library";
 
 interface DarkThemeStoryPlayerProps {
   episodes: Episode[] | [];
+  onAudioError: () => void; // Add error callback prop
 }
 
 const RotationKnob = ({
@@ -256,7 +257,10 @@ const RotationKnob = ({
   );
 };
 
-const DarkThemeStoryPlayer = ({ episodes }: DarkThemeStoryPlayerProps) => {
+const DarkThemeStoryPlayer = ({
+  episodes,
+  onAudioError,
+}: DarkThemeStoryPlayerProps) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [rotationAngle, setRotationAngle] = useState(0);
@@ -291,6 +295,14 @@ const DarkThemeStoryPlayer = ({ episodes }: DarkThemeStoryPlayerProps) => {
       }
     };
   }, [selectedIndex]);
+
+  const handleAudioError = () => {
+    // Clear current audio and notify parent
+    soundRef.current?.unload();
+    soundRef.current = null;
+    setIsPlaying(false);
+    onAudioError();
+  };
 
   const playAudio = () => {
     const episode = episodes[selectedIndex];
@@ -336,15 +348,11 @@ const DarkThemeStoryPlayer = ({ episodes }: DarkThemeStoryPlayerProps) => {
         onpause: () => setIsPlaying(false),
         onstop: () => setIsPlaying(false),
         onplayerror: () => {
-          setIsPlaying(false);
-          soundRef.current?.unload();
-          soundRef.current?.unload();
+          handleAudioError();
         },
         onloaderror: (soundId, err) => {
           console.error("Audio initialization error:", err);
-          setIsPlaying(false);
-          soundRef.current?.unload();
-          soundRef.current = null;
+          handleAudioError();
         },
       });
 

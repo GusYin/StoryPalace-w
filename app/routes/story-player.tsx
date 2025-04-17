@@ -57,55 +57,61 @@ const StoryPlayerPage = () => {
     // { voiceName: "Daddy", isReady: false },
   ];
 
+  const fetchStory = async () => {
+    try {
+      setLoading(true);
+
+      // Check cache first
+      const cachedStory = await getCachedStory(storyId);
+      if (cachedStory) {
+        setStory(cachedStory);
+        setLoading(false);
+        return;
+      }
+
+      const getStory = httpsCallable<{ storyId: string }, { story: Story }>(
+        functions,
+        "getStory"
+      );
+      const result = await getStory({ storyId });
+      const freshStory = result.data.story;
+
+      // Update state and cache
+      setStory(freshStory);
+      await cacheStory(freshStory);
+    } catch (err) {
+      console.error("Error fetching story:", err);
+      toast.error(
+        <div>
+          Failed to load story.
+          <button
+            onClick={fetchStory}
+            className="ml-2 px-2 py-1 text-sm bg-white/10 hover:bg-white/20 rounded"
+          >
+            Retry
+          </button>
+        </div>,
+        { autoClose: false }
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (!storyId) {
       navigate("/library");
       return;
     }
 
-    const fetchStory = async () => {
-      try {
-        setLoading(true);
-
-        // Check cache first
-        const cachedStory = await getCachedStory(storyId);
-        if (cachedStory) {
-          setStory(cachedStory);
-          setLoading(false);
-          return;
-        }
-
-        const getStory = httpsCallable<{ storyId: string }, { story: Story }>(
-          functions,
-          "getStory"
-        );
-        const result = await getStory({ storyId });
-        const freshStory = result.data.story;
-
-        // Update state and cache
-        setStory(freshStory);
-        await cacheStory(freshStory);
-      } catch (err) {
-        console.error("Error fetching story:", err);
-        toast.error(
-          <div>
-            Failed to load story.
-            <button
-              onClick={fetchStory}
-              className="ml-2 px-2 py-1 text-sm bg-white/10 hover:bg-white/20 rounded"
-            >
-              Retry
-            </button>
-          </div>,
-          { autoClose: false }
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchStory();
   }, [storyId, navigate]);
+
+  const handleAudioError = async () => {
+    // Clear cache and force refresh
+    await localforage.removeItem(getStoryCacheKey(storyId));
+    fetchStory();
+  };
 
   if (!storyId) {
     navigate("/library");
@@ -185,7 +191,10 @@ const StoryPlayerPage = () => {
             </div>
           </div>
 
-          <DarkThemeStoryPlayer episodes={story?.episodes || []} />
+          <DarkThemeStoryPlayer
+            episodes={story?.episodes || []}
+            onAudioError={handleAudioError}
+          />
         </div>
       </div>
     </div>
