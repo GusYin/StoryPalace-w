@@ -1,8 +1,6 @@
 import { useNavigate } from "react-router";
 import AuthHeaderDark from "~/components/dark-theme-auth-header";
 import { PlayIconWhite } from "~/components/icons/play";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
 const StorySeriesDetailPage = () => {
   const navigate = useNavigate();
@@ -17,19 +15,6 @@ const StorySeriesDetailPage = () => {
   return (
     <div className="min-h-screen bg-custom-bg-dark font-dosis text-white">
       <AuthHeaderDark />
-      <ToastContainer
-        position="bottom-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="dark"
-        toastClassName="bg-gray-800 text-white"
-      />
 
       <main className="px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto mt-8">
         {/* Back Navigation */}
