@@ -55,6 +55,8 @@ interface LightweightEpisode {
   metadata: EpisodeMetadata;
 }
 
+const STORY_TTL = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+
 // Helper component for the image with loading state
 const ImageWithLoader = ({
   src,
@@ -77,7 +79,7 @@ const ImageWithLoader = ({
     const fetchAndCacheImage = async () => {
       try {
         const cacheKey = `image_${src}`;
-        const ttl = 24 * 60 * 60 * 1000; // 24 hours
+        const ttl = STORY_TTL; // 24 hours
 
         // Check cache first
         const cached = await localforage.getItem<{
@@ -149,7 +151,7 @@ const LibraryPage = () => {
 
   const fetchStoriesMetadata = async (pageToken?: string) => {
     const cacheKey = `stories_${pageToken || "initial"}`;
-    const ttl = 24 * 60 * 60 * 1000; // 24 hours
+    const ttl = STORY_TTL; // 24 hours
 
     try {
       // Check cache first
