@@ -354,7 +354,10 @@ const LibraryPage = () => {
                       className="bg-[#161D1C] rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition-shadow"
                     >
                       <div className="p-5">
-                        <div className="mb-2">
+                        <div
+                          className="mb-2 cursor-pointer"
+                          onClick={() => navigate(`/library/${story.id}`)}
+                        >
                           <h3 className="text-xl font-semibold mb-2">
                             {story.metadata.title}
                           </h3>
@@ -367,14 +370,20 @@ const LibraryPage = () => {
                     The aspect ratio 3/4 (0.75) is commonly used for book covers, 
                     but we can adjust the ratio in aspect-[X/Y] to match 
                     specific image requirements if needed. */}
-                        <div className="aspect-[4/4] bg-gray-500 mb-2 w-full overflow-hidden">
+                        <div
+                          className="aspect-[4/4] bg-gray-500 mb-2 w-full overflow-hidden cursor-pointer"
+                          onClick={() => navigate(`/library/${story.id}`)}
+                        >
                           <ImageWithLoader
                             src={story.imgSrc}
                             alt={story.metadata.title}
                           />
                         </div>
 
-                        <p className="text-sm mb-2 line-clamp-4">
+                        <p
+                          className="text-sm mb-2 line-clamp-4 cursor-pointer"
+                          onClick={() => navigate(`/library/${story.id}`)}
+                        >
                           {story.metadata.description}
                         </p>
 
