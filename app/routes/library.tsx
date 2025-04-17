@@ -339,7 +339,7 @@ const LibraryPage = () => {
           {/* Stories Grid */}
           <div className="">
             {loading ? (
-              <div className="absolute inset-0 bg-black/50 backdrop-blur-[.7px] rounded-full flex items-center justify-center">
+              <div className="absolute inset-0 bg-black/50 backdrop-blur-[.7px] flex items-center justify-center">
                 <div className="animate-spin h-5 w-5 border-2 border-current border-t-transparent rounded-full"></div>
               </div>
             ) : (
