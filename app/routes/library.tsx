@@ -149,7 +149,7 @@ const LibraryPage = () => {
 
   const fetchStoriesMetadata = async (pageToken?: string) => {
     const cacheKey = `stories_${pageToken || "initial"}`;
-    const ttl = 60 * 60 * 1000; // Cache for 1 hour
+    const ttl = 24 * 60 * 60 * 1000; // 24 hours
 
     try {
       // Check cache first
