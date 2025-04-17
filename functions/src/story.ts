@@ -49,6 +49,8 @@ interface LightweightEpisode {
   metadata: EpisodeMetadata;
 }
 
+const STORY_TTL = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+
 // Validation Functions
 const parseStoryMetadata = (data: string): StoryMetadata => {
   const raw = JSON.parse(data);
@@ -91,7 +93,7 @@ const getCoverImageUrl = async (bucket: Bucket, storyPrefix: string) => {
       return coverFile
         .getSignedUrl({
           action: "read",
-          expires: Date.now() + 5 * 60 * 1000,
+          expires: Date.now() + STORY_TTL,
           version: "v4",
         })
         .then(([url]) => url);
@@ -128,7 +130,7 @@ const getValidAudioUrls = async (
       file
         .getSignedUrl({
           action: "read",
-          expires: Date.now() + 5 * 60 * 1000,
+          expires: Date.now() + STORY_TTL,
           version: "v4",
         })
         .then(([url]) => url)
