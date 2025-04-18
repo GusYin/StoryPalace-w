@@ -110,18 +110,23 @@ const StorySeriesDetailPage = () => {
                 <h3 className="text-sm mb-1">
                   {story.episodes.length} EPISODES
                 </h3>
-                <div className="grid grid-cols-2 gap-0 mb-8">
-                  <div className="bg-[#161D1C] p-4 rounded-tl-xl rounded-bl-xl">
-                    <p className="text-gray-400 text-sm mb-1">AGE GROUP</p>
-                    <p className="text-lg">
+                <div className="max-w-50 grid grid-cols-2 gap-0 mb-6">
+                  <div className="flex flex-col justify-between h-full bg-[#161D1C] p-3 rounded-tl-xl rounded-bl-xl">
+                    <p className="text-gray-400 text-xs mb-0.5">AGE GROUP</p>
+                    <p className="text-base">
                       {story.metadata.recommendedAge} years
                     </p>
                   </div>
-                  <div className="bg-[#161D1C] p-4 rounded-tr-xl rounded-br-xl">
-                    <p className="text-gray-400 text-sm mb-1">DURATION</p>
-                    <p className="text-lg">
-                      {story.metadata.durationMinutes} mins
-                    </p>
+                  <div className="flex flex-col justify-between h-full items-end bg-[#161D1C] p-3 rounded-tr-xl rounded-br-xl">
+                    {/* This empty div gets assigned with items-end from the parent div
+                        so the whole div is aligned to the right. Which means the p tags
+                        inside of it can be vertically right aligned. */}
+                    <div>
+                      <p className="text-gray-400 text-xs mb-0.5">DURATION</p>
+                      <p className="text-base">
+                        {story.metadata.durationMinutes} mins
+                      </p>
+                    </div>
                   </div>
                 </div>
 
