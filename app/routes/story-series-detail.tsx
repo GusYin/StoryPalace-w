@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router";
 import AuthHeaderDark from "~/components/dark-theme-auth-header";
-import { PlayIconWhite } from "~/components/icons/play";
 import { httpsCallable } from "firebase/functions";
 import { functions } from "~/firebase/firebase";
 import { ImageWithLoader, type LightweightStory, type Story } from "./library";
 import localforage from "localforage";
+import { PlayIconBlack } from "~/components/icons/play-icon-black";
 
 const STORY_TTL = 24 * 60 * 60 * 1000; // 24 hours
 
@@ -62,21 +62,21 @@ const StorySeriesDetailPage = () => {
     <div className="min-h-screen bg-custom-bg-dark font-dosis text-white">
       <AuthHeaderDark />
 
-      <main className="px-8 sm:px-14 max-w-4xl mx-auto mt-8">
+      <main className="px-8 sm:px-14 max-w-4xl mx-auto mt-16">
         {/* Back Navigation - stays on top */}
         <button
           onClick={() => navigate("/library")}
-          className="mb-8 hover:text-custom-teal transition-colors"
+          className="cursor-pointer mb-8 hover:text-custom-teal transition-colors"
         >
           ← Back to library
         </button>
 
         {/* Main Content Container */}
-        <div className="md:flex md:gap-8">
+        <div className="md:flex md:gap-12">
           {/* Left Sidebar (Image + Play Button) */}
-          <div className="md:w-1/3 md:sticky md:top-8 md:self-start">
+          <div className="md:w-3/7 md:sticky md:top-8 md:self-start">
             {/* Story Image */}
-            <div className="aspect-[4/4] bg-gray-500 mb-4 overflow-hidden rounded-xl">
+            <div className="aspect-[4/4] md:aspect-auto md:w-[278px] md:h-[278px] bg-gray-500 mb-4 overflow-hidden md:shrink-0 md:flex-none">
               <ImageWithLoader src={story.imgSrc} alt={story.metadata.title} />
             </div>
 
@@ -85,11 +85,11 @@ const StorySeriesDetailPage = () => {
               onClick={() =>
                 navigate("/story-player", { state: { storyId: story.id } })
               }
-              className="w-full bg-custom-teal text-black py-4 rounded-xl font-semibold
-              hover:bg-[#05b092] transition-colors flex items-center justify-center gap-2
-              mb-8 md:mb-0"
+              className="cursor-pointer w-full md:w-[278px] bg-white text-custom-bg-dark
+                py-4 rounded-3xl font-semibold hover:bg-[#05b092] transition-colors flex 
+                items-center justify-center gap-2 mb-8 md:mb-0"
             >
-              <PlayIconWhite className="w-6 h-6" />
+              <PlayIconBlack className="" />
               Play this series
             </button>
           </div>
