@@ -107,16 +107,17 @@ const StorySeriesDetailPage = () => {
                 </h1>
 
                 {/* Metadata Grid */}
-                <div className="grid grid-cols-2 gap-4 mb-8">
-                  <div className="bg-[#161D1C] p-4 rounded-xl">
-                    <p className="text-gray-400 text-sm mb-1">EPISODES</p>
-                    <p className="text-lg">{story.episodes.length}</p>
-                  </div>
-                  <div className="bg-[#161D1C] p-4 rounded-xl">
+                <h3 className="text-sm mb-1">
+                  {story.episodes.length} EPISODES
+                </h3>
+                <div className="grid grid-cols-2 gap-0 mb-8">
+                  <div className="bg-[#161D1C] p-4 rounded-tl-xl rounded-bl-xl">
                     <p className="text-gray-400 text-sm mb-1">AGE GROUP</p>
-                    <p className="text-lg">{story.metadata.recommendedAge}</p>
+                    <p className="text-lg">
+                      {story.metadata.recommendedAge} years
+                    </p>
                   </div>
-                  <div className="bg-[#161D1C] p-4 rounded-xl">
+                  <div className="bg-[#161D1C] p-4 rounded-tr-xl rounded-br-xl">
                     <p className="text-gray-400 text-sm mb-1">DURATION</p>
                     <p className="text-lg">
                       {story.metadata.durationMinutes} mins
