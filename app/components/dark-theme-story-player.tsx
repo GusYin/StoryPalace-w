@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Howl } from "howler";
-import { styled } from "styled-components";
+import { styled, css } from "styled-components";
 import { PlayWhiteIcon } from "./icons/play-white";
 import { SkipPrevious } from "./icons/skip-previous";
 import { SkipNext } from "./icons/skip-next";
@@ -12,15 +12,19 @@ interface DarkThemeStoryPlayerProps {
   onAudioError: () => void; // Add error callback prop
 }
 
+interface RotationKnobProps {
+  angle: number;
+  onRotate: (angle: number) => void;
+  episodesCount: number;
+  isPlaying: boolean; // Add isPlaying prop
+}
+
 const RotationKnob = ({
   angle,
   onRotate,
   episodesCount,
-}: {
-  angle: number;
-  onRotate: (angle: number) => void;
-  episodesCount: number;
-}) => {
+  isPlaying,
+}: RotationKnobProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const dragStartAngle = useRef(0);
@@ -243,7 +247,7 @@ const RotationKnob = ({
   };
 
   return (
-    <KnobContainer>
+    <KnobContainer $isPlaying={isPlaying}>
       <canvas
         ref={canvasRef}
         width={320}
@@ -253,6 +257,14 @@ const RotationKnob = ({
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
       />
+      {isPlaying && (
+        <EqualizerBars $isPlaying={isPlaying}>
+          <div />
+          <div />
+          <div />
+          <div />
+        </EqualizerBars>
+      )}
     </KnobContainer>
   );
 };
@@ -380,6 +392,7 @@ const DarkThemeStoryPlayer = ({
           angle={rotationAngle}
           onRotate={setRotationAngle}
           episodesCount={episodes.length}
+          isPlaying={isPlaying} // Pass isPlaying state
         />
       </div>
 
@@ -426,13 +439,33 @@ const Title = styled.h1`
   max-width: 600px;
 `;
 
-const KnobContainer = styled.div`
+// Update KnobContainer styled component
+const KnobContainer = styled.div<{ $isPlaying: boolean }>`
   position: relative;
   width: 320px;
   height: 320px;
+
   canvas {
     width: 100%;
     height: 100%;
+    transition: filter 0.3s ease;
+    ${({ $isPlaying }) =>
+      $isPlaying &&
+      css`
+        animation: knob-pulse 1.5s ease-in-out infinite;
+      `}
+  }
+
+  @keyframes knob-pulse {
+    0% {
+      filter: drop-shadow(0 0 5px rgba(7, 197, 165, 0.3));
+    }
+    50% {
+      filter: drop-shadow(0 0 15px rgba(7, 197, 165, 0.6));
+    }
+    100% {
+      filter: drop-shadow(0 0 5px rgba(7, 197, 165, 0.3));
+    }
   }
 `;
 
@@ -444,7 +477,7 @@ const Controls = styled.div`
   // ); // Compensate for circle position
 `;
 
-const ControlButton = styled.button`
+const ControlButton = styled.button<{ $isPlaying?: boolean }>`
   background: none;
   border: none;
   color: #07c5a5;
@@ -455,14 +488,81 @@ const ControlButton = styled.button`
     opacity: 0.8;
   }
   svg {
-    // width: 40px; // Control size through CSS
-    // height: 40px;
+    ${({ $isPlaying }) =>
+      $isPlaying &&
+      css`
+        animation: button-pulse 1.5s ease-in-out infinite;
+      `}
     vertical-align: middle;
 
     /* Optional hover effects */
     transition: transform 0.2s;
     &:hover {
       transform: scale(1.1);
+    }
+  }
+
+  @keyframes button-pulse {
+    0% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: scale(1.1);
+      opacity: 0.8;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+`;
+
+// Add this to your components
+const EqualizerBars = styled.div<{ $isPlaying: boolean }>`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  gap: 3px;
+  height: 40px;
+  align-items: flex-end;
+
+  div {
+    width: 4px;
+    background: #07c5a5;
+    ${({ $isPlaying }) =>
+      $isPlaying &&
+      css`
+        animation: equalizer 0.8s infinite ease-in-out;
+      `}
+
+    &:nth-child(1) {
+      height: 25%;
+      animation-delay: 0s;
+    }
+    &:nth-child(2) {
+      height: 40%;
+      animation-delay: 0.2s;
+    }
+    &:nth-child(3) {
+      height: 30%;
+      animation-delay: 0.4s;
+    }
+    &:nth-child(4) {
+      height: 50%;
+      animation-delay: 0.6s;
+    }
+  }
+
+  @keyframes equalizer {
+    0%,
+    100% {
+      transform: scaleY(1);
+    }
+    50% {
+      transform: scaleY(0.3);
     }
   }
 `;
