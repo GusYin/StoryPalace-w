@@ -4,13 +4,16 @@ import AuthHeaderDark from "~/components/dark-theme-auth-header";
 import { PlayIconWhite } from "~/components/icons/play";
 import { httpsCallable } from "firebase/functions";
 import { functions } from "~/firebase/firebase";
-import type { Story } from "./library";
+import type { LightweightStory, Story } from "./library";
+import localforage from "localforage";
+
+const STORY_TTL = 24 * 60 * 60 * 1000; // 24 hours
 
 const StorySeriesDetailPage = () => {
   const navigate = useNavigate();
   const { storyId } = useParams<{ storyId: string }>();
   const location = useLocation();
-  const [story, setStory] = useState<Story>(location.state?.story);
+  const [story, setStory] = useState<LightweightStory>(location.state?.story);
   const [loading, setLoading] = useState(!location.state?.story);
 
   useEffect(() => {
@@ -18,12 +21,31 @@ const StorySeriesDetailPage = () => {
 
     const fetchStory = async () => {
       try {
+        const cacheKey = `story_metadata_${storyId}`;
+
+        // Check cache first
+        const cachedStory = await localforage.getItem<{
+          data: LightweightStory;
+          timestamp: number;
+        }>(cacheKey);
+
+        if (cachedStory && Date.now() - cachedStory.timestamp < STORY_TTL) {
+          setStory(cachedStory.data);
+          setLoading(false);
+          return;
+        }
+
+        // Fetch from Firebase if no valid cache
         const getStory = httpsCallable<{ storyId: string }, { story: Story }>(
           functions,
           "getStoryMetadata"
         );
         const result = await getStory({ storyId });
         setStory(result.data.story);
+        await localforage.setItem(cacheKey, {
+          data: result.data.story,
+          timestamp: Date.now(),
+        });
       } catch (error) {
         console.error("Error fetching story:", error);
       } finally {

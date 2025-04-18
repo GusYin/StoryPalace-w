@@ -22,10 +22,10 @@ const StoryPlayerPage = () => {
   const getStoryCacheKey = (id: string) => `story_${id}`;
 
   // Cache story data
-  const cacheStory = async (storyData: Story) => {
+  const cacheStory = async (story: Story) => {
     try {
-      await localforage.setItem(getStoryCacheKey(storyData.id), {
-        data: storyData,
+      await localforage.setItem(getStoryCacheKey(story.id), {
+        data: story,
         timestamp: Date.now(),
       });
     } catch (error) {

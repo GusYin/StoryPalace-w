@@ -43,14 +43,14 @@ export interface Episode {
   audioUrls: string[];
 }
 
-interface LightweightStory {
+export interface LightweightStory {
   id: string;
   metadata: StoryMetadata;
   imgSrc?: string;
   episodes: LightweightEpisode[];
 }
 
-interface LightweightEpisode {
+export interface LightweightEpisode {
   id: string;
   metadata: EpisodeMetadata;
 }
@@ -150,7 +150,7 @@ const LibraryPage = () => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const fetchStoriesMetadata = async (pageToken?: string) => {
-    const cacheKey = `stories_${pageToken || "initial"}`;
+    const cacheKey = `stories_metadata_${pageToken || "initial"}`;
     const ttl = STORY_TTL; // 24 hours
 
     try {
