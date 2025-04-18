@@ -76,7 +76,7 @@ const StorySeriesDetailPage = () => {
           {/* Left Sidebar (Image + Play Button) */}
           <div className="md:w-3/7 md:sticky md:top-8 md:self-start">
             {/* Story Image */}
-            <div className="aspect-[4/4] md:aspect-auto md:w-[278px] md:h-[278px] bg-gray-500 mb-4 overflow-hidden md:shrink-0 md:flex-none">
+            <div className="aspect-[4/4] md:aspect-auto md:w-[278px] md:h-[278px] bg-gray-500 mb-[20px] overflow-hidden md:shrink-0 md:flex-none">
               <ImageWithLoader src={story.imgSrc} alt={story.metadata.title} />
             </div>
 
@@ -102,28 +102,28 @@ const StorySeriesDetailPage = () => {
               </div>
             ) : (
               <>
-                <h1 className="text-4xl font-bold mb-6">
+                <h1 className="font-fraunces text-4xl font-semibold mb-2">
                   {story.metadata.title}
                 </h1>
 
                 {/* Metadata Grid */}
-                <h3 className="text-sm mb-1">
-                  {story.episodes.length} EPISODES
-                </h3>
-                <div className="max-w-50 grid grid-cols-2 gap-0 mb-6">
-                  <div className="flex flex-col justify-between h-full bg-[#161D1C] p-3 rounded-tl-xl rounded-bl-xl">
-                    <p className="text-gray-400 text-xs mb-0.5">AGE GROUP</p>
-                    <p className="text-base">
+                <p className="text-3xl mb-12">
+                  {story.episodes.length} Episodes
+                </p>
+                <div className="max-w-67 grid grid-cols-2 gap-0 mb-12">
+                  <div className="flex flex-col justify-between h-full bg-custom-bg-lighter-dark p-5 pr-0 rounded-tl-xl rounded-bl-xl">
+                    <p className="mb-0.5">AGE GROUP</p>
+                    <p className="text-xl font-semibold">
                       {story.metadata.recommendedAge} years
                     </p>
                   </div>
-                  <div className="flex flex-col justify-between h-full items-end bg-[#161D1C] p-3 rounded-tr-xl rounded-br-xl">
+                  <div className="flex flex-col justify-between h-full items-end bg-custom-bg-lighter-dark p-5 pl-0 rounded-tr-xl rounded-br-xl">
                     {/* This empty div gets assigned with items-end from the parent div
                         so the whole div is aligned to the right. Which means the p tags
                         inside of it can be vertically right aligned. */}
                     <div>
-                      <p className="text-gray-400 text-xs mb-0.5">DURATION</p>
-                      <p className="text-base">
+                      <p className="mb-0.5">DURATION</p>
+                      <p className="text-xl font-semibold">
                         {story.metadata.durationMinutes} mins
                       </p>
                     </div>
@@ -132,7 +132,6 @@ const StorySeriesDetailPage = () => {
 
                 {/* Story Description */}
                 <div className="mb-8">
-                  <h2 className="text-2xl font-bold mb-4">About the Series</h2>
                   <p className="text-gray-300 leading-relaxed">
                     {story.metadata.description}
                   </p>
