@@ -140,6 +140,83 @@ const getValidAudioUrls = async (
   return audioUrls;
 };
 
+export const getStoryMetadata = functions.https.onCall(async (request) => {
+  await isUserAuthenticatedAndEmailVerified(request);
+
+  if (!request.data.storyId) {
+    throw new functions.https.HttpsError(
+      "invalid-argument",
+      "storyId is required"
+    );
+  }
+
+  try {
+    const bucket: Bucket = admin.storage().bucket();
+    const storyId: string = request.data.storyId;
+    const storyPrefix = `stories/${storyId}/`;
+
+    // 1. Get story metadata
+    const metadataFile = bucket.file(`${storyPrefix}metadata.json`);
+    const [metadataExists] = await metadataFile.exists();
+
+    if (!metadataExists) {
+      throw new functions.https.HttpsError("not-found", "Story not found");
+    }
+
+    const [metadata] = await metadataFile.download();
+    const storyMeta: StoryMetadata = parseStoryMetadata(metadata.toString());
+
+    // 2. Get cover image URL
+    const imgSrc = await getCoverImageUrl(bucket, storyPrefix);
+
+    // 3. Get episode folders
+    const [, , episodeApiResponse] = (await bucket.getFiles({
+      prefix: `${storyPrefix}episodes/`,
+      delimiter: "/",
+    })) as [any, any, { prefixes?: string[] }];
+
+    const episodePrefixes = episodeApiResponse?.prefixes || [];
+    const episodes: LightweightEpisode[] = [];
+
+    for (const episodePrefix of episodePrefixes) {
+      try {
+        const [epMetadata] = await bucket
+          .file(`${episodePrefix}metadata.json`)
+          .download();
+        const episodeMeta: EpisodeMetadata = parseEpisodeMetadata(
+          epMetadata.toString()
+        );
+
+        episodes.push({
+          id: episodePrefix.split("/").filter(Boolean).pop() || "",
+          metadata: episodeMeta,
+        });
+      } catch (error) {
+        functions.logger.error(
+          `Error processing episode metadata in ${episodePrefix}:`,
+          error
+        );
+        // Skip this episode if metadata processing fails
+      }
+    }
+
+    const story: LightweightStory = {
+      id: storyId,
+      metadata: storyMeta,
+      imgSrc,
+      episodes,
+    };
+
+    return { story };
+  } catch (error) {
+    functions.logger.error("Error fetching story metadata:", error);
+    throw new functions.https.HttpsError(
+      "internal",
+      "Error retrieving story metadata"
+    );
+  }
+});
+
 // Returns lightweight metadata
 export const getStoriesMetadata = functions.https.onCall(async (request) => {
   await isUserAuthenticatedAndEmailVerified(request);

@@ -356,7 +356,11 @@ const LibraryPage = () => {
                       <div className="p-5">
                         <div
                           className="mb-2 cursor-pointer"
-                          onClick={() => navigate(`/library/${story.id}`)}
+                          onClick={() =>
+                            navigate(`/library/${story.id}`, {
+                              state: { story },
+                            })
+                          }
                         >
                           <h3 className="text-xl font-semibold mb-2">
                             {story.metadata.title}
@@ -372,7 +376,11 @@ const LibraryPage = () => {
                     specific image requirements if needed. */}
                         <div
                           className="aspect-[4/4] bg-gray-500 mb-2 w-full overflow-hidden cursor-pointer"
-                          onClick={() => navigate(`/library/${story.id}`)}
+                          onClick={() =>
+                            navigate(`/library/${story.id}`, {
+                              state: { story },
+                            })
+                          }
                         >
                           <ImageWithLoader
                             src={story.imgSrc}
@@ -382,7 +390,11 @@ const LibraryPage = () => {
 
                         <p
                           className="text-sm mb-2 line-clamp-4 cursor-pointer"
-                          onClick={() => navigate(`/library/${story.id}`)}
+                          onClick={() =>
+                            navigate(`/library/${story.id}`, {
+                              state: { story },
+                            })
+                          }
                         >
                           {story.metadata.description}
                         </p>
