@@ -131,23 +131,22 @@ const StorySeriesDetailPage = () => {
                 </div>
 
                 {/* Story Description */}
-                <div className="mb-8">
-                  <p className="text-gray-300 leading-relaxed">
+                <div className="mb-12">
+                  <p className="text-xl leading-[32px]">
                     {story.metadata.description}
                   </p>
                 </div>
 
                 {/* Episode List */}
                 <div className="mb-20">
-                  <h2 className="text-2xl font-bold mb-6">Episode List</h2>
-                  <div className="space-y-4">
+                  <h2 className="text-xl font-medium mb-1">EPISODE LIST</h2>
+                  <div className="text-xl leading-[32px]">
                     {story.episodes.map((episode, index) => (
                       <div
                         key={index}
-                        className="bg-[#161D1C] p-4 rounded-xl flex justify-between items-center
-                        hover:bg-[#1e2525] transition-colors"
+                        className="flex justify-between items-center"
                       >
-                        <span className="text-gray-300">
+                        <span className="">
                           Episode {index + 1}: {episode.metadata.title}
                         </span>
                       </div>
