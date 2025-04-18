@@ -4,7 +4,7 @@ import AuthHeaderDark from "~/components/dark-theme-auth-header";
 import { PlayIconWhite } from "~/components/icons/play";
 import { httpsCallable } from "firebase/functions";
 import { functions } from "~/firebase/firebase";
-import type { LightweightStory, Story } from "./library";
+import { ImageWithLoader, type LightweightStory, type Story } from "./library";
 import localforage from "localforage";
 
 const STORY_TTL = 24 * 60 * 60 * 1000; // 24 hours
@@ -102,6 +102,17 @@ const StorySeriesDetailPage = () => {
                   </div>
                 </div>
 
+                {/* Story image
+                    The aspect ratio 3/4 (0.75) is commonly used for book covers, 
+                    but we can adjust the ratio in aspect-[X/Y] to match 
+                    specific image requirements if needed. */}
+                <div className="aspect-[4/4] bg-gray-500 mb-2 w-full overflow-hidden cursor-pointer">
+                  <ImageWithLoader
+                    src={story.imgSrc}
+                    alt={story.metadata.title}
+                  />
+                </div>
+
                 {/* Play Button */}
                 <button
                   onClick={() =>
@@ -120,12 +131,7 @@ const StorySeriesDetailPage = () => {
               {/* Story Description */}
               <div className="mb-12">
                 <p className="text-gray-300 leading-relaxed">
-                  Lily and Leo love exploring, but their adventures take a
-                  magical turn when the mischievous pixies hiding in their
-                  backyard start playing tricks on them! With their wise old cat
-                  watching over them, they unravel tiny mysteries, solve playful
-                  problems, and learn important lessons about kindness,
-                  friendship, and perseverance.
+                  {story.metadata.description}
                 </p>
               </div>
 

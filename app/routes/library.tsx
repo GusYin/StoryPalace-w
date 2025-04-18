@@ -58,7 +58,7 @@ export interface LightweightEpisode {
 const STORY_TTL = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 
 // Helper component for the image with loading state
-const ImageWithLoader = ({
+export const ImageWithLoader = ({
   src,
   alt,
   onLoad,
