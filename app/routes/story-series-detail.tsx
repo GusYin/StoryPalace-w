@@ -62,8 +62,8 @@ const StorySeriesDetailPage = () => {
     <div className="min-h-screen bg-custom-bg-dark font-dosis text-white">
       <AuthHeaderDark />
 
-      <main className="px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto mt-8">
-        {/* Back Navigation */}
+      <main className="px-8 sm:px-14 max-w-4xl mx-auto mt-8">
+        {/* Back Navigation - stays on top */}
         <button
           onClick={() => navigate("/library")}
           className="mb-8 hover:text-custom-teal transition-colors"
@@ -71,89 +71,87 @@ const StorySeriesDetailPage = () => {
           ← Back to library
         </button>
 
-        {/* Series Header */}
-        <div>
-          {loading ? (
-            <div className="absolute inset-0 bg-black/50 backdrop-blur-[.7px] flex items-center justify-center">
-              <div className="animate-spin h-5 w-5 border-2 border-current border-t-transparent rounded-full"></div>
+        {/* Main Content Container */}
+        <div className="md:flex md:gap-8">
+          {/* Left Sidebar (Image + Play Button) */}
+          <div className="md:w-1/3 md:sticky md:top-8 md:self-start">
+            {/* Story Image */}
+            <div className="aspect-[4/4] bg-gray-500 mb-4 overflow-hidden rounded-xl">
+              <ImageWithLoader src={story.imgSrc} alt={story.metadata.title} />
             </div>
-          ) : (
-            <>
-              <div className="mb-8">
-                <h1 className="text-4xl font-bold mb-4">
+
+            {/* Play Button */}
+            <button
+              onClick={() =>
+                navigate("/story-player", { state: { storyId: story.id } })
+              }
+              className="w-full bg-custom-teal text-black py-4 rounded-xl font-semibold
+              hover:bg-[#05b092] transition-colors flex items-center justify-center gap-2
+              mb-8 md:mb-0"
+            >
+              <PlayIconWhite className="w-6 h-6" />
+              Play this series
+            </button>
+          </div>
+
+          {/* Right Content */}
+          <div className="md:w-2/3">
+            {loading ? (
+              <div className="absolute inset-0 bg-black/50 backdrop-blur-[.7px] flex items-center justify-center">
+                <div className="animate-spin h-5 w-5 border-2 border-current border-t-transparent rounded-full"></div>
+              </div>
+            ) : (
+              <>
+                <h1 className="text-4xl font-bold mb-6">
                   {story.metadata.title}
                 </h1>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                  <div>
-                    <p className="text-gray-400 text-sm">EPISODES</p>
-                    <p className="text-lg">{story.episodes.length} Episodes</p>
+
+                {/* Metadata Grid */}
+                <div className="grid grid-cols-2 gap-4 mb-8">
+                  <div className="bg-[#161D1C] p-4 rounded-xl">
+                    <p className="text-gray-400 text-sm mb-1">EPISODES</p>
+                    <p className="text-lg">{story.episodes.length}</p>
                   </div>
-                  <div>
-                    <p className="text-gray-400 text-sm">AGE GROUP</p>
+                  <div className="bg-[#161D1C] p-4 rounded-xl">
+                    <p className="text-gray-400 text-sm mb-1">AGE GROUP</p>
+                    <p className="text-lg">{story.metadata.recommendedAge}</p>
+                  </div>
+                  <div className="bg-[#161D1C] p-4 rounded-xl">
+                    <p className="text-gray-400 text-sm mb-1">DURATION</p>
                     <p className="text-lg">
-                      {story.metadata.recommendedAge} years
+                      {story.metadata.durationMinutes} mins
                     </p>
                   </div>
-                  <div>
-                    <p className="text-gray-400 text-sm">DURATION</p>
-                    <p className="text-lg">
-                      {story.metadata.durationMinutes} minutes
-                    </p>
+                </div>
+
+                {/* Story Description */}
+                <div className="mb-8">
+                  <h2 className="text-2xl font-bold mb-4">About the Series</h2>
+                  <p className="text-gray-300 leading-relaxed">
+                    {story.metadata.description}
+                  </p>
+                </div>
+
+                {/* Episode List */}
+                <div className="mb-20">
+                  <h2 className="text-2xl font-bold mb-6">Episode List</h2>
+                  <div className="space-y-4">
+                    {story.episodes.map((episode, index) => (
+                      <div
+                        key={index}
+                        className="bg-[#161D1C] p-4 rounded-xl flex justify-between items-center
+                        hover:bg-[#1e2525] transition-colors"
+                      >
+                        <span className="text-gray-300">
+                          Episode {index + 1}: {episode.metadata.title}
+                        </span>
+                      </div>
+                    ))}
                   </div>
                 </div>
-
-                {/* Story image
-                    The aspect ratio 3/4 (0.75) is commonly used for book covers, 
-                    but we can adjust the ratio in aspect-[X/Y] to match 
-                    specific image requirements if needed. */}
-                <div className="aspect-[4/4] bg-gray-500 mb-2 w-full overflow-hidden cursor-pointer">
-                  <ImageWithLoader
-                    src={story.imgSrc}
-                    alt={story.metadata.title}
-                  />
-                </div>
-
-                {/* Play Button */}
-                <button
-                  onClick={() =>
-                    navigate("/story-player", {
-                      state: { storyId: story.id },
-                    })
-                  }
-                  className="w-full bg-custom-teal text-black py-4 rounded-xl font-semibold
-              hover:bg-[#05b092] transition-colors flex items-center justify-center gap-2"
-                >
-                  <PlayIconWhite className="w-6 h-6" />
-                  Play this series
-                </button>
-              </div>
-
-              {/* Story Description */}
-              <div className="mb-12">
-                <p className="text-gray-300 leading-relaxed">
-                  {story.metadata.description}
-                </p>
-              </div>
-
-              {/* Episode List */}
-              <div className="mb-20">
-                <h2 className="text-2xl font-bold mb-6">Episode List</h2>
-                <div className="space-y-4">
-                  {story.episodes.map((episode, index) => (
-                    <div
-                      key={index}
-                      className="bg-[#161D1C] p-4 rounded-xl flex justify-between items-center
-                  hover:bg-[#1e2525] transition-colors"
-                    >
-                      <span className="text-gray-300">
-                        {episode.metadata.title}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </>
-          )}
+              </>
+            )}
+          </div>
         </div>
       </main>
     </div>
