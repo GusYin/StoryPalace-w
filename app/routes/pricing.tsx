@@ -8,11 +8,16 @@ import { auth } from "~/firebase/firebase";
 import { BillingCycle, PricingPlan } from "~/lib/constant";
 import { functions } from "~/firebase/firebase";
 import { toast, ToastContainer } from "react-toastify";
+import ButtonWithLoading from "~/components/button-with-loading";
 
 export default function PricingPage() {
   const hasPremium = true;
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState<{
+    type: "" | "create-free" | "basic" | "premium";
+    cycle?: "monthly" | "yearly";
+  }>({ type: "", cycle: undefined });
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -74,79 +79,106 @@ export default function PricingPage() {
   };
 
   async function handleCreateFreeAccount(): Promise<void> {
-    const isAuthed = await authGuard();
-    if (isAuthed !== true) {
-      return;
-    }
+    setIsLoading({ type: "create-free" });
 
-    const userPlan = await fetchUserPlan();
+    try {
+      const isAuthed = await authGuard();
+      if (isAuthed !== true) {
+        return;
+      }
 
-    if (userPlan?.plan === PricingPlan.Free) {
-      // User already has a Basic plan
-      toast.info("You are already subscribed to the Free plan.");
-      return;
-    }
+      const userPlan = await fetchUserPlan();
 
-    if (userPlan?.plan === PricingPlan.Basic) {
-      // User already has a Basic plan
-      toast.info("You are already subscribed to the Basic plan.");
-      return;
-    }
+      if (userPlan?.plan === PricingPlan.Free) {
+        // User already has a Basic plan
+        toast.info("You are already subscribed to the Free plan.");
+        return;
+      }
 
-    if (userPlan?.plan === PricingPlan.Premium) {
-      toast.info("You are already subscribed to the Premium plan.");
-      return;
+      if (userPlan?.plan === PricingPlan.Basic) {
+        // User already has a Basic plan
+        toast.info("You are already subscribed to the Basic plan.");
+        return;
+      }
+
+      if (userPlan?.plan === PricingPlan.Premium) {
+        toast.info("You are already subscribed to the Premium plan.");
+        return;
+      }
+    } catch (error) {
+      console.error("Error creating free account:", error);
+    } finally {
+      setIsLoading({ type: "" });
     }
   }
 
-  async function subscribeBasicPlan(monthlyOrYearly: string): Promise<void> {
-    const isAuthed = await authGuard();
+  async function subscribeBasicPlan(
+    monthlyOrYearly: "monthly" | "yearly"
+  ): Promise<void> {
+    setIsLoading({ type: "basic", cycle: monthlyOrYearly });
 
-    if (isAuthed !== true) {
-      return;
-    }
+    try {
+      const isAuthed = await authGuard();
 
-    const userPlan = await fetchUserPlan();
+      if (isAuthed !== true) {
+        return;
+      }
 
-    if (userPlan?.plan === PricingPlan.Basic) {
-      // User already has a Basic plan
-      toast.info("You are already subscribed to the Basic plan.");
-      return;
-    }
+      const userPlan = await fetchUserPlan();
 
-    if (userPlan?.plan === PricingPlan.Premium) {
-      /// Downgrade to Basic
-      toast.warn(
-        `Downgrading to Basic will cancel your Premium plan. 
+      if (userPlan?.plan === PricingPlan.Basic) {
+        // User already has a Basic plan
+        toast.info("You are already subscribed to the Basic plan.");
+        return;
+      }
+
+      if (userPlan?.plan === PricingPlan.Premium) {
+        /// Downgrade to Basic
+        toast.warn(
+          `Downgrading to Basic will cancel your Premium plan. 
         Note that funds paid for the Premium plan cannot be refunded.`
-      );
-      return;
-    }
+        );
+        return;
+      }
 
-    if (userPlan?.plan === PricingPlan.Free) {
-      navigate(`/subscribe-plan/basic/${monthlyOrYearly}`);
+      if (userPlan?.plan === PricingPlan.Free) {
+        navigate(`/subscribe-plan/basic/${monthlyOrYearly}`);
+      }
+    } catch (error) {
+      console.error("Error subscribing to Basic plan:", error);
+    } finally {
+      setIsLoading({ type: "" });
     }
   }
 
-  async function subscribePremiumPlan(monthlyOrYearly: string): Promise<void> {
-    const isAuthed = await authGuard();
+  async function subscribePremiumPlan(
+    monthlyOrYearly: "monthly" | "yearly"
+  ): Promise<void> {
+    setIsLoading({ type: "premium", cycle: monthlyOrYearly });
+    try {
+      const isAuthed = await authGuard();
 
-    if (isAuthed !== true) {
-      return;
-    }
+      if (isAuthed !== true) {
+        return;
+      }
 
-    const userPlan = await fetchUserPlan();
+      const userPlan = await fetchUserPlan();
 
-    if (userPlan?.plan === PricingPlan.Premium) {
-      toast.info("You are already subscribed to the Premium plan.");
-      return;
-    }
+      if (userPlan?.plan === PricingPlan.Premium) {
+        toast.info("You are already subscribed to the Premium plan.");
+        return;
+      }
 
-    if (
-      userPlan?.plan === PricingPlan.Free ||
-      userPlan?.plan === PricingPlan.Basic
-    ) {
-      navigate(`/subscribe-plan/premium/${monthlyOrYearly}`);
+      if (
+        userPlan?.plan === PricingPlan.Free ||
+        userPlan?.plan === PricingPlan.Basic
+      ) {
+        navigate(`/subscribe-plan/premium/${monthlyOrYearly}`);
+      }
+    } catch (error) {
+      console.error("Error subscribing to Premium plan:", error);
+    } finally {
+      setIsLoading({ type: "" });
     }
   }
 
@@ -193,12 +225,13 @@ export default function PricingPage() {
                   This plan doesn't offer custom narrators.
                 </p>
               </div>
-              <button
+              <ButtonWithLoading
+                isLoading={isLoading.type === "create-free"}
                 onClick={handleCreateFreeAccount}
-                className="cursor-pointer font-semibold text-xl w-full mt-13 px-4 py-2 border-1 border-custom-stroke-grey rounded-2xl hover:bg-gray-50 transition-colors"
+                className="font-semibold text-xl w-full mt-13 px-4 py-2 border-1 border-custom-stroke-grey rounded-2xl hover:bg-gray-50 transition-colors"
               >
                 Create Free Account
-              </button>
+              </ButtonWithLoading>
             </div>
             {/* Basic Plan */}
             <div className="flex flex-col h-full text-black font-dosis bg-container-grey py-8 px-5 rounded-xl">
@@ -246,12 +279,22 @@ export default function PricingPage() {
                       Cancel anytime
                     </p>
                   </div>
-                  <button
+                  {/* <button
                     onClick={() => subscribeBasicPlan(BillingCycle.Monthly)}
                     className="cursor-pointer tracking-normal text-lg font-bold border-1 border-custom-stroke-grey w-full px-4 py-2 rounded-2xl hover:bg-white transition-colors"
                   >
                     Subscribe
-                  </button>
+                  </button> */}
+                  <ButtonWithLoading
+                    isLoading={
+                      isLoading.type === "basic" &&
+                      isLoading.cycle === BillingCycle.Monthly
+                    }
+                    onClick={() => subscribeBasicPlan(BillingCycle.Monthly)}
+                    className="tracking-normal text-lg font-bold border-1 border-custom-stroke-grey w-full px-4 py-2 rounded-2xl hover:bg-white transition-colors"
+                  >
+                    Subscribe
+                  </ButtonWithLoading>
                 </div>
 
                 {/* Yearly Plan */}
@@ -280,12 +323,22 @@ export default function PricingPage() {
                         </span>
                       </p>
                     </div>
-                    <button
+                    {/* <button
                       onClick={() => subscribeBasicPlan(BillingCycle.Yearly)}
                       className="cursor-pointer tracking-normal text-lg font-bold border-1 border-custom-stroke-grey w-full px-4 py-2 rounded-2xl hover:bg-white transition-colors"
                     >
                       Subscribe
-                    </button>
+                    </button> */}
+                    <ButtonWithLoading
+                      isLoading={
+                        isLoading.type === "basic" &&
+                        isLoading.cycle === BillingCycle.Yearly
+                      }
+                      onClick={() => subscribeBasicPlan(BillingCycle.Yearly)}
+                      className="tracking-normal text-lg font-bold border-1 border-custom-stroke-grey w-full px-4 py-2 rounded-2xl hover:bg-white transition-colors"
+                    >
+                      Subscribe
+                    </ButtonWithLoading>
                   </div>
                 </div>
               </div>
@@ -345,12 +398,22 @@ export default function PricingPage() {
                         Cancel anytime
                       </p>
                     </div>
-                    <button
+                    {/* <button
                       onClick={() => subscribePremiumPlan(BillingCycle.Monthly)}
                       className="cursor-pointer tracking-normal text-lg font-bold border-1 border-custom-stroke-grey w-full px-4 py-2 rounded-2xl hover:bg-white transition-colors"
                     >
                       Subscribe
-                    </button>
+                    </button> */}
+                    <ButtonWithLoading
+                      isLoading={
+                        isLoading.type === "premium" &&
+                        isLoading.cycle === BillingCycle.Monthly
+                      }
+                      onClick={() => subscribeBasicPlan(BillingCycle.Monthly)}
+                      className="tracking-normal text-lg font-bold border-1 border-custom-stroke-grey w-full px-4 py-2 rounded-2xl hover:bg-white transition-colors"
+                    >
+                      Subscribe
+                    </ButtonWithLoading>
                   </div>
 
                   {/* Yearly Plan */}
@@ -379,14 +442,24 @@ export default function PricingPage() {
                           </span>
                         </p>
                       </div>
-                      <button
+                      {/* <button
                         onClick={() =>
                           subscribePremiumPlan(BillingCycle.Yearly)
                         }
                         className="cursor-pointer tracking-normal text-lg font-bold border-1 border-custom-stroke-grey w-full px-4 py-2 rounded-2xl hover:bg-white transition-colors"
                       >
                         Subscribe
-                      </button>
+                      </button> */}
+                      <ButtonWithLoading
+                        isLoading={
+                          isLoading.type === "premium" &&
+                          isLoading.cycle === BillingCycle.Yearly
+                        }
+                        onClick={() => subscribeBasicPlan(BillingCycle.Yearly)}
+                        className="tracking-normal text-lg font-bold border-1 border-custom-stroke-grey w-full px-4 py-2 rounded-2xl hover:bg-white transition-colors"
+                      >
+                        Subscribe
+                      </ButtonWithLoading>
                     </div>
                   </div>
                 </div>
