@@ -116,40 +116,59 @@ export default function SubscribePlan() {
 
       {/* Order summary content */}
       <main className="font-dosis text-black p-4 flex items-center justify-center">
-        <div className="w-full max-w-[390px] md:h-[346px] mt-15">
-          <h1 className="font-semibold font-fraunces text-4xl text-center px-4">
+        <div className="w-full max-w-[390px] md:h-[346px] mt-15 bg-white rounded-xl shadow-lg p-6">
+          <h1 className="font-semibold font-fraunces text-4xl text-center mb-8">
             Order Summary
           </h1>
 
           {/* Plan info container */}
-          <div className="mt-15 p-5 h-full flex flex-col">
-            {/* Plan and pricing container */}
-            <div className="flex justify-between items-center mb-2">
-              <div>
-                <div>PRODUCT DETAILS</div>
-                <span className="text-lg text-gray-700">
-                  {plan?.toUpperCase()} Plan
-                  <p className="text-sm text-gray-500">
-                    {monthlyOrYearly === "yearly"
-                      ? "Yearly Subscription"
-                      : "Monthly Subscription"}
-                  </p>
+          <div className="h-full flex flex-col justify-between">
+            {/* Product & Price container */}
+            <div className="space-y-4">
+              {/* Plan details */}
+              <div className="grid grid-cols-2 gap-4 items-baseline">
+                {/* Product Details Column */}
+                <div className="flex flex-col">
+                  <span className="text-sm text-gray-500 mb-1">
+                    PRODUCT DETAILS
+                  </span>
+                  <div>
+                    <p className="text-lg text-gray-700">
+                      {plan?.toUpperCase()} Plan
+                    </p>
+                    <p className="text-sm text-gray-500 mt-1">
+                      {monthlyOrYearly === "yearly"
+                        ? "Yearly Subscription"
+                        : "Monthly Subscription"}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Price Column */}
+                <div className="flex flex-col items-end">
+                  <span className="text-sm text-gray-500 mb-1">PRICE</span>
+                  <div className="flex flex-col items-end">
+                    {/* Spacer to match subscription type height */}
+                    <div className="text-sm invisible mt-1">{`spacer`}</div>
+                    <span className="text-lg text-gray-700">${price}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Total container */}
+            <div className="border-t border-gray-200 pt-4">
+              <div className="flex justify-between items-center">
+                <span className="text-lg font-semibold text-gray-800">
+                  TOTAL
+                </span>
+                <span className="text-lg font-semibold text-gray-800">
+                  ${price}
                 </span>
               </div>
-
-              <div>
-                <div>PRICE</div>
-                <span className="text-lg text-gray-700">${price}</span>
-              </div>
             </div>
 
-            <div className="flex justify-between items-center pt-6">
-              <span className="text-lg font-semibold text-gray-800">TOTAL</span>
-              <span className="text-lg font-semibold text-gray-800">
-                ${price}
-              </span>
-            </div>
-
+            {/* Checkout button */}
             <ButtonWithLoading
               isLoading={isSubscribing}
               onClick={startSubscription}
