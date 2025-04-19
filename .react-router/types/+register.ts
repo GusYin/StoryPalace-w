@@ -17,7 +17,6 @@ type Params = {
   "/reset-password": {};
   "/pricing": {};
   "/my-account": {};
-  "/upgrade-plan": {};
   "/subscribe-plan/:plan/:monthlyOrYearly": {
     "plan": string;
     "monthlyOrYearly": string;

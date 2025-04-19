@@ -17,7 +17,6 @@ export default [
   route("pricing", "routes/pricing.tsx"),
   layout("components/protected-route.tsx", [
     route("my-account", "routes/my-account/my-account.tsx"),
-    route("upgrade-plan", "routes/my-account/upgrade-plan.tsx"),
     route(
       "subscribe-plan/:plan/:monthlyOrYearly",
       "routes/my-account/subscribe-plan.tsx"
