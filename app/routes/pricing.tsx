@@ -279,12 +279,6 @@ export default function PricingPage() {
                       Cancel anytime
                     </p>
                   </div>
-                  {/* <button
-                    onClick={() => subscribeBasicPlan(BillingCycle.Monthly)}
-                    className="cursor-pointer tracking-normal text-lg font-bold border-1 border-custom-stroke-grey w-full px-4 py-2 rounded-2xl hover:bg-white transition-colors"
-                  >
-                    Subscribe
-                  </button> */}
                   <ButtonWithLoading
                     isLoading={
                       isLoading.type === "basic" &&
@@ -323,12 +317,6 @@ export default function PricingPage() {
                         </span>
                       </p>
                     </div>
-                    {/* <button
-                      onClick={() => subscribeBasicPlan(BillingCycle.Yearly)}
-                      className="cursor-pointer tracking-normal text-lg font-bold border-1 border-custom-stroke-grey w-full px-4 py-2 rounded-2xl hover:bg-white transition-colors"
-                    >
-                      Subscribe
-                    </button> */}
                     <ButtonWithLoading
                       isLoading={
                         isLoading.type === "basic" &&
@@ -398,12 +386,6 @@ export default function PricingPage() {
                         Cancel anytime
                       </p>
                     </div>
-                    {/* <button
-                      onClick={() => subscribePremiumPlan(BillingCycle.Monthly)}
-                      className="cursor-pointer tracking-normal text-lg font-bold border-1 border-custom-stroke-grey w-full px-4 py-2 rounded-2xl hover:bg-white transition-colors"
-                    >
-                      Subscribe
-                    </button> */}
                     <ButtonWithLoading
                       isLoading={
                         isLoading.type === "premium" &&
@@ -442,14 +424,6 @@ export default function PricingPage() {
                           </span>
                         </p>
                       </div>
-                      {/* <button
-                        onClick={() =>
-                          subscribePremiumPlan(BillingCycle.Yearly)
-                        }
-                        className="cursor-pointer tracking-normal text-lg font-bold border-1 border-custom-stroke-grey w-full px-4 py-2 rounded-2xl hover:bg-white transition-colors"
-                      >
-                        Subscribe
-                      </button> */}
                       <ButtonWithLoading
                         isLoading={
                           isLoading.type === "premium" &&
