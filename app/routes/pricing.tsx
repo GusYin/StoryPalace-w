@@ -1,16 +1,18 @@
 import type { User } from "firebase/auth";
+import { httpsCallable } from "firebase/functions";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import Footer from "~/components/footer";
 import Header from "~/components/header";
 import { auth } from "~/firebase/firebase";
 import { BillingCycle, PricingPlan } from "~/lib/constant";
+import { functions } from "~/firebase/firebase";
+import { toast, ToastContainer } from "react-toastify";
 
 export default function PricingPage() {
   const hasPremium = true;
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
-  const [userPlan, setUserPlan] = useState<PricingPlan | null>(null);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -21,23 +23,47 @@ export default function PricingPage() {
   }, []);
 
   const fetchUserPlan = async () => {
-    if (user) {
-      const idTokenResult = await user.getIdTokenResult();
+    try {
+      const getUserPlan = httpsCallable<
+        {},
+        { plan: "free" | "basic" | "premium"; trialEndDate?: string }
+      >(functions, "getUserPlan");
 
-      // when a user has signed up but not yet email verified,
-      // we set their plan to be noPlan.
-      const plan =
-        (idTokenResult.claims.plan as PricingPlan) || PricingPlan.NoPlan;
-
-      setUserPlan(plan);
+      const result = await getUserPlan({});
+      return result.data;
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      // Toast with retry button
+      toast.error(
+        <div>
+          Failed to fetch your plan.{" "}
+          <button
+            onClick={() => {
+              fetchUserPlan().catch((err) =>
+                console.error("Retry failed:", err)
+              );
+            }}
+            style={{ marginLeft: "10px", fontWeight: "bold" }}
+          >
+            Retry
+          </button>
+        </div>,
+        {
+          autoClose: false,
+          closeOnClick: false,
+        }
+      );
+      return null;
     }
   };
 
-  const authGuard = () => {
+  const authGuard = async () => {
     if (!user) {
       navigate("/signup");
       return;
     }
+
+    await user.reload();
 
     if (!user.emailVerified) {
       navigate("/verify-email");
@@ -47,58 +73,79 @@ export default function PricingPage() {
     return true;
   };
 
-  const planGuard = async () => {
-    if (userPlan === null) {
-      await fetchUserPlan();
+  async function handleCreateFreeAccount(): Promise<void> {
+    const isAuthed = await authGuard();
+    if (isAuthed !== true) {
       return;
     }
 
-    // when a user has signed up but not yet email verified,
-    // we set their plan to be noPlan.
-    if (userPlan === PricingPlan.NoPlan) {
-      navigate("/verify-email");
+    const userPlan = await fetchUserPlan();
+
+    if (userPlan?.plan === PricingPlan.Free) {
+      // User already has a Basic plan
+      toast.info("You are already subscribed to the Free plan.");
       return;
     }
 
-    return true;
-  };
-
-  function handleCreateFreeAccount(): void {
-    if (authGuard() !== true) {
+    if (userPlan?.plan === PricingPlan.Basic) {
+      // User already has a Basic plan
+      toast.info("You are already subscribed to the Basic plan.");
       return;
     }
 
-    navigate("/my-account");
+    if (userPlan?.plan === PricingPlan.Premium) {
+      toast.info("You are already subscribed to the Premium plan.");
+      return;
+    }
   }
 
   async function subscribeBasicPlan(monthlyOrYearly: string): Promise<void> {
-    if (authGuard() !== true) {
+    const isAuthed = await authGuard();
+
+    if (isAuthed !== true) {
       return;
     }
 
-    const isPlanValid = await planGuard();
+    const userPlan = await fetchUserPlan();
 
-    if (isPlanValid !== true) {
+    if (userPlan?.plan === PricingPlan.Basic) {
+      // User already has a Basic plan
+      toast.info("You are already subscribed to the Basic plan.");
       return;
     }
 
-    if (userPlan === PricingPlan.Free) {
+    if (userPlan?.plan === PricingPlan.Premium) {
+      /// Downgrade to Basic
+      toast.warn(
+        `Downgrading to Basic will cancel your Premium plan. 
+        Note that funds paid for the Premium plan cannot be refunded.`
+      );
+      return;
+    }
+
+    if (userPlan?.plan === PricingPlan.Free) {
       navigate(`/subscribe-plan/basic/${monthlyOrYearly}`);
     }
   }
 
   async function subscribePremiumPlan(monthlyOrYearly: string): Promise<void> {
-    if (authGuard() !== true) {
+    const isAuthed = await authGuard();
+
+    if (isAuthed !== true) {
       return;
     }
 
-    const isPlanValid = await planGuard();
+    const userPlan = await fetchUserPlan();
 
-    if (isPlanValid !== true) {
+    if (userPlan?.plan === PricingPlan.Premium) {
+      toast.info("You are already subscribed to the Premium plan.");
       return;
     }
 
-    if (userPlan === PricingPlan.Free || userPlan === PricingPlan.Basic) {
+    if (
+      userPlan?.plan === PricingPlan.Free ||
+      userPlan?.plan === PricingPlan.Basic
+    ) {
       navigate(`/subscribe-plan/premium/${monthlyOrYearly}`);
     }
   }
@@ -106,6 +153,18 @@ export default function PricingPage() {
   return (
     <div className="min-h-screen bg-white">
       <Header />
+      <ToastContainer
+        position="bottom-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
       <div className="py-15 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           {" "}

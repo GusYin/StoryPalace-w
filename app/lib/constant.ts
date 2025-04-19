@@ -1,5 +1,4 @@
 export enum PricingPlan {
-  NoPlan = "noPlan",
   Free = "free",
   Basic = "basic",
   Premium = "premium",
