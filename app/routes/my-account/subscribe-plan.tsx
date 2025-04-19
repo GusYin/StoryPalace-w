@@ -122,44 +122,41 @@ export default function SubscribePlan() {
           </h1>
 
           {/* Plan info container */}
-          <div className="p-5 pt-0 h-full flex flex-col justify-between">
-            {/* Product & Price container */}
-            <div className="space-y-4">
-              {/* Plan details */}
-              <div className="grid grid-cols-[2fr_1fr] gap-x-8 items-baseline">
-                {/* Product Details Column - Now 2/3 of the space */}
-                <div className="text-xl flex flex-col">
-                  <span className="font-medium text-custom-text-grey mb-1">
-                    PRODUCT DETAILS
+          <div className="p-5 pt-0 flex flex-col justify-between">
+            {/* Plan details */}
+            <div className="mb-5 grid grid-cols-[2fr_1fr] gap-x-8 items-baseline">
+              {/* Product Details Column - Now 2/3 of the space */}
+              <div className="text-xl flex flex-col">
+                <span className="font-medium text-custom-text-grey mb-1">
+                  PRODUCT DETAILS
+                </span>
+                <div className="mt-7">
+                  <span className="capitalize-plan font-semibold">
+                    {plan} Plan
                   </span>
-                  <div className="mt-7">
-                    <span className="capitalize-plan font-semibold">
-                      {plan} Plan
-                    </span>
-                    <p className="leading-[32px] mt-1 font-light">
-                      {monthlyOrYearly === "yearly"
-                        ? "Yearly Subscription"
-                        : "Monthly Subscription"}
-                    </p>
-                  </div>
+                  <p className="leading-[32px] mt-1 font-light">
+                    {monthlyOrYearly === "yearly"
+                      ? "Yearly Subscription"
+                      : "Monthly Subscription"}
+                  </p>
                 </div>
+              </div>
 
-                {/* Price Column - Now 1/3 of the space */}
-                <div className="text-xl flex flex-col items-end">
-                  <span className="font-medium text-custom-text-grey mb-1">
-                    PRICE
-                  </span>
-                  <div className="mt-7 flex flex-col items-end">
-                    {/* Matching spacer */}
-                    <div className="invisible">dummy text</div>
-                    <p className="leading-[32px] font-light mt-1">${price}</p>
-                  </div>
+              {/* Price Column - Now 1/3 of the space */}
+              <div className="text-xl flex flex-col items-end">
+                <span className="font-medium text-custom-text-grey mb-1">
+                  PRICE
+                </span>
+                <div className="mt-7 flex flex-col items-end">
+                  {/* Matching spacer */}
+                  <div className="invisible">dummy text</div>
+                  <p className="leading-[32px] font-light mt-1">${price}</p>
                 </div>
               </div>
             </div>
 
             {/* Total container */}
-            <div className="">
+            <div className="mt-12">
               <div className="flex justify-between items-center">
                 <span className="text-lg font-semibold text-gray-800">
                   TOTAL
