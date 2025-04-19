@@ -128,15 +128,15 @@ export default function SubscribePlan() {
               {/* Plan details */}
               <div className="grid grid-cols-[2fr_1fr] gap-x-8 items-baseline">
                 {/* Product Details Column - Now 2/3 of the space */}
-                <div className="flex flex-col">
-                  <span className="text-xl font-semibold text-custom-text-grey mb-1">
+                <div className="text-xl flex flex-col">
+                  <span className="font-medium text-custom-text-grey mb-1">
                     PRODUCT DETAILS
                   </span>
-                  <div>
-                    <p className="text-lg text-gray-700">
-                      {plan?.toUpperCase()} Plan
-                    </p>
-                    <p className="text-sm text-gray-500 mt-1">
+                  <div className="mt-7">
+                    <span className="capitalize-plan font-semibold">
+                      {plan} Plan
+                    </span>
+                    <p className="leading-[32px] mt-1 font-light">
                       {monthlyOrYearly === "yearly"
                         ? "Yearly Subscription"
                         : "Monthly Subscription"}
@@ -145,21 +145,21 @@ export default function SubscribePlan() {
                 </div>
 
                 {/* Price Column - Now 1/3 of the space */}
-                <div className="flex flex-col items-end">
-                  <span className="text-xl font-semibold text-custom-text-grey mb-1">
+                <div className="text-xl flex flex-col items-end">
+                  <span className="font-medium text-custom-text-grey mb-1">
                     PRICE
                   </span>
-                  <div className="flex flex-col items-end">
+                  <div className="mt-7 flex flex-col items-end">
                     {/* Matching spacer */}
-                    <div className="text-sm invisible mt-1">dummy text</div>
-                    <span className="text-lg text-gray-700">${price}</span>
+                    <div className="invisible">dummy text</div>
+                    <p className="leading-[32px] font-light mt-1">${price}</p>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Total container */}
-            <div className="border-t border-gray-200 pt-4">
+            <div className="">
               <div className="flex justify-between items-center">
                 <span className="text-lg font-semibold text-gray-800">
                   TOTAL
