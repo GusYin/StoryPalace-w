@@ -123,29 +123,31 @@ export default function SubscribePlan() {
 
           {/* Plan info container */}
           <div className="mt-15 p-5 h-full flex flex-col">
-            <div className="flex-1">
-              <div className="border-b border-gray-200 pb-4">
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-lg text-gray-700">
-                    {plan?.toUpperCase()} Plan
-                  </span>
-                  <span className="text-lg text-gray-700">${price}</span>
-                </div>
-                <p className="text-sm text-gray-500 text-center">
-                  {monthlyOrYearly === "yearly"
-                    ? "Yearly Subscription"
-                    : "Monthly Subscription"}
-                </p>
+            {/* Plan and pricing container */}
+            <div className="flex justify-between items-center mb-2">
+              <div>
+                <div>PRODUCT DETAILS</div>
+                <span className="text-lg text-gray-700">
+                  {plan?.toUpperCase()} Plan
+                  <p className="text-sm text-gray-500">
+                    {monthlyOrYearly === "yearly"
+                      ? "Yearly Subscription"
+                      : "Monthly Subscription"}
+                  </p>
+                </span>
               </div>
 
-              <div className="flex justify-between items-center pt-6">
-                <span className="text-lg font-semibold text-gray-800">
-                  TOTAL
-                </span>
-                <span className="text-lg font-semibold text-gray-800">
-                  ${price}
-                </span>
+              <div>
+                <div>PRICE</div>
+                <span className="text-lg text-gray-700">${price}</span>
               </div>
+            </div>
+
+            <div className="flex justify-between items-center pt-6">
+              <span className="text-lg font-semibold text-gray-800">TOTAL</span>
+              <span className="text-lg font-semibold text-gray-800">
+                ${price}
+              </span>
             </div>
 
             <ButtonWithLoading
