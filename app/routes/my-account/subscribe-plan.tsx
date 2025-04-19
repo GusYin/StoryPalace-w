@@ -150,11 +150,9 @@ export default function SubscribePlan() {
                     PRICE
                   </span>
                   <div className="flex flex-col items-end">
-                    <span className="text-lg text-gray-700">${price}</span>
                     {/* Matching spacer */}
-                    <div className="text-sm invisible mt-1">
-                      Yearly Subscription
-                    </div>
+                    <div className="text-sm invisible mt-1">dummy text</div>
+                    <span className="text-lg text-gray-700">${price}</span>
                   </div>
                 </div>
               </div>
