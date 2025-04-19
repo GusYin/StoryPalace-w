@@ -115,21 +115,21 @@ export default function SubscribePlan() {
       <AuthHeader />
 
       {/* Order summary content */}
-      <main className="font-dosis text-black p-4 flex items-center justify-center">
-        <div className="w-full max-w-[390px] md:h-[346px] mt-15 bg-white rounded-xl shadow-lg p-6">
-          <h1 className="font-semibold font-fraunces text-4xl text-center mb-8">
+      <main className="font-dosis text-black flex items-center justify-center">
+        <div className="w-full max-w-[390px] md:h-[346px] mt-15">
+          <h1 className="font-semibold font-fraunces text-4xl text-center mb-15">
             Order Summary
           </h1>
 
           {/* Plan info container */}
-          <div className="h-full flex flex-col justify-between">
+          <div className="p-5 pt-0 h-full flex flex-col justify-between">
             {/* Product & Price container */}
             <div className="space-y-4">
               {/* Plan details */}
-              <div className="grid grid-cols-2 gap-4 items-baseline">
-                {/* Product Details Column */}
+              <div className="grid grid-cols-[2fr_1fr] gap-x-8 items-baseline">
+                {/* Product Details Column - Now 2/3 of the space */}
                 <div className="flex flex-col">
-                  <span className="text-sm text-gray-500 mb-1">
+                  <span className="text-xl font-semibold text-custom-text-grey mb-1">
                     PRODUCT DETAILS
                   </span>
                   <div>
@@ -144,13 +144,17 @@ export default function SubscribePlan() {
                   </div>
                 </div>
 
-                {/* Price Column */}
+                {/* Price Column - Now 1/3 of the space */}
                 <div className="flex flex-col items-end">
-                  <span className="text-sm text-gray-500 mb-1">PRICE</span>
+                  <span className="text-xl font-semibold text-custom-text-grey mb-1">
+                    PRICE
+                  </span>
                   <div className="flex flex-col items-end">
-                    {/* Spacer to match subscription type height */}
-                    <div className="text-sm invisible mt-1">{`spacer`}</div>
                     <span className="text-lg text-gray-700">${price}</span>
+                    {/* Matching spacer */}
+                    <div className="text-sm invisible mt-1">
+                      Yearly Subscription
+                    </div>
                   </div>
                 </div>
               </div>
