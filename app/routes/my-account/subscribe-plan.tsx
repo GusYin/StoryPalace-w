@@ -114,37 +114,48 @@ export default function SubscribePlan() {
     <div className="min-h-screen bg-white">
       <AuthHeader />
 
-      {/* Order summary content - Simplified structure */}
-      <main className="font-dosis p-4 flex items-center justify-center">
-        <div className="max-w-md w-full p-8">
-          <h2 className="text-xl font-semibold text-gray-700 mb-6 text-center">
+      {/* Order summary content */}
+      <main className="font-dosis text-black p-4 flex items-center justify-center">
+        <div className="w-full max-w-[390px] md:h-[346px] mt-15">
+          <h1 className="font-semibold font-fraunces text-4xl text-center px-4">
             Order Summary
-          </h2>
+          </h1>
 
-          <div className="border-b border-gray-200 pb-4 mb-4">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-gray-600">{plan?.toUpperCase()} Plan</span>
-              <span className="text-gray-600">${price}</span>
+          {/* Plan info container */}
+          <div className="mt-15 p-5 h-full flex flex-col">
+            <div className="flex-1">
+              <div className="border-b border-gray-200 pb-4">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-lg text-gray-700">
+                    {plan?.toUpperCase()} Plan
+                  </span>
+                  <span className="text-lg text-gray-700">${price}</span>
+                </div>
+                <p className="text-sm text-gray-500 text-center">
+                  {monthlyOrYearly === "yearly"
+                    ? "Yearly Subscription"
+                    : "Monthly Subscription"}
+                </p>
+              </div>
+
+              <div className="flex justify-between items-center pt-6">
+                <span className="text-lg font-semibold text-gray-800">
+                  TOTAL
+                </span>
+                <span className="text-lg font-semibold text-gray-800">
+                  ${price}
+                </span>
+              </div>
             </div>
-            <p className="text-sm text-gray-500 text-center">
-              {monthlyOrYearly === "yearly"
-                ? "Yearly Subscription"
-                : "Monthly Subscription"}
-            </p>
-          </div>
 
-          <div className="flex justify-between items-center pt-4 mb-8">
-            <span className="font-semibold text-gray-700">TOTAL</span>
-            <span className="font-semibold text-gray-700">${price}</span>
+            <ButtonWithLoading
+              isLoading={isSubscribing}
+              onClick={startSubscription}
+              className="w-full bg-[#06846f] text-white py-4 rounded-lg hover:bg-[#056955] transition-colors font-semibold text-lg"
+            >
+              Checkout
+            </ButtonWithLoading>
           </div>
-
-          <ButtonWithLoading
-            isLoading={isSubscribing}
-            onClick={startSubscription}
-            className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold"
-          >
-            Checkout
-          </ButtonWithLoading>
         </div>
       </main>
     </div>
