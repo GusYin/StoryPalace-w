@@ -127,3 +127,7 @@
   text-transform: capitalize;
   display: inline; /* Ensure it stays inline if needed */
 }
+
+.Toastify__progress-bar {
+  background: #06846f !important;
+}

@@ -195,7 +195,7 @@ export default function PricingPage() {
               </div>
               <button
                 onClick={handleCreateFreeAccount}
-                className="font-semibold text-xl w-full mt-13 px-4 py-2 border-1 border-custom-stroke-grey rounded-2xl hover:bg-gray-50 transition-colors"
+                className="cursor-pointer font-semibold text-xl w-full mt-13 px-4 py-2 border-1 border-custom-stroke-grey rounded-2xl hover:bg-gray-50 transition-colors"
               >
                 Create Free Account
               </button>
@@ -248,7 +248,7 @@ export default function PricingPage() {
                   </div>
                   <button
                     onClick={() => subscribeBasicPlan(BillingCycle.Monthly)}
-                    className="tracking-normal text-lg font-bold border-1 border-custom-stroke-grey w-full px-4 py-2 rounded-2xl hover:bg-white transition-colors"
+                    className="cursor-pointer tracking-normal text-lg font-bold border-1 border-custom-stroke-grey w-full px-4 py-2 rounded-2xl hover:bg-white transition-colors"
                   >
                     Subscribe
                   </button>
@@ -282,7 +282,7 @@ export default function PricingPage() {
                     </div>
                     <button
                       onClick={() => subscribeBasicPlan(BillingCycle.Yearly)}
-                      className="tracking-normal text-lg font-bold border-1 border-custom-stroke-grey w-full px-4 py-2 rounded-2xl hover:bg-white transition-colors"
+                      className="cursor-pointer tracking-normal text-lg font-bold border-1 border-custom-stroke-grey w-full px-4 py-2 rounded-2xl hover:bg-white transition-colors"
                     >
                       Subscribe
                     </button>
@@ -347,7 +347,7 @@ export default function PricingPage() {
                     </div>
                     <button
                       onClick={() => subscribePremiumPlan(BillingCycle.Monthly)}
-                      className="tracking-normal text-lg font-bold border-1 border-custom-stroke-grey w-full px-4 py-2 rounded-2xl hover:bg-white transition-colors"
+                      className="cursor-pointer tracking-normal text-lg font-bold border-1 border-custom-stroke-grey w-full px-4 py-2 rounded-2xl hover:bg-white transition-colors"
                     >
                       Subscribe
                     </button>
@@ -383,7 +383,7 @@ export default function PricingPage() {
                         onClick={() =>
                           subscribePremiumPlan(BillingCycle.Yearly)
                         }
-                        className="tracking-normal text-lg font-bold border-1 border-custom-stroke-grey w-full px-4 py-2 rounded-2xl hover:bg-white transition-colors"
+                        className="cursor-pointer tracking-normal text-lg font-bold border-1 border-custom-stroke-grey w-full px-4 py-2 rounded-2xl hover:bg-white transition-colors"
                       >
                         Subscribe
                       </button>
