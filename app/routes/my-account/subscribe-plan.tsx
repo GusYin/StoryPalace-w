@@ -122,9 +122,9 @@ export default function SubscribePlan() {
           </h1>
 
           {/* Plan info container */}
-          <div className="p-5 pt-0 flex flex-col justify-between">
+          <div className="pt-0 flex flex-col justify-between">
             {/* Plan details */}
-            <div className="mb-5 grid grid-cols-[2fr_1fr] gap-x-8 items-baseline">
+            <div className="p-5 grid grid-cols-[2fr_1fr] gap-x-8 items-baseline">
               {/* Product Details Column - Now 2/3 of the space */}
               <div className="text-xl flex flex-col">
                 <span className="font-medium text-custom-text-grey mb-1">
@@ -156,25 +156,22 @@ export default function SubscribePlan() {
             </div>
 
             {/* Total container */}
-            <div className="mt-12">
-              <div className="flex justify-between items-center">
-                <span className="text-lg font-semibold text-gray-800">
+            <div className="p-5 mt-12 bg-container-grey rounded-2xl">
+              <div className="flex justify-between items-center mb-5">
+                <span className="leading-[32px] text-xl font-semibold">
                   TOTAL
                 </span>
-                <span className="text-lg font-semibold text-gray-800">
-                  ${price}
-                </span>
+                <span className="text-xl font-semibold">${price}</span>
               </div>
+              {/* Checkout button */}
+              <ButtonWithLoading
+                isLoading={isSubscribing}
+                onClick={startSubscription}
+                className="w-full bg-custom-teal text-white py-4 rounded-4xl hover:bg-[#056955] transition-colors font-normal text-xl"
+              >
+                Checkout
+              </ButtonWithLoading>
             </div>
-
-            {/* Checkout button */}
-            <ButtonWithLoading
-              isLoading={isSubscribing}
-              onClick={startSubscription}
-              className="w-full bg-[#06846f] text-white py-4 rounded-lg hover:bg-[#056955] transition-colors font-semibold text-lg"
-            >
-              Checkout
-            </ButtonWithLoading>
           </div>
         </div>
       </main>
