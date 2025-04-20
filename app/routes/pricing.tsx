@@ -133,10 +133,47 @@ export default function PricingPage() {
       }
 
       if (userPlan?.plan === PricingPlan.Premium) {
-        /// Downgrade to Basic
+        // Show confirmation toast for downgrade
         toast.warn(
-          `Downgrading to Basic will cancel your Premium plan. 
-        Note that funds paid for the Premium plan cannot be refunded.`
+          <div className="flex flex-col gap-y-4 p-4">
+            <div className="flex items-start gap-3">
+              <div className="flex flex-col gap-2">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Confirm Plan Change
+                </h3>
+                <p className="text-gray-700">
+                  Downgrading to Basic will cancel your Premium plan. Note that
+                  funds paid for the Premium plan cannot be refunded.
+                </p>
+                <p className="text-gray-700">
+                  Your Basic plan will start after the current Premium plan
+                  payment cycle ends.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-3 w-auto mt-2">
+              <button
+                onClick={() =>
+                  navigate(`/subscribe-plan/basic/${monthlyOrYearly}`)
+                }
+                className="cursor-pointer p-2 bg-custom-teal text-white rounded-4xl hover:bg-custom-teal-dark transition-colors font-medium whitespace-nowrap w-full text-center"
+              >
+                Confirm Downgrade
+              </button>
+              <button
+                onClick={() => toast.dismiss()}
+                className="cursor-pointer p-2 bg-[#F3F5F5] text-black rounded-4xl hover:bg-gray-200 transition-colors font-medium whitespace-nowrap w-full text-center"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>,
+          {
+            autoClose: false,
+            closeOnClick: false,
+            className: "",
+          }
         );
         return;
       }
