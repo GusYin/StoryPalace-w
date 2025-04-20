@@ -391,7 +391,7 @@ export default function PricingPage() {
                         isLoading.type === "premium" &&
                         isLoading.cycle === BillingCycle.Monthly
                       }
-                      onClick={() => subscribeBasicPlan(BillingCycle.Monthly)}
+                      onClick={() => subscribePremiumPlan(BillingCycle.Monthly)}
                       className="tracking-normal text-lg font-bold border-1 border-custom-stroke-grey w-full px-4 py-2 rounded-2xl hover:bg-white transition-colors"
                     >
                       Subscribe
@@ -429,7 +429,9 @@ export default function PricingPage() {
                           isLoading.type === "premium" &&
                           isLoading.cycle === BillingCycle.Yearly
                         }
-                        onClick={() => subscribeBasicPlan(BillingCycle.Yearly)}
+                        onClick={() =>
+                          subscribePremiumPlan(BillingCycle.Yearly)
+                        }
                         className="tracking-normal text-lg font-bold border-1 border-custom-stroke-grey w-full px-4 py-2 rounded-2xl hover:bg-white transition-colors"
                       >
                         Subscribe
