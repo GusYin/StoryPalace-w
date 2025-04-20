@@ -122,11 +122,11 @@ export default function SubscribePlan() {
           </h1>
 
           {/* Plan info container */}
-          <div className="pt-0 flex flex-col justify-between">
+          <div className="text-xl pt-0 flex flex-col justify-between">
             {/* Plan details */}
-            <div className="p-5 grid grid-cols-[2fr_1fr] gap-x-8 items-baseline">
-              {/* Product Details Column - Now 2/3 of the space */}
-              <div className="text-xl flex flex-col">
+            <div className="p-5 grid grid-cols-[4fr_1fr] gap-x-8 items-baseline">
+              {/* Product Details Column - Now 1/4 of the space */}
+              <div className="flex flex-col">
                 <span className="font-medium text-custom-text-grey mb-1">
                   PRODUCT DETAILS
                 </span>
@@ -142,14 +142,14 @@ export default function SubscribePlan() {
                 </div>
               </div>
 
-              {/* Price Column - Now 1/3 of the space */}
-              <div className="text-xl flex flex-col items-end">
+              {/* Price Column - Now 1/4 of the space */}
+              <div className="flex flex-col">
                 <span className="font-medium text-custom-text-grey mb-1">
                   PRICE
                 </span>
-                <div className="mt-7 flex flex-col items-end">
+                <div className="mt-7">
                   {/* Matching spacer */}
-                  <div className="invisible">dummy text</div>
+                  <span className="invisible font-semibold">d</span>
                   <p className="leading-[32px] font-light mt-1">${price}</p>
                 </div>
               </div>
@@ -157,17 +157,20 @@ export default function SubscribePlan() {
 
             {/* Total container */}
             <div className="p-5 mt-12 bg-container-grey rounded-2xl">
-              <div className="flex justify-between items-center mb-5">
-                <span className="leading-[32px] text-xl font-semibold">
-                  TOTAL
-                </span>
-                <span className="text-xl font-semibold">${price}</span>
+              <div className="grid grid-cols-[4fr_1fr] items-baseline">
+                <div className="flex flex-col mb-5">
+                  <span className="leading-[32px] font-semibold">TOTAL</span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="font-semibold">${price}</span>
+                </div>
               </div>
+
               {/* Checkout button */}
               <ButtonWithLoading
                 isLoading={isSubscribing}
                 onClick={startSubscription}
-                className="w-full bg-custom-teal text-white py-4 rounded-4xl hover:bg-[#056955] transition-colors font-normal text-xl"
+                className="w-full bg-custom-teal text-white py-4 rounded-4xl hover:bg-[#056955] transition-colors font-normal"
               >
                 Checkout
               </ButtonWithLoading>
