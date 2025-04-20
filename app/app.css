@@ -136,3 +136,8 @@
 .Toastify__toast--info .Toastify__toast-icon svg {
   fill: #06846f !important;
 }
+
+/* Change info toast icon background */
+.Toastify__toast--warning .Toastify__toast-icon svg {
+  fill: #06846f !important;
+}
