@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 import { toast, ToastContainer } from "react-toastify";
+import SkeletonHeader from "~/components/header-skeleton";
 import { auth } from "~/firebase/firebase";
 
 // Allowed redirect paths for security
@@ -39,9 +40,23 @@ export default function AuthRedirect() {
   }, [navigate, searchParams]);
 
   return (
-    <div>
-      <ToastContainer position="bottom-right" />
-      Loading...
+    <div className="min-h-screen bg-white">
+      <SkeletonHeader />
+      <ToastContainer
+        position="bottom-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
+      <div className="absolute inset-0 bg-black/20 backdrop-blur-[.7px] flex items-center justify-center">
+        <div className="animate-spin h-5 w-5 border-2 border-current border-t-transparent rounded-full"></div>
+      </div>
     </div>
   );
 }
