@@ -16,6 +16,7 @@ type Params = {
   "/verify-email": {};
   "/reset-password": {};
   "/pricing": {};
+  "/auth-redirect": {};
   "/my-account": {};
   "/subscribe-plan/:plan/:monthlyOrYearly": {
     "plan": string;

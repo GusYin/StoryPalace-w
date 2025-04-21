@@ -62,17 +62,32 @@ export default function PricingPage() {
     }
   };
 
-  const authGuard = async () => {
+  const authGuard = async (plan?: PricingPlan, cycle?: BillingCycle) => {
     if (!user) {
-      navigate("/signup");
-      return;
+      if (plan && cycle) {
+        const redirectPath = encodeURIComponent(
+          `/subscribe-plan/${plan}/${cycle}`
+        );
+        navigate(`/signup?redirect=${redirectPath}`);
+      } else {
+        navigate("/signup");
+      }
+      return false;
     }
 
     await user.reload();
 
     if (!user.emailVerified) {
-      navigate("/verify-email");
-      return;
+      if (plan && cycle) {
+        // Show toast with redirect to verify email
+        const redirectPath = encodeURIComponent(
+          `/subscribe-plan/${plan}/${cycle}`
+        );
+        navigate(`/verify-email?redirect=${redirectPath}`);
+      } else {
+        navigate("/verify-email");
+      }
+      return false;
     }
 
     return true;
@@ -113,16 +128,13 @@ export default function PricingPage() {
   }
 
   async function subscribeBasicPlan(
-    monthlyOrYearly: "monthly" | "yearly"
+    monthlyOrYearly: BillingCycle
   ): Promise<void> {
     setIsLoading({ type: "basic", cycle: monthlyOrYearly });
 
     try {
-      const isAuthed = await authGuard();
-
-      if (isAuthed !== true) {
-        return;
-      }
+      const isAuthed = await authGuard(PricingPlan.Basic, monthlyOrYearly);
+      if (!isAuthed) return;
 
       const userPlan = await fetchUserPlan();
 
@@ -189,15 +201,12 @@ export default function PricingPage() {
   }
 
   async function subscribePremiumPlan(
-    monthlyOrYearly: "monthly" | "yearly"
+    monthlyOrYearly: BillingCycle
   ): Promise<void> {
     setIsLoading({ type: "premium", cycle: monthlyOrYearly });
     try {
-      const isAuthed = await authGuard();
-
-      if (isAuthed !== true) {
-        return;
-      }
+      const isAuthed = await authGuard(PricingPlan.Premium, monthlyOrYearly);
+      if (!isAuthed) return;
 
       const userPlan = await fetchUserPlan();
 

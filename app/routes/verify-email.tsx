@@ -18,6 +18,27 @@ const VerifyEmailPage = () => {
     return () => unsubscribe();
   }, []);
 
+  useEffect(() => {
+    const checkVerification = setInterval(async () => {
+      const user = auth.currentUser;
+      await user?.reload();
+
+      if (user?.emailVerified) {
+        clearInterval(checkVerification);
+        const searchParams = new URLSearchParams(window.location.search);
+        const redirect = searchParams.get("redirect");
+
+        if (redirect) {
+          navigate(`/auth-redirect?redirect=${redirect}`);
+        } else {
+          navigate("/my-account");
+        }
+      }
+    }, 10000); // Check every 10 seconds
+
+    return () => clearInterval(checkVerification);
+  }, [navigate]);
+
   async function resendVerifyEmail(e: FormEvent) {
     e.preventDefault();
     setResending(true);

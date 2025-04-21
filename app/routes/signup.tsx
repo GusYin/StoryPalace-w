@@ -43,7 +43,10 @@ const SignUpPage = () => {
       if (user.user.emailVerified) {
         navigate("/my-account");
       } else {
-        navigate("/verify-email");
+        const searchParams = new URLSearchParams(window.location.search);
+        const redirect = searchParams.get("redirect");
+
+        navigate(`/verify-email${redirect ? `?redirect=${redirect}` : ""}`);
       }
     } catch (err) {
       setError("Invalid email or password. Please try again.");

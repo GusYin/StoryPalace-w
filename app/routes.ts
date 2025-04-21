@@ -16,6 +16,7 @@ export default [
   route("reset-password", "routes/reset-password.tsx"),
   route("pricing", "routes/pricing.tsx"),
   layout("components/protected-route.tsx", [
+    route("auth-redirect", "routes/auth-redirect.tsx"),
     route("my-account", "routes/my-account/my-account.tsx"),
     route(
       "subscribe-plan/:plan/:monthlyOrYearly",
