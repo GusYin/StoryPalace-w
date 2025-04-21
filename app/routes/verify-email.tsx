@@ -7,10 +7,17 @@ const VerifyEmailPage = () => {
   const [isResending, setResending] = useState(false);
   const navigate = useNavigate();
 
+  const searchParams = new URLSearchParams(window.location.search);
+  const redirect = searchParams.get("redirect");
+
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user?.emailVerified) {
-        navigate("/my-account");
+        if (redirect) {
+          navigate(`/auth-redirect?redirect=${redirect}`);
+        } else {
+          navigate("/my-account");
+        }
         return;
       }
     });
@@ -25,8 +32,6 @@ const VerifyEmailPage = () => {
 
       if (user?.emailVerified) {
         clearInterval(checkVerification);
-        const searchParams = new URLSearchParams(window.location.search);
-        const redirect = searchParams.get("redirect");
 
         if (redirect) {
           navigate(`/auth-redirect?redirect=${redirect}`);
@@ -34,7 +39,7 @@ const VerifyEmailPage = () => {
           navigate("/my-account");
         }
       }
-    }, 10000); // Check every 10 seconds
+    }, 5000);
 
     return () => clearInterval(checkVerification);
   }, [navigate]);
