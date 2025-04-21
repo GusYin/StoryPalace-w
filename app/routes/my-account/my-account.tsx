@@ -154,7 +154,7 @@ const MyAccount: React.FC = () => {
         </div>
 
         {/* Plan Section */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-[#F3F7F6] p-6 rounded-xl shadow-xs">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-[#F3F7F6] p-5 rounded-xl shadow-xs">
           <div className="mb-4 sm:mb-0">
             <h3 className="text-[#707978] font-medium text-xl mb-4">
               YOUR PLAN
@@ -170,7 +170,7 @@ const MyAccount: React.FC = () => {
           ) : (
             <button
               onClick={() => navigate("/upgrade")}
-              className="w-full sm:w-auto md:w-80 bg-custom-teal text-white px-3 py-3 rounded-3xl hover:bg-blue-600 transition-colors"
+              className="text-xl w-full sm:w-auto md:w-80 bg-custom-teal text-white px-3 py-3 rounded-3xl hover:bg-blue-600 transition-colors"
             >
               Upgrade Plan
             </button>
@@ -182,8 +182,8 @@ const MyAccount: React.FC = () => {
           <h3 className="text-[#707978] font-medium text-xl mb-3">
             ACCOUNT SETTINGS
           </h3>
-          <div className="space-y-8">
-            <div className="text-xl">
+          <div className="text-xl space-y-8">
+            <div>
               <label className="text-black block">Name</label>
               {editingName ? (
                 <div className="text-[#707978] text-xl mt-1 flex gap-2">
@@ -196,13 +196,13 @@ const MyAccount: React.FC = () => {
                   />
                   <button
                     onClick={handleUpdateName}
-                    className="text-base w-auto bg-custom-teal text-white px-6 py-3 rounded-3xl hover:bg-blue-600 transition-colors"
+                    className="w-auto bg-custom-teal text-white px-6 py-3 rounded-3xl hover:bg-blue-600 transition-colors"
                   >
                     Save
                   </button>
                   <button
                     onClick={() => setEditingName(false)}
-                    className="text-base border border-[#829793] px-3 py-3 rounded-3xl w-auto bg-white text-black hover:text-blue-600 transition-colors"
+                    className="border border-[#829793] px-3 py-3 rounded-3xl w-auto bg-white text-black hover:text-blue-600 transition-colors"
                   >
                     Cancel
                   </button>
@@ -215,21 +215,23 @@ const MyAccount: React.FC = () => {
                       setNewName(userDisplay?.name || "");
                       setEditingName(true);
                     }}
-                    className="underline text-[#06846F] hover:text-blue-500"
+                    className="text-xl leading-[32px] underline text-[#06846F] hover:text-blue-500"
                   >
                     Edit
                   </button>
                 </div>
               )}
             </div>
-            <div className="text-xl">
+            <div>
               <label className="text-black block">Email Address</label>
               <div className="text-[#707978] mt-1">{userDisplay?.email}</div>
             </div>
             <div className="flex justify-between items-center mt-1">
               <div>
-                <label className="text-xl text-black block">Password</label>
-                <div className="text-[#707978] mt-1">**********</div>
+                <label className="text-black block">Password</label>
+                <div className="leading-[32px] text-[#707978] mt-1">
+                  **********
+                </div>
               </div>
               <div>
                 <button
@@ -245,9 +247,9 @@ const MyAccount: React.FC = () => {
 
         {/* Change Password Modal */}
         {showChangePassword && (
-          <div className="fixed inset-0 bg-black bg-black/50 flex items-center justify-center">
+          <div className="text-xl fixed inset-0 bg-black bg-black/50 flex items-center justify-center">
             <div className="bg-white p-6 rounded-xl space-y-4">
-              <h3 className="text-xl font-bold">Change Password</h3>
+              <h3 className="font-bold">Change Password</h3>
               <input
                 type="password"
                 placeholder="Current Password"
@@ -265,13 +267,13 @@ const MyAccount: React.FC = () => {
               <div className="flex gap-2">
                 <button
                   onClick={handleChangePassword}
-                  className="text-base w-auto bg-custom-teal text-white px-5 py-3 rounded-3xl hover:bg-blue-600 transition-colors"
+                  className="w-auto bg-custom-teal text-white px-5 py-3 rounded-3xl hover:bg-blue-600 transition-colors"
                 >
                   Submit
                 </button>
                 <button
                   onClick={() => setShowChangePassword(false)}
-                  className="text-base border border-[#829793] px-3 py-3 rounded-3xl w-auto bg-white text-black hover:text-blue-600 transition-colors"
+                  className="border border-[#829793] px-3 py-3 rounded-3xl w-auto bg-white text-black hover:text-blue-600 transition-colors"
                 >
                   Cancel
                 </button>
@@ -314,7 +316,7 @@ const MyAccount: React.FC = () => {
         )}
 
         {/* Actions Section */}
-        <div className="bg-white p-6 space-y-16 pl-0">
+        <div className="text-xl bg-white p-6 space-y-16 pl-0">
           <button
             onClick={doLogout}
             className="w-[200px] text-black py-3 px-3 border border-[#829793] rounded-3xl hover:bg-gray-50 transition-colors"
