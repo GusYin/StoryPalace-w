@@ -23,16 +23,29 @@ export default function Login() {
 
       if (user.user.emailVerified) {
         redirect
-          ? navigate(`/auth-redirect?redirect=${redirect}`)
+          ? navigate(`/auth-redirect?redirect=${encodeURIComponent(redirect)}`)
           : navigate("/my-account");
       } else {
-        navigate(`/verify-email${redirect ? `?redirect=${redirect}` : ""}`);
+        navigate(
+          `/verify-email${
+            redirect ? `?redirect=${encodeURIComponent(redirect)}` : ""
+          }`
+        );
       }
     } catch (err) {
       setError("Invalid email or password. Please try again.");
     } finally {
       setIsLoading(false);
     }
+  }
+
+  function doSignup(): void {
+    const searchParams = new URLSearchParams(window.location.search);
+    const redirect = searchParams.get("redirect");
+
+    navigate(
+      `/signup${redirect ? `?redirect=${encodeURIComponent(redirect)}` : ""}`
+    );
   }
 
   return (
@@ -65,7 +78,7 @@ export default function Login() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="font-dosis font-medium text-xl placeholder-black bg-[#F3F7F7] mt-1 appearance-none block w-full px-3 py-2 border border-[#829793] rounded-xl shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors"
+                className="font-dosis font-medium text-xl placeholder-black bg-[#F3F7F7] mt-1 appearance-none block w-full px-3 py-2 border border-[#829793] rounded-xl shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
               />
 
               <input
@@ -77,7 +90,7 @@ export default function Login() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="font-dosis font-medium text-xl placeholder-black bg-[#F3F7F7] mt-1 appearance-none block w-full px-3 py-2 border border-[#829793] rounded-xl shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors"
+                className="font-dosis font-medium text-xl placeholder-black bg-[#F3F7F7] mt-1 appearance-none block w-full px-3 py-2 border border-[#829793] rounded-xl shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
               />
             </div>
 
@@ -88,7 +101,7 @@ export default function Login() {
             <button
               type="submit"
               disabled={isLoading}
-              className="font-dosis font-xl bg-black mt-6 w-full flex justify-center py-2 px-4 border border-transparent rounded-full shadow-xs font-bold text-white hover:bg-blue-700 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              className="cursor-pointer font-dosis font-xl bg-black mt-6 w-full flex justify-center py-2 px-4 border border-transparent rounded-full shadow-xs font-bold text-white hover:bg-blue-700 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
               {isLoading ? "Signing in..." : "Login"}
             </button>
@@ -101,7 +114,7 @@ export default function Login() {
           Forgot password?{" "}
           <a
             href="/reset-password"
-            className="underline font-medium text-[#06846F] hover:text-blue-500"
+            className="cursor-pointer underline font-medium text-[#06846F] hover:text-blue-500"
           >
             Reset password
           </a>
@@ -109,8 +122,8 @@ export default function Login() {
         <p>
           Don't have an account?{" "}
           <a
-            href="/signup"
-            className="underline font-medium text-[#06846F] hover:text-blue-500"
+            onClick={doSignup}
+            className="cursor-pointer underline font-medium text-[#06846F] hover:text-blue-500"
           >
             Create account
           </a>

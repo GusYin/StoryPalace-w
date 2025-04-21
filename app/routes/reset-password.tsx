@@ -33,7 +33,7 @@ const ResetPasswordPage = () => {
             <h1 className="text-3xl font-bold text-gray-900">
               Reset your password
             </h1>
-            <p className="mt-2 text-gray-600">
+            <p className="mt-2 font-dosis font-medium">
               Please enter the email address associated with your account
             </p>
           </div>
@@ -44,7 +44,7 @@ const ResetPasswordPage = () => {
               <div>
                 <input
                   type="email"
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-hidden focus:ring-2 focus:ring-blue-500"
+                  className="font-dosis font-medium text-xl placeholder-black bg-[#F3F7F7] mt-1 appearance-none block w-full px-3 py-2 border border-[#829793] rounded-xl shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                   placeholder="Enter your email"
                   onChange={(e) => setEmail(e.target.value)}
                 />
@@ -54,16 +54,16 @@ const ResetPasswordPage = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              className="font-dosis font-xl bg-black mt-6 w-full flex justify-center py-2 px-4 border border-transparent rounded-full shadow-xs font-bold text-white hover:bg-blue-700 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
               {isLoading ? "Sending reset link..." : "Request reset link"}
             </button>
 
-            <div className="text-center text-sm text-gray-500">
+            <div className="text-black text-center font-dosis font-xl">
               Back to login?{" "}
               <a
                 href="/login"
-                className="font-medium text-blue-600 hover:text-blue-500"
+                className="underline font-medium text-[#06846F] hover:text-blue-500"
               >
                 Login
               </a>

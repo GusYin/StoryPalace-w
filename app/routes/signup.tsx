@@ -46,7 +46,11 @@ const SignUpPage = () => {
         const searchParams = new URLSearchParams(window.location.search);
         const redirect = searchParams.get("redirect");
 
-        navigate(`/verify-email${redirect ? `?redirect=${redirect}` : ""}`);
+        navigate(
+          `/verify-email${
+            redirect ? `?redirect=${encodeURIComponent(redirect)}` : ""
+          }`
+        );
       }
     } catch (err) {
       setError("Invalid email or password. Please try again.");
@@ -72,6 +76,15 @@ const SignUpPage = () => {
           break;
       }
     };
+
+  function doLogin(): void {
+    const searchParams = new URLSearchParams(window.location.search);
+    const redirect = searchParams.get("redirect");
+
+    navigate(
+      `/login${redirect ? `?redirect=${encodeURIComponent(redirect)}` : ""}`
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white">
@@ -142,16 +155,16 @@ const SignUpPage = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="font-dosis font-xl bg-black mt-6 w-full text-white py-2 px-4 rounded-full hover:bg-blue-700 focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              className="cursor-pointer font-dosis text-xl bg-black mt-6 w-full text-white py-2 px-4 rounded-full hover:bg-blue-700 focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
             >
               {isLoading ? "Creating an account..." : "Create account"}
             </button>
 
-            <div className="mt-11 text-center text-sm text-black font-dosis font-xl space-y-4">
+            <div className="mt-11 text-center text-xl leading-[32px] text-black font-dosis space-y-4">
               Already have an account?{" "}
               <a
-                href="/login"
-                className="underline font-medium text-[#06846F] hover:text-blue-500"
+                onClick={doLogin}
+                className="cursor-pointer underline font-medium text-[#06846F] hover:text-blue-500"
               >
                 Login
               </a>
