@@ -6,12 +6,14 @@ export default function ButtonWithLoading({
   children,
   className = "",
   disabled = false,
+  description = "Checking...", // Default value set here
 }: {
   isLoading: boolean;
   onClick: () => void;
   children: ReactNode;
   className?: string;
   disabled?: boolean;
+  description?: string; // Corrected prop name
 }) {
   return (
     <button
@@ -27,7 +29,7 @@ export default function ButtonWithLoading({
               d="M12 22c5.421 0 10-4.579 10-10h-2c0 4.337-3.663 8-8 8s-8-3.663-8-8c0-4.336 3.663-8 8-8V2C6.579 2 2 6.58 2 12c0 5.421 4.579 10 10 10z"
             />
           </svg>
-          Checking...
+          {description} {/* Use description prop here */}
         </div>
       ) : (
         children

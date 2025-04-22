@@ -13,6 +13,7 @@ import { auth, logout } from "~/firebase/firebase";
 import { PricingPlan } from "~/lib/constant";
 import { httpsCallable } from "firebase/functions";
 import { functions } from "~/firebase/firebase";
+import ButtonWithLoading from "~/components/button-with-loading";
 
 const MyAccount: React.FC = () => {
   const navigate = useNavigate();
@@ -25,6 +26,7 @@ const MyAccount: React.FC = () => {
   const [success, setSuccess] = React.useState("");
   const [userPlan, setUserPlan] = useState<string | null>(null);
   const [trialEndDate, setTrialEndDate] = useState<Date | null>(null);
+  const [isDeletingAccount, setIsDeletingAccount] = useState<boolean>(false);
 
   // Add these new states for delete account flow
   const [showDeleteAccountModal, setShowDeleteAccountModal] =
@@ -107,6 +109,7 @@ const MyAccount: React.FC = () => {
   };
 
   const handleConfirmDeleteAccount = async () => {
+    setIsDeletingAccount(true);
     try {
       const user = auth.currentUser;
       if (!user || !user.email) {
@@ -128,6 +131,8 @@ const MyAccount: React.FC = () => {
       setError("Error deleting account. Please check your password.");
       setShowDeleteAccountModal(false);
       setDeleteAccountPassword("");
+    } finally {
+      setIsDeletingAccount(false);
     }
   };
 
@@ -196,13 +201,13 @@ const MyAccount: React.FC = () => {
                   />
                   <button
                     onClick={handleUpdateName}
-                    className="w-auto bg-custom-teal text-white px-6 py-3 rounded-3xl hover:bg-blue-600 transition-colors"
+                    className="cursor-pointer w-auto bg-custom-teal text-white px-6 py-3 rounded-3xl hover:bg-blue-600 transition-colors"
                   >
                     Save
                   </button>
                   <button
                     onClick={() => setEditingName(false)}
-                    className="border border-[#829793] px-3 py-3 rounded-3xl w-auto bg-white text-black hover:text-blue-600 transition-colors"
+                    className="cursor-pointer border border-[#829793] px-3 py-3 rounded-3xl w-auto bg-white text-black hover:text-blue-600 transition-colors"
                   >
                     Cancel
                   </button>
@@ -215,7 +220,7 @@ const MyAccount: React.FC = () => {
                       setNewName(userDisplay?.name || "");
                       setEditingName(true);
                     }}
-                    className="text-xl leading-[32px] underline text-[#06846F] hover:text-blue-500"
+                    className="cursor-pointer leading-[32px] underline text-[#06846F] hover:text-blue-500"
                   >
                     Edit
                   </button>
@@ -236,7 +241,7 @@ const MyAccount: React.FC = () => {
               <div>
                 <button
                   onClick={() => setShowChangePassword(true)}
-                  className="border border-[#829793] px-3 py-3 rounded-3xl w-auto bg-white text-black hover:text-blue-600 transition-colors"
+                  className="cursor-pointer border border-[#829793] px-3 py-3 rounded-3xl w-auto bg-white text-black hover:text-blue-600 transition-colors"
                 >
                   Change Password
                 </button>
@@ -267,13 +272,13 @@ const MyAccount: React.FC = () => {
               <div className="flex gap-2">
                 <button
                   onClick={handleChangePassword}
-                  className="w-auto bg-custom-teal text-white px-5 py-3 rounded-3xl hover:bg-blue-600 transition-colors"
+                  className="cursor-pointer w-auto bg-custom-teal text-white px-5 py-3 rounded-3xl hover:bg-blue-600 transition-colors"
                 >
                   Submit
                 </button>
                 <button
                   onClick={() => setShowChangePassword(false)}
-                  className="border border-[#829793] px-3 py-3 rounded-3xl w-auto bg-white text-black hover:text-blue-600 transition-colors"
+                  className="cursor-pointer border border-[#829793] px-3 py-3 rounded-3xl w-auto bg-white text-black hover:text-blue-600 transition-colors"
                 >
                   Cancel
                 </button>
@@ -282,7 +287,7 @@ const MyAccount: React.FC = () => {
           </div>
         )}
 
-        {/* Add Delete Account Modal */}
+        {/* Delete Account Modal */}
         {showDeleteAccountModal && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
             <div className="bg-white p-6 rounded-xl space-y-4 w-80">
@@ -294,19 +299,22 @@ const MyAccount: React.FC = () => {
                 onChange={(e) => setDeleteAccountPassword(e.target.value)}
                 className="font-dosis bg-[#F3F7F7] border border-[#829793] p-2 w-full rounded-xl transition-colors"
               />
-              <div className="flex gap-2">
-                <button
+              <div className="text-xl flex gap-2">
+                <ButtonWithLoading
+                  description="Deleting..."
+                  isLoading={isDeletingAccount}
                   onClick={handleConfirmDeleteAccount}
-                  className="text-base w-auto text-[#EF4444] hover:text-red-700 hover:bg-red-50 border border-[#EF4444] px-5 py-3 rounded-3xl transition-colors"
+                  className="cursor-pointer w-auto text-[#EF4444] hover:text-red-700 hover:bg-red-50 border border-[#EF4444] px-5 py-3 rounded-3xl transition-colors"
                 >
                   Delete
-                </button>
+                </ButtonWithLoading>
                 <button
+                  disabled={isDeletingAccount}
                   onClick={() => {
                     setShowDeleteAccountModal(false);
                     setDeleteAccountPassword("");
                   }}
-                  className="text-base border border-[#829793] px-3 py-3 rounded-3xl w-auto bg-white text-black hover:text-blue-600 transition-colors"
+                  className="cursor-pointer border border-[#829793] px-3 py-3 rounded-3xl w-auto bg-white text-black hover:text-blue-600 transition-colors"
                 >
                   Cancel
                 </button>
@@ -319,14 +327,14 @@ const MyAccount: React.FC = () => {
         <div className="text-xl bg-white p-6 space-y-16 pl-0">
           <button
             onClick={doLogout}
-            className="w-[200px] text-black py-3 px-3 border border-[#829793] rounded-3xl hover:bg-gray-50 transition-colors"
+            className="cursor-pointer w-[200px] text-black py-3 px-3 border border-[#829793] rounded-3xl hover:bg-gray-50 transition-colors"
           >
             Log out
           </button>
           <div className="">
             <button
               onClick={handleDeleteAccount}
-              className="w-[200px] text-[#EF4444] hover:text-red-700 px-4 py-2 border border-[#EF4444] rounded-3xl hover:bg-red-50 transition-colors"
+              className="cursor-pointer w-[200px] text-[#EF4444] hover:text-red-700 px-4 py-2 border border-[#EF4444] rounded-3xl hover:bg-red-50 transition-colors"
             >
               Delete Account
             </button>
