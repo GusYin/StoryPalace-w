@@ -144,7 +144,6 @@
   fill: #ef4444 !important;
 }
 
-/* Error progress bar */
 .Toastify__toast--error .Toastify__progress-bar--error {
   background: #ef4444 !important;
 }

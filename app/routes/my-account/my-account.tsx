@@ -23,12 +23,11 @@ const MyAccount: React.FC = () => {
   const [currentPassword, setCurrentPassword] = React.useState("");
   const [newPassword, setNewPassword] = React.useState("");
   const [showChangePassword, setShowChangePassword] = React.useState(false);
-  const [error, setError] = React.useState("");
-  const [success, setSuccess] = React.useState("");
   const [userPlan, setUserPlan] = useState<string | null>(null);
   const [trialEndDate, setTrialEndDate] = useState<Date | null>(null);
   const [isDeletingAccount, setIsDeletingAccount] = useState<boolean>(false);
-  const [deleteAccountError, setDeleteAccountError] = React.useState("");
+  const [deleteAccountInlineError, setDeleteAccountInlineError] =
+    React.useState("");
 
   // Add these new states for delete account flow
   const [showDeleteAccountModal, setShowDeleteAccountModal] =
@@ -65,6 +64,7 @@ const MyAccount: React.FC = () => {
         }
       } catch (error) {
         console.error("Error fetching user data:", error);
+        toast.error("Failed to load account information");
         setUserPlan("free");
       }
     };
@@ -75,7 +75,10 @@ const MyAccount: React.FC = () => {
   const doLogout = async () =>
     logout()
       .then()
-      .catch((err) => console.error(err))
+      .catch((err) => {
+        console.error(err);
+        toast.error("Failed to log out. Please try again.");
+      })
       .finally(() => navigate("/"));
 
   const handleUpdateName = async () => {
@@ -83,9 +86,9 @@ const MyAccount: React.FC = () => {
       await updateProfile(auth.currentUser!, { displayName: newName });
       setUserDisplay((prev) => ({ ...prev, name: newName }));
       setEditingName(false);
-      setSuccess("Name updated successfully");
+      toast.success("Name updated successfully");
     } catch (error) {
-      setError("Error updating name");
+      toast.error("Error updating name");
     }
   };
 
@@ -97,12 +100,14 @@ const MyAccount: React.FC = () => {
       );
       await reauthenticateWithCredential(auth.currentUser!, credential);
       await updatePassword(auth.currentUser!, newPassword);
-      setSuccess("Password changed successfully");
+      toast.success("Password changed successfully");
       setShowChangePassword(false);
       setCurrentPassword("");
       setNewPassword("");
     } catch (error) {
-      setError("Error changing password. Please check your current password.");
+      toast.error(
+        "Error changing password. Please check your current password."
+      );
     }
   };
 
@@ -113,7 +118,7 @@ const MyAccount: React.FC = () => {
   const handleConfirmDeleteAccount = async () => {
     // Validate password
     if (!deleteAccountPassword.trim()) {
-      setDeleteAccountError("Password is required");
+      setDeleteAccountInlineError("Password is required");
       return;
     }
 
@@ -121,7 +126,7 @@ const MyAccount: React.FC = () => {
     try {
       const user = auth.currentUser;
       if (!user || !user.email) {
-        setError("No authenticated user found");
+        toast.error("No authenticated user found");
         return;
       }
 
@@ -136,10 +141,10 @@ const MyAccount: React.FC = () => {
       await deleteUser(user);
       navigate("/");
     } catch (error: any) {
-      setError("Error deleting account. Please check your password.");
+      console.error("Delete account error:", error);
 
       // Handle specific error codes
-      if (error.code === "auth/wrong-password") {
+      if (error.code === "auth/invalid-credential") {
         toast.error("Incorrect password");
       } else if (error.code === "auth/requires-recent-login") {
         toast.error("Session expired. Please log in again.");
@@ -151,7 +156,7 @@ const MyAccount: React.FC = () => {
       setDeleteAccountPassword("");
     } finally {
       setIsDeletingAccount(false);
-      setDeleteAccountError("");
+      setDeleteAccountInlineError("");
     }
   };
 
@@ -171,16 +176,6 @@ const MyAccount: React.FC = () => {
         theme="light"
       />
       <div className="font-dosis w-full mx-auto space-y-8 mt-14 px-4 sm:px-6 lg:px-20">
-        {/* Success/Error Messages */}
-        {error && (
-          <div className="text-red-500 p-3 bg-red-50 rounded-lg">{error}</div>
-        )}
-        {success && (
-          <div className="text-green-500 p-3 bg-green-50 rounded-lg">
-            {success}
-          </div>
-        )}
-
         {/* Combined Title and Welcome Section */}
         <div className="text-black tracking-[3%] bg-white p-6 space-y-5 mb-[46px] pl-0">
           <div className="text-xl font-medium">MY ACCOUNT</div>
@@ -330,16 +325,18 @@ const MyAccount: React.FC = () => {
                   value={deleteAccountPassword}
                   onChange={(e) => {
                     setDeleteAccountPassword(e.target.value);
-                    setDeleteAccountError(""); // Clear error when typing
+                    setDeleteAccountInlineError(""); // Clear error when typing
                   }}
                   className={`font-dosis bg-[#F3F7F7] border ${
-                    deleteAccountError
+                    deleteAccountInlineError
                       ? "border-custom-error"
                       : "border-[#829793]"
                   } p-2 w-full rounded-xl transition-colors`}
                 />
-                {deleteAccountError && (
-                  <p className="text-red-500 text-sm">{deleteAccountError}</p>
+                {deleteAccountInlineError && (
+                  <p className="text-red-500 text-sm">
+                    {deleteAccountInlineError}
+                  </p>
                 )}
               </div>
               <div className="text-xl flex gap-2">
@@ -356,7 +353,7 @@ const MyAccount: React.FC = () => {
                   onClick={() => {
                     setShowDeleteAccountModal(false);
                     setDeleteAccountPassword("");
-                    setDeleteAccountError("");
+                    setDeleteAccountInlineError("");
                   }}
                   className="cursor-pointer border border-[#829793] px-3 py-3 rounded-3xl w-auto bg-white text-black hover:text-blue-600 transition-colors"
                 >
