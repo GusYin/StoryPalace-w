@@ -13,6 +13,7 @@
   --color-custom-stroke-grey: #829793;
   --color-custom-bg-dark: #0d0d0d;
   --color-custom-bg-lighter-dark: #161d1c;
+  --color-custom-error: #ef4444;
 }
 
 @layer utilities {
@@ -137,4 +138,13 @@
 .Toastify__toast--info .Toastify__toast-icon svg,
 .Toastify__toast--warning .Toastify__toast-icon svg {
   fill: #06846f !important;
+}
+
+.Toastify__toast--error .Toastify__toast-icon svg {
+  fill: #ef4444 !important;
+}
+
+/* Error progress bar */
+.Toastify__toast--error .Toastify__progress-bar--error {
+  background: #ef4444 !important;
 }

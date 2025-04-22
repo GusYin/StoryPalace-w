@@ -14,6 +14,7 @@ import { PricingPlan } from "~/lib/constant";
 import { httpsCallable } from "firebase/functions";
 import { functions } from "~/firebase/firebase";
 import ButtonWithLoading from "~/components/button-with-loading";
+import { toast, ToastContainer } from "react-toastify";
 
 const MyAccount: React.FC = () => {
   const navigate = useNavigate();
@@ -27,6 +28,7 @@ const MyAccount: React.FC = () => {
   const [userPlan, setUserPlan] = useState<string | null>(null);
   const [trialEndDate, setTrialEndDate] = useState<Date | null>(null);
   const [isDeletingAccount, setIsDeletingAccount] = useState<boolean>(false);
+  const [deleteAccountError, setDeleteAccountError] = React.useState("");
 
   // Add these new states for delete account flow
   const [showDeleteAccountModal, setShowDeleteAccountModal] =
@@ -109,6 +111,12 @@ const MyAccount: React.FC = () => {
   };
 
   const handleConfirmDeleteAccount = async () => {
+    // Validate password
+    if (!deleteAccountPassword.trim()) {
+      setDeleteAccountError("Password is required");
+      return;
+    }
+
     setIsDeletingAccount(true);
     try {
       const user = auth.currentUser;
@@ -127,18 +135,41 @@ const MyAccount: React.FC = () => {
       // If reauthentication succeeds, delete user
       await deleteUser(user);
       navigate("/");
-    } catch (error) {
+    } catch (error: any) {
       setError("Error deleting account. Please check your password.");
+
+      // Handle specific error codes
+      if (error.code === "auth/wrong-password") {
+        toast.error("Incorrect password");
+      } else if (error.code === "auth/requires-recent-login") {
+        toast.error("Session expired. Please log in again.");
+      } else {
+        toast.error("Error deleting account. Please try again.");
+      }
+
       setShowDeleteAccountModal(false);
       setDeleteAccountPassword("");
     } finally {
       setIsDeletingAccount(false);
+      setDeleteAccountError("");
     }
   };
 
   return (
     <div className="min-h-screen bg-white">
       <AuthHeader />
+      <ToastContainer
+        position="bottom-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
       <div className="font-dosis w-full mx-auto space-y-8 mt-14 px-4 sm:px-6 lg:px-20">
         {/* Success/Error Messages */}
         {error && (
@@ -292,19 +323,31 @@ const MyAccount: React.FC = () => {
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
             <div className="bg-white p-6 rounded-xl space-y-4 w-80">
               <h3 className="text-xl font-bold">Confirm Account Deletion</h3>
-              <input
-                type="password"
-                placeholder="Enter your password to confirm"
-                value={deleteAccountPassword}
-                onChange={(e) => setDeleteAccountPassword(e.target.value)}
-                className="font-dosis bg-[#F3F7F7] border border-[#829793] p-2 w-full rounded-xl transition-colors"
-              />
+              <div className="space-y-1">
+                <input
+                  type="password"
+                  placeholder="Enter your password to confirm"
+                  value={deleteAccountPassword}
+                  onChange={(e) => {
+                    setDeleteAccountPassword(e.target.value);
+                    setDeleteAccountError(""); // Clear error when typing
+                  }}
+                  className={`font-dosis bg-[#F3F7F7] border ${
+                    deleteAccountError
+                      ? "border-custom-error"
+                      : "border-[#829793]"
+                  } p-2 w-full rounded-xl transition-colors`}
+                />
+                {deleteAccountError && (
+                  <p className="text-red-500 text-sm">{deleteAccountError}</p>
+                )}
+              </div>
               <div className="text-xl flex gap-2">
                 <ButtonWithLoading
                   description="Deleting..."
                   isLoading={isDeletingAccount}
                   onClick={handleConfirmDeleteAccount}
-                  className="cursor-pointer w-auto text-[#EF4444] hover:text-red-700 hover:bg-red-50 border border-[#EF4444] px-5 py-3 rounded-3xl transition-colors"
+                  className="cursor-pointer w-auto text-custom-error hover:text-red-700 hover:bg-red-50 border border-[#EF4444] px-5 py-3 rounded-3xl transition-colors"
                 >
                   Delete
                 </ButtonWithLoading>
@@ -313,6 +356,7 @@ const MyAccount: React.FC = () => {
                   onClick={() => {
                     setShowDeleteAccountModal(false);
                     setDeleteAccountPassword("");
+                    setDeleteAccountError("");
                   }}
                   className="cursor-pointer border border-[#829793] px-3 py-3 rounded-3xl w-auto bg-white text-black hover:text-blue-600 transition-colors"
                 >
