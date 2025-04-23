@@ -36,7 +36,7 @@ export default function OrderSummary() {
       return;
     }
 
-    navigate(`/pay/${plan}/${monthlyOrYearly}`);
+    navigate(`/payment/${plan}/${monthlyOrYearly}`);
   };
 
   if (notOk) {

@@ -22,7 +22,7 @@ type Params = {
     "plan": string;
     "monthlyOrYearly": string;
   };
-  "/pay/:plan/:monthlyOrYearly": {
+  "/payment/:plan/:monthlyOrYearly": {
     "plan": string;
     "monthlyOrYearly": string;
   };

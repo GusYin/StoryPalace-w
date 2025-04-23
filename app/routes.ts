@@ -22,7 +22,7 @@ export default [
       "order-summary/:plan/:monthlyOrYearly",
       "routes/pay/order-summary.tsx"
     ),
-    route("pay/:plan/:monthlyOrYearly", "routes/pay/pay.tsx"),
+    route("payment/:plan/:monthlyOrYearly", "routes/pay/payment.tsx"),
     route("library", "routes/library.tsx"),
     route("library/:storyId", "routes/story-series-detail.tsx"),
     route("story-player", "routes/story-player.tsx"),
