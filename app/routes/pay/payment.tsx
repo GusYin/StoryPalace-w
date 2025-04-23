@@ -74,7 +74,7 @@ export default function Payment() {
   if (loading || !isValidPlan || !isValidFrequency) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-custom-teal"></div>
       </div>
     );
   }
@@ -95,97 +95,71 @@ export default function Payment() {
         theme="light"
       />
 
-      <main className="font-dosis text-black flex items-center justify-center">
-        <div className="w-full max-w-[390px] mt-8 px-4">
-          <h1 className="font-semibold font-fraunces text-3xl text-center mb-8">
-            Order Summary
+      <main className="font-dosis text-xl text-black flex flex-col items-center justify-center">
+        <div className="w-full max-w-[500px] mt-12 px-[30px]">
+          <h1 className="font-semibold text-start mb-8">ORDER SUMMARY</h1>
+
+          {/* Plan Details */}
+          <div className="flex justify-between items-start">
+            <div>
+              <h2 className="font-bold capitalize">{plan} Plan</h2>
+              <p className="leading-[32px] font-light">
+                {monthlyOrYearly === "yearly"
+                  ? "Yearly Subscription"
+                  : "Monthly Subscription"}
+              </p>
+            </div>
+            <div>
+              <h2 className="invisible font-bold capitalize">d</h2>
+              <span className="leading-[32px] font-light">${price}</span>
+            </div>
+          </div>
+        </div>
+        <div className="rounded-2xl bg-container-grey w-full max-w-[500px] mt-12 p-[30px]">
+          {/* Payment Information (Visual Only - Actual processing via Stripe) */}
+          <h1 className="font-semibold text-start mb-[30px]">
+            CARD INFORMATION
           </h1>
 
-          <div className="space-y-6">
-            {/* Plan Details */}
-            <div className="flex justify-between items-start">
-              <div>
-                <h2 className="text-xl font-semibold capitalize">
-                  {plan} Plan
-                </h2>
-                <p className="text-gray-600 mt-1">
-                  {monthlyOrYearly === "yearly"
-                    ? "Yearly Subscription"
-                    : "Monthly Subscription"}
-                </p>
-              </div>
-              <span className="text-xl font-medium">${price}</span>
-            </div>
-
-            <hr className="border-t border-gray-200" />
-
-            {/* Total Section */}
-            <div className="flex justify-between items-center">
-              <span className="text-xl font-semibold">Total</span>
-              <span className="text-xl font-semibold">${price}</span>
-            </div>
-
-            {/* Payment Divider */}
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-200"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">
-                  Payment Details
-                </span>
+          <div className="space-y-[40px] mb-[30px]">
+            <div className="space-y-1">
+              <label className="block">Card number</label>
+              <div className="h-10 bg-gray-100 rounded-lg flex items-center">
+                <span className="text-gray-500">xxxx-xxxx-xxxx-xxxx</span>
               </div>
             </div>
 
-            {/* Payment Information (Visual Only - Actual processing via Stripe) */}
-            <div className="space-y-6 pt-4">
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">
-                  Card number
-                </label>
-                <div className="h-10 bg-gray-100 rounded-lg px-4 flex items-center">
-                  <span className="text-gray-500">xxxx-xxxx-xxxx-xxxx</span>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <label className="block">Expiry date</label>
+                <div className="h-10 bg-gray-100 rounded-lg flex items-center">
+                  <span className="text-gray-500">MM/YY</span>
                 </div>
               </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700">
-                    Expiry date
-                  </label>
-                  <div className="h-10 bg-gray-100 rounded-lg px-4 flex items-center">
-                    <span className="text-gray-500">MM/YY</span>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700">
-                    CVV code
-                  </label>
-                  <div className="h-10 bg-gray-100 rounded-lg px-4 flex items-center">
-                    <span className="text-gray-500">xxx</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">
-                  Name on card
-                </label>
-                <div className="h-10 bg-gray-100 rounded-lg px-4 flex items-center">
-                  <span className="text-gray-500">Pay</span>
+              <div className="space-y-1">
+                <label className="block">CVV code</label>
+                <div className="h-10 bg-gray-100 rounded-lg flex items-center">
+                  <span className="text-gray-500">xxx</span>
                 </div>
               </div>
             </div>
 
-            {/* Pay Button */}
-            <ButtonWithLoading
-              isLoading={isSubscribing}
-              onClick={pay}
-              className="w-full bg-custom-teal text-white py-4 rounded-xl hover:bg-[#056955] transition-colors font-medium text-lg mt-8"
-            >
-              Pay ${price}
-            </ButtonWithLoading>
+            <div className="space-y-1">
+              <label className="block">Name on card</label>
+              <div className="h-10 bg-gray-100 rounded-lg flex items-center">
+                <span className="text-gray-500">Pay</span>
+              </div>
+            </div>
           </div>
+
+          {/* Pay Button */}
+          <ButtonWithLoading
+            isLoading={isSubscribing}
+            onClick={pay}
+            className="w-full bg-custom-teal text-white py-4 rounded-4xl hover:bg-[#056955] transition-colors"
+          >
+            Pay
+          </ButtonWithLoading>
         </div>
       </main>
     </div>
