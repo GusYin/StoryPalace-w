@@ -22,6 +22,10 @@ type Params = {
     "plan": string;
     "monthlyOrYearly": string;
   };
+  "/pay/:plan/:monthlyOrYearly": {
+    "plan": string;
+    "monthlyOrYearly": string;
+  };
   "/library": {};
   "/library/:storyId": {
     "storyId": string;

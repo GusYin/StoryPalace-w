@@ -1,5 +1,10 @@
+import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router";
+import { getAuth, type User } from "firebase/auth";
+import { httpsCallable } from "firebase/functions";
+import { functions } from "~/firebase/firebase";
 import { toast, ToastContainer } from "react-toastify";
+import ButtonWithLoading from "~/components/button-with-loading";
 import AuthHeader from "~/components/header-auth";
 
 type SubscriptionParams = {
@@ -18,30 +23,60 @@ const PRICE_MAP = {
   },
 };
 
-export default function OrderSummary() {
+export default function Pay() {
   const { plan, monthlyOrYearly } = useParams<SubscriptionParams>();
   const navigate = useNavigate();
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isSubscribing, setIsSubscribing] = useState(false);
 
   const isValidPlan = plan === "basic" || plan === "premium";
   const isValidFrequency =
     monthlyOrYearly === "monthly" || monthlyOrYearly === "yearly";
-  const price =
-    plan && monthlyOrYearly ? PRICE_MAP[plan][monthlyOrYearly] : NaN;
+  const price = plan && monthlyOrYearly ? PRICE_MAP[plan][monthlyOrYearly] : 0;
 
-  const notOk = !isValidPlan || !isValidFrequency || isNaN(price);
+  useEffect(() => {
+    const auth = getAuth();
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      setUser(user);
+      setLoading(false);
+    });
 
-  const checkout = () => {
-    if (notOk) {
-      toast.error("Subscription failed. Please try again.");
-      return;
+    return () => unsubscribe();
+  }, [navigate]);
+
+  const checkout = async () => {
+    try {
+      setIsSubscribing(true);
+      setError(null);
+
+      const createCheckoutSession = httpsCallable(
+        functions,
+        "createCheckoutSession"
+      );
+      const result = await createCheckoutSession({
+        planId: `${plan}_${monthlyOrYearly}`,
+        userId: user?.uid,
+        email: user?.email,
+      });
+
+      const { sessionId } = result.data as { sessionId: string };
+      window.location.href = `https://checkout.stripe.com/pay/${sessionId}`;
+    } catch (error) {
+      console.error("Subscription error:", error);
+      toast.error("❌ Subscription failed. Please try again.");
+    } finally {
+      setIsSubscribing(false);
     }
-
-    navigate(`/pay/${plan}/${monthlyOrYearly}`);
   };
 
-  if (notOk) {
-    toast.error("Subscription failed. Please try again.");
-    navigate("/pricing");
+  if (loading || !isValidPlan || !isValidFrequency) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
   }
 
   return (
@@ -113,12 +148,13 @@ export default function OrderSummary() {
               </div>
 
               {/* Checkout button */}
-              <button
+              <ButtonWithLoading
+                isLoading={isSubscribing}
                 onClick={checkout}
                 className="w-full bg-custom-teal text-white py-4 rounded-4xl hover:bg-[#056955] transition-colors font-normal"
               >
                 Checkout
-              </button>
+              </ButtonWithLoading>
             </div>
           </div>
         </div>
