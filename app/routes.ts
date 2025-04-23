@@ -19,8 +19,8 @@ export default [
     route("auth-redirect", "routes/auth-redirect.tsx"),
     route("my-account", "routes/my-account/my-account.tsx"),
     route(
-      "subscribe-plan/:plan/:monthlyOrYearly",
-      "routes/my-account/subscribe-plan.tsx"
+      "order-summary/:plan/:monthlyOrYearly",
+      "routes/pay/order-summary.tsx"
     ),
     route("library", "routes/library.tsx"),
     route("library/:storyId", "routes/story-series-detail.tsx"),

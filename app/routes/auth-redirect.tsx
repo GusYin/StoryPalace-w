@@ -6,10 +6,10 @@ import { auth } from "~/firebase/firebase";
 
 // Allowed redirect paths for security
 const ALLOWED_PATHS = [
-  "/subscribe-plan/basic/monthly",
-  "/subscribe-plan/basic/yearly",
-  "/subscribe-plan/premium/monthly",
-  "/subscribe-plan/premium/yearly",
+  "/order-summary/basic/monthly",
+  "/order-summary/basic/yearly",
+  "/order-summary/premium/monthly",
+  "/order-summary/premium/yearly",
 ];
 
 export default function AuthRedirect() {

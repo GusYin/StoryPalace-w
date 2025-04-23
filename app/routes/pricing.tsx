@@ -66,7 +66,7 @@ export default function PricingPage() {
     if (!user) {
       if (plan && cycle) {
         const redirectPath = encodeURIComponent(
-          `/subscribe-plan/${plan}/${cycle}`
+          `/order-summary/${plan}/${cycle}`
         );
         navigate(`/signup?redirect=${redirectPath}`);
       } else {
@@ -81,7 +81,7 @@ export default function PricingPage() {
       if (plan && cycle) {
         // Show toast with redirect to verify email
         const redirectPath = encodeURIComponent(
-          `/subscribe-plan/${plan}/${cycle}`
+          `/order-summary/${plan}/${cycle}`
         );
         navigate(`/verify-email?redirect=${redirectPath}`);
       } else {
@@ -167,7 +167,7 @@ export default function PricingPage() {
             <div className="flex flex-col gap-3 w-auto mt-2">
               <button
                 onClick={() =>
-                  navigate(`/subscribe-plan/basic/${monthlyOrYearly}`)
+                  navigate(`/order-summary/basic/${monthlyOrYearly}`)
                 }
                 className="cursor-pointer p-2 bg-custom-teal text-white rounded-4xl hover:bg-custom-teal-dark transition-colors font-medium whitespace-nowrap w-full text-center"
               >
@@ -191,7 +191,7 @@ export default function PricingPage() {
       }
 
       if (userPlan?.plan === PricingPlan.Free) {
-        navigate(`/subscribe-plan/basic/${monthlyOrYearly}`);
+        navigate(`/order-summary/basic/${monthlyOrYearly}`);
       }
     } catch (error) {
       console.error("Error subscribing to Basic plan:", error);
@@ -219,7 +219,7 @@ export default function PricingPage() {
         userPlan?.plan === PricingPlan.Free ||
         userPlan?.plan === PricingPlan.Basic
       ) {
-        navigate(`/subscribe-plan/premium/${monthlyOrYearly}`);
+        navigate(`/order-summary/premium/${monthlyOrYearly}`);
       }
     } catch (error) {
       console.error("Error subscribing to Premium plan:", error);

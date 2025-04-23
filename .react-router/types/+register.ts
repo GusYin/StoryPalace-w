@@ -18,7 +18,7 @@ type Params = {
   "/pricing": {};
   "/auth-redirect": {};
   "/my-account": {};
-  "/subscribe-plan/:plan/:monthlyOrYearly": {
+  "/order-summary/:plan/:monthlyOrYearly": {
     "plan": string;
     "monthlyOrYearly": string;
   };

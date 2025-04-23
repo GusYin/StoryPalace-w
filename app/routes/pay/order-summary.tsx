@@ -23,7 +23,7 @@ const PRICE_MAP = {
   },
 };
 
-export default function SubscribePlan() {
+export default function OrderSummary() {
   const { plan, monthlyOrYearly } = useParams<SubscriptionParams>();
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
