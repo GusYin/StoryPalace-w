@@ -38,14 +38,20 @@ const SignUpPage = () => {
     setError("");
 
     try {
-      const user = await createUserWithEmailAndPw(email, password, userName);
+      const userCredential = await createUserWithEmailAndPw(
+        email,
+        password,
+        userName
+      );
 
-      if (user.user.emailVerified) {
-        navigate("/my-account");
+      const searchParams = new URLSearchParams(window.location.search);
+      const redirect = searchParams.get("redirect");
+
+      if (userCredential.user.emailVerified) {
+        redirect
+          ? navigate(`/auth-redirect?redirect=${encodeURIComponent(redirect)}`)
+          : navigate("/my-account");
       } else {
-        const searchParams = new URLSearchParams(window.location.search);
-        const redirect = searchParams.get("redirect");
-
         navigate(
           `/verify-email${
             redirect ? `?redirect=${encodeURIComponent(redirect)}` : ""

@@ -16,12 +16,11 @@ export default function Login() {
     setError("");
 
     try {
-      const user = await signInWithEmailAndPw(email, password);
-
+      const userCredential = await signInWithEmailAndPw(email, password);
       const searchParams = new URLSearchParams(window.location.search);
       const redirect = searchParams.get("redirect");
 
-      if (user.user.emailVerified) {
+      if (userCredential.user.emailVerified) {
         redirect
           ? navigate(`/auth-redirect?redirect=${encodeURIComponent(redirect)}`)
           : navigate("/my-account");

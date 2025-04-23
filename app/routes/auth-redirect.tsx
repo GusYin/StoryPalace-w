@@ -19,8 +19,6 @@ export default function AuthRedirect() {
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (user) {
-        await user.reload();
-
         // Validate and parse redirect path
         const redirectPath = decodeURIComponent(
           searchParams.get("redirect") || "/"
