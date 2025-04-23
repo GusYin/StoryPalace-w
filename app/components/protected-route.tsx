@@ -9,11 +9,13 @@ type ProtectedRouteProps = {
 export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   const navigate = useNavigate();
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (!user) {
         navigate("/login");
         return;
       }
+
+      await user.reload();
 
       if (!user.emailVerified) {
         navigate("/verify-email");

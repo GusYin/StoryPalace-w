@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router";
 import { getAuth, type User } from "firebase/auth";
 import { httpsCallable } from "firebase/functions";
 import { functions } from "~/firebase/firebase";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import ButtonWithLoading from "~/components/button-with-loading";
 import AuthHeader from "~/components/header-auth";
 
@@ -42,16 +42,16 @@ export default function SubscribePlan() {
       setUser(user);
       setLoading(false);
 
-      if (!user) {
-        toast.info("Please login to subscribe");
-        navigate("/login");
-        return;
-      }
+      // if (!user) {
+      //   toast.info("Please login to subscribe");
+      //   navigate("/login");
+      //   return;
+      // }
 
-      if (!user.emailVerified) {
-        toast.error("Please verify your email first");
-        navigate("/verify-email");
-      }
+      // if (!user.emailVerified) {
+      //   toast.info("Please verify your email first");
+      //   navigate("/verify-email");
+      // }
     });
 
     return () => unsubscribe();
@@ -113,6 +113,18 @@ export default function SubscribePlan() {
   return (
     <div className="min-h-screen bg-white">
       <AuthHeader />
+      <ToastContainer
+        position="bottom-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
 
       {/* Order summary content */}
       <main className="font-dosis text-black flex items-center justify-center">
