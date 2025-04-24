@@ -8,6 +8,11 @@ import ButtonWithLoading from "~/components/button-with-loading";
 import AuthHeader from "~/components/header-auth";
 import { VisibilityOn } from "~/components/icons/visibility-on";
 import { VisibilityOff } from "~/components/icons/visibility-off";
+import { DiscoverCC } from "~/components/icons/cc-discover";
+import { VisaCC } from "~/components/icons/cc-visa";
+import { AmexCC } from "~/components/icons/cc-amex";
+import { MastercardCC } from "~/components/icons/cc-mastercard";
+import { GenericCardCC } from "~/components/icons/cc-generic-card";
 
 type SubscriptionParams = {
   plan: "basic" | "premium";
@@ -25,6 +30,16 @@ const PRICE_MAP = {
   },
 };
 
+// Card brand detection function above the component
+const getCardBrand = (number: string) => {
+  const cleaned = number.replace(/-/g, "");
+  if (/^4/.test(cleaned)) return "visa";
+  if (/^5[1-5]/.test(cleaned)) return "mastercard";
+  if (/^3[47]/.test(cleaned)) return "amex";
+  if (/^6(?:011|5)/.test(cleaned)) return "discover";
+  return "generic";
+};
+
 export default function Payment() {
   const { plan, monthlyOrYearly } = useParams<SubscriptionParams>();
   const navigate = useNavigate();
@@ -36,6 +51,9 @@ export default function Payment() {
   const [cvv, setCvv] = useState("");
   const [nameOnCard, setNameOnCard] = useState("");
   const [showCvv, setShowCvv] = useState(false);
+  const [cardBrand, setCardBrand] = useState<
+    "visa" | "mastercard" | "amex" | "discover" | "generic"
+  >("generic");
 
   const isValidPlan = plan === "basic" || plan === "premium";
   const isValidFrequency =
@@ -56,6 +74,7 @@ export default function Payment() {
     const input = e.target.value.replace(/\D/g, "");
     const formatted = input.slice(0, 16).replace(/(\d{4})(?=\d)/g, "$1-");
     setCardNumber(formatted);
+    setCardBrand(getCardBrand(input));
   };
 
   const handleExpiryDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -144,7 +163,22 @@ export default function Payment() {
 
           <div className="space-y-[40px] mb-[30px] text-xl font-dosis">
             <div>
-              <label>Card number</label>
+              <div className="flex justify-between items-center">
+                <label>Card number</label>
+                <div className="h-6 w-12">
+                  {cardBrand === "visa" && <VisaCC className="w-full h-full" />}
+                  {cardBrand === "mastercard" && (
+                    <MastercardCC className="w-full h-full" />
+                  )}
+                  {cardBrand === "amex" && <AmexCC className="w-full h-full" />}
+                  {cardBrand === "discover" && (
+                    <DiscoverCC className="w-full h-full" />
+                  )}
+                  {cardBrand === "generic" && (
+                    <GenericCardCC className="w-full h-full" />
+                  )}
+                </div>
+              </div>
               <div className="h-17 mt-1">
                 <input
                   id="cardNumber"
