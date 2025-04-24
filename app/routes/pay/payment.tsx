@@ -14,7 +14,7 @@ type SubscriptionParams = {
 
 const PRICE_MAP = {
   basic: {
-    monthly: 19.99, // Updated to match screenshot price
+    monthly: 19.99,
     yearly: 59.88,
   },
   premium: {
@@ -116,43 +116,55 @@ export default function Payment() {
           </div>
         </div>
         <div className="rounded-2xl bg-container-grey w-full max-w-[500px] mt-12 p-[30px]">
-          {/* Payment Information (Visual Only - Actual processing via Stripe) */}
           <h1 className="font-semibold text-start mb-[30px]">
             CARD INFORMATION
           </h1>
 
-          <div className="space-y-[40px] mb-[30px]">
-            <div className="space-y-1">
-              <label className="block">Card number</label>
-              <div className="h-10 bg-gray-100 rounded-lg flex items-center">
-                <span className="text-gray-500">xxxx-xxxx-xxxx-xxxx</span>
+          <div className="space-y-[40px] mb-[30px] text-xl font-dosis">
+            <label>Card number</label>
+            <div className="h-17 mt-1">
+              <input
+                type="text"
+                placeholder="XXXX-XXXX-XXXX-XXXX"
+                className="bg-custom-bg-light leading-[32px] w-full h-full font-medium placeholder-custom-text-grey appearance-none px-5 py-2 border border-custom-stroke-grey rounded-lg shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                maxLength={16}
+              />{" "}
+            </div>
+
+            <div className="grid grid-cols-2 gap-10">
+              <div>
+                <label>Expiry date</label>
+                <div className="h-17 mt-1">
+                  <input
+                    type="text"
+                    placeholder="MM/YY"
+                    className="bg-custom-bg-light leading-[32px] w-full h-full font-medium placeholder-custom-text-grey appearance-none px-5 py-2 border border-custom-stroke-grey rounded-lg shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    maxLength={5}
+                  />
+                </div>
+              </div>
+              <div>
+                <label>CVV code</label>
+                <div className="h-17 mt-1">
+                  <input
+                    type="password"
+                    placeholder="XXX"
+                    className="bg-custom-bg-light leading-[32px] w-full h-full font-medium placeholder-custom-text-grey appearance-none px-5 py-2 border border-custom-stroke-grey rounded-lg shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    maxLength={3}
+                  />
+                </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <label className="block">Expiry date</label>
-                <div className="h-10 bg-gray-100 rounded-lg flex items-center">
-                  <span className="text-gray-500">MM/YY</span>
-                </div>
-              </div>
-              <div className="space-y-1">
-                <label className="block">CVV code</label>
-                <div className="h-10 bg-gray-100 rounded-lg flex items-center">
-                  <span className="text-gray-500">xxx</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-1">
-              <label className="block">Name on card</label>
-              <div className="h-10 bg-gray-100 rounded-lg flex items-center">
-                <span className="text-gray-500">Pay</span>
-              </div>
+            <label>Name on card</label>
+            <div className="h-17 mt-1">
+              <input
+                type="text"
+                className="bg-custom-bg-light leading-[32px] w-full h-full font-medium placeholder-custom-text-grey appearance-none px-5 py-2 border border-custom-stroke-grey rounded-lg shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              />
             </div>
           </div>
 
-          {/* Pay Button */}
           <ButtonWithLoading
             isLoading={isSubscribing}
             onClick={pay}
