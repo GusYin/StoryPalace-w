@@ -124,6 +124,7 @@ export default function Payment() {
             <label>Card number</label>
             <div className="h-17 mt-1">
               <input
+                id="cardNumber"
                 type="text"
                 placeholder="XXXX-XXXX-XXXX-XXXX"
                 className="bg-custom-bg-light leading-[32px] w-full h-full font-medium placeholder-custom-text-grey appearance-none px-5 py-2 border border-custom-stroke-grey rounded-lg shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
@@ -136,6 +137,7 @@ export default function Payment() {
                 <label>Expiry date</label>
                 <div className="h-17 mt-1">
                   <input
+                    id="expiryDate"
                     type="text"
                     placeholder="MM/YY"
                     className="bg-custom-bg-light leading-[32px] w-full h-full font-medium placeholder-custom-text-grey appearance-none px-5 py-2 border border-custom-stroke-grey rounded-lg shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
@@ -159,6 +161,7 @@ export default function Payment() {
             <label>Name on card</label>
             <div className="h-17 mt-1">
               <input
+                id="nameOnCard"
                 type="text"
                 className="bg-custom-bg-light leading-[32px] w-full h-full font-medium placeholder-custom-text-grey appearance-none px-5 py-2 border border-custom-stroke-grey rounded-lg shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
               />
