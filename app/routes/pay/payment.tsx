@@ -30,6 +30,28 @@ const PRICE_MAP = {
   },
 };
 
+const luhnCheck = (cardNumber: string): boolean => {
+  const cleaned = cardNumber.replace(/\D/g, "");
+  let sum = 0;
+  let shouldDouble = false;
+
+  for (let i = cleaned.length - 1; i >= 0; i--) {
+    let digit = parseInt(cleaned.charAt(i), 10);
+
+    if (shouldDouble) {
+      digit *= 2;
+      if (digit > 9) {
+        digit -= 9;
+      }
+    }
+
+    sum += digit;
+    shouldDouble = !shouldDouble;
+  }
+
+  return sum % 10 === 0;
+};
+
 // Card brand detection function above the component
 const getCardBrand = (number: string) => {
   const cleaned = number.replace(/-/g, "");
@@ -54,6 +76,7 @@ export default function Payment() {
   const [cardBrand, setCardBrand] = useState<
     "visa" | "mastercard" | "amex" | "discover" | "generic"
   >("generic");
+  const [isCardValid, setIsCardValid] = useState(true);
 
   const isValidPlan = plan === "basic" || plan === "premium";
   const isValidFrequency =
@@ -75,6 +98,7 @@ export default function Payment() {
     const formatted = input.slice(0, 16).replace(/(\d{4})(?=\d)/g, "$1-");
     setCardNumber(formatted);
     setCardBrand(getCardBrand(input));
+    setIsCardValid(true); // Reset validation on change
   };
 
   const handleExpiryDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -92,6 +116,15 @@ export default function Payment() {
 
   const pay = async () => {
     try {
+      // Validate card number first
+      const cleanedCardNumber = cardNumber.replace(/-/g, "");
+
+      if (cleanedCardNumber.length !== 16 || !luhnCheck(cleanedCardNumber)) {
+        setIsCardValid(false);
+        toast.error("❌ Invalid credit card number");
+        return;
+      }
+
       setIsSubscribing(true);
       const createCheckoutSession = httpsCallable(
         functions,
@@ -184,7 +217,11 @@ export default function Payment() {
                   id="cardNumber"
                   type="text"
                   placeholder="XXXX-XXXX-XXXX-XXXX"
-                  className="bg-custom-bg-light leading-[32px] w-full h-full font-medium placeholder-custom-text-grey appearance-none px-5 py-2 border border-custom-stroke-grey rounded-lg shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  className={`bg-custom-bg-light leading-[32px] w-full h-full font-medium placeholder-custom-text-grey appearance-none px-5 py-2 border ${
+                    isCardValid
+                      ? "border-custom-stroke-grey"
+                      : "border-[#ef4444]"
+                  } rounded-lg shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors`}
                   value={cardNumber}
                   onChange={handleCardNumberChange}
                   maxLength={19}
