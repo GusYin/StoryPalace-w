@@ -173,13 +173,7 @@ export default function Payment() {
       setIsNameValid(isNameValid);
 
       if (!isCardValid || !isExpiryValid || !isCvvValid || !isNameValid) {
-        let errorMessage = "Please fix the following issues:";
-        if (!isCardValid) errorMessage += "\n- Invalid card number";
-        if (!isExpiryValid) errorMessage += "\n- Invalid expiry date";
-        if (!isCvvValid) errorMessage += "\n- Invalid CVV";
-        if (!isNameValid) errorMessage += "\n- Invalid name on card";
-
-        toast.error(errorMessage);
+        toast.error("Please put in the correct card details");
         return;
       }
 
