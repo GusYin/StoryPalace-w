@@ -54,6 +54,31 @@ const luhnCheck = (cardNumber: string): boolean => {
   return sum % 10 === 0;
 };
 
+const validateExpiryDate = (date: string): boolean => {
+  if (!/^\d{2}\/\d{2}$/.test(date)) return false;
+
+  const [month, year] = date.split("/");
+  const now = new Date();
+  const currentYear = now.getFullYear() % 100;
+  const currentMonth = now.getMonth() + 1;
+
+  return (
+    parseInt(month) >= 1 &&
+    parseInt(month) <= 12 &&
+    (parseInt(year) > currentYear ||
+      (parseInt(year) === currentYear && parseInt(month) >= currentMonth))
+  );
+};
+
+const validateCVV = (cvv: string, cardBrand: string): boolean => {
+  const requiredLength = cardBrand === "amex" ? 4 : 3;
+  return cvv.length === requiredLength && /^\d+$/.test(cvv);
+};
+
+const validateName = (name: string): boolean => {
+  return name.trim().length > 0 && /\s/.test(name.trim());
+};
+
 // Card brand detection function above the component
 const getCardBrand = (number: string) => {
   const cleaned = number.replace(/-/g, "");
@@ -78,6 +103,9 @@ export default function Payment() {
   const [nameOnCard, setNameOnCard] = useState("");
   const [showCvv, setShowCvv] = useState(false);
   const [isCardValid, setIsCardValid] = useState(true);
+  const [isExpiryValid, setIsExpiryValid] = useState(true);
+  const [isCvvValid, setIsCvvValid] = useState(true);
+  const [isNameValid, setIsNameValid] = useState(true);
   const [cardBrand, setCardBrand] = useState<
     "visa" | "mastercard" | "amex" | "discover" | "diners" | "jcb" | "generic"
   >("generic");
@@ -112,20 +140,46 @@ export default function Payment() {
       formatted = `${input.slice(0, 2)}/${input.slice(2, 4)}`;
     }
     setExpiryDate(formatted);
+    setIsExpiryValid(true); // Reset validation on change
+  };
+
+  const handleCvvChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setCvv(e.target.value);
+    setIsCvvValid(true);
   };
 
   const toggleCvvVisibility = (isVisible: boolean) => {
     setShowCvv(isVisible);
   };
 
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNameOnCard(e.target.value);
+    setIsNameValid(true);
+  };
+
   const pay = async () => {
     try {
-      // Validate card number first
+      // Validate all fields first
       const cleanedCardNumber = cardNumber.replace(/-/g, "");
+      const isCardValid =
+        cleanedCardNumber.length === 16 && luhnCheck(cleanedCardNumber);
+      const isExpiryValid = validateExpiryDate(expiryDate);
+      const isCvvValid = validateCVV(cvv, cardBrand);
+      const isNameValid = validateName(nameOnCard);
 
-      if (cleanedCardNumber.length !== 16 || !luhnCheck(cleanedCardNumber)) {
-        setIsCardValid(false);
-        toast.error("Invalid credit card number");
+      setIsCardValid(isCardValid);
+      setIsExpiryValid(isExpiryValid);
+      setIsCvvValid(isCvvValid);
+      setIsNameValid(isNameValid);
+
+      if (!isCardValid || !isExpiryValid || !isCvvValid || !isNameValid) {
+        let errorMessage = "Please fix the following issues:";
+        if (!isCardValid) errorMessage += "\n- Invalid card number";
+        if (!isExpiryValid) errorMessage += "\n- Invalid expiry date";
+        if (!isCvvValid) errorMessage += "\n- Invalid CVV";
+        if (!isNameValid) errorMessage += "\n- Invalid name on card";
+
+        toast.error(errorMessage);
         return;
       }
 
@@ -193,7 +247,7 @@ export default function Payment() {
             </div>
           </div>
         </div>
-        <div className="rounded-2xl bg-container-grey w-full max-w-[500px] mt-12 p-[30px]">
+        <div className="rounded-2xl bg-container-grey w-full max-w-[500px] mt-12 mb-12 p-[30px]">
           <h1 className="font-semibold text-start mb-[30px]">
             CARD INFORMATION
           </h1>
@@ -246,7 +300,11 @@ export default function Payment() {
                     id="expiryDate"
                     type="text"
                     placeholder="MM/YY"
-                    className="bg-custom-bg-light leading-[32px] w-full h-full font-medium placeholder-custom-text-grey appearance-none px-5 py-2 border border-custom-stroke-grey rounded-lg shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    className={`bg-custom-bg-light leading-[32px] w-full h-full font-medium placeholder-custom-text-grey appearance-none px-5 py-2 border ${
+                      isExpiryValid
+                        ? "border-custom-stroke-grey"
+                        : "border-custom-error"
+                    } rounded-lg shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors`}
                     value={expiryDate}
                     onChange={handleExpiryDateChange}
                     maxLength={5}
@@ -260,10 +318,14 @@ export default function Payment() {
                   <input
                     type={showCvv ? "text" : "password"}
                     placeholder="XXX"
-                    className="bg-custom-bg-light leading-[32px] w-full h-full font-medium placeholder-custom-text-grey appearance-none px-5 py-2 border border-custom-stroke-grey rounded-lg shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors pr-12"
+                    className={`bg-custom-bg-light leading-[32px] w-full h-full font-medium placeholder-custom-text-grey appearance-none px-5 py-2 border ${
+                      isNameValid
+                        ? "border-custom-stroke-grey"
+                        : "border-custom-error"
+                    } rounded-lg shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors`}
                     maxLength={3}
                     value={cvv}
-                    onChange={(e) => setCvv(e.target.value)}
+                    onChange={handleCvvChange}
                     inputMode="numeric"
                   />
                   <div
@@ -286,9 +348,13 @@ export default function Payment() {
                 <input
                   id="nameOnCard"
                   type="text"
-                  className="bg-custom-bg-light leading-[32px] w-full h-full font-medium placeholder-custom-text-grey appearance-none px-5 py-2 border border-custom-stroke-grey rounded-lg shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  className={`bg-custom-bg-light leading-[32px] w-full h-full font-medium placeholder-custom-text-grey appearance-none px-5 py-2 border ${
+                    isNameValid
+                      ? "border-custom-stroke-grey"
+                      : "border-custom-error"
+                  } rounded-lg shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors`}
                   value={nameOnCard}
-                  onChange={(e) => setNameOnCard(e.target.value)}
+                  onChange={handleNameChange}
                 />
               </div>
             </div>
