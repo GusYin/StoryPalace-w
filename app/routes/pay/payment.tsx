@@ -13,6 +13,8 @@ import { VisaCC } from "~/components/icons/cc-visa";
 import { AmexCC } from "~/components/icons/cc-amex";
 import { MastercardCC } from "~/components/icons/cc-mastercard";
 import { GenericCardCC } from "~/components/icons/cc-generic-card";
+import { DinersCC } from "~/components/icons/cc-diners";
+import { JCBCC } from "~/components/icons/cc-jcb";
 
 type SubscriptionParams = {
   plan: "basic" | "premium";
@@ -59,6 +61,8 @@ const getCardBrand = (number: string) => {
   if (/^5[1-5]/.test(cleaned)) return "mastercard";
   if (/^3[47]/.test(cleaned)) return "amex";
   if (/^6(?:011|5)/.test(cleaned)) return "discover";
+  if (/^(36|38|30[0-5])/.test(cleaned)) return "diners";
+  if (/^35/.test(cleaned)) return "jcb";
   return "generic";
 };
 
@@ -73,10 +77,10 @@ export default function Payment() {
   const [cvv, setCvv] = useState("");
   const [nameOnCard, setNameOnCard] = useState("");
   const [showCvv, setShowCvv] = useState(false);
-  const [cardBrand, setCardBrand] = useState<
-    "visa" | "mastercard" | "amex" | "discover" | "generic"
-  >("generic");
   const [isCardValid, setIsCardValid] = useState(true);
+  const [cardBrand, setCardBrand] = useState<
+    "visa" | "mastercard" | "amex" | "discover" | "diners" | "jcb" | "generic"
+  >("generic");
 
   const isValidPlan = plan === "basic" || plan === "premium";
   const isValidFrequency =
@@ -207,6 +211,10 @@ export default function Payment() {
                   {cardBrand === "discover" && (
                     <DiscoverCC className="w-full h-full" />
                   )}
+                  {cardBrand === "diners" && (
+                    <DinersCC className="w-full h-full" />
+                  )}
+                  {cardBrand === "jcb" && <JCBCC className="w-full h-full" />}
                   {cardBrand === "generic" && (
                     <GenericCardCC className="w-full h-full" />
                   )}
