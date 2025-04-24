@@ -28,8 +28,11 @@ export default function Payment() {
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [isSubscribing, setIsSubscribing] = useState(false);
+  const [cardNumber, setCardNumber] = useState("");
+  const [expiryDate, setExpiryDate] = useState("");
+  const [cvv, setCvv] = useState("");
+  const [nameOnCard, setNameOnCard] = useState("");
 
   const isValidPlan = plan === "basic" || plan === "premium";
   const isValidFrequency =
@@ -46,11 +49,24 @@ export default function Payment() {
     return () => unsubscribe();
   }, [navigate]);
 
+  const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const input = e.target.value.replace(/\D/g, "");
+    const formatted = input.slice(0, 16).replace(/(\d{4})(?=\d)/g, "$1-");
+    setCardNumber(formatted);
+  };
+
+  const handleExpiryDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const input = e.target.value.replace(/\D/g, "");
+    let formatted = input.slice(0, 4);
+    if (input.length >= 2) {
+      formatted = `${input.slice(0, 2)}/${input.slice(2, 4)}`;
+    }
+    setExpiryDate(formatted);
+  };
+
   const pay = async () => {
     try {
       setIsSubscribing(true);
-      setError(null);
-
       const createCheckoutSession = httpsCallable(
         functions,
         "createCheckoutSession"
@@ -99,7 +115,6 @@ export default function Payment() {
         <div className="w-full max-w-[500px] mt-12 px-[30px]">
           <h1 className="font-semibold text-start mb-8">ORDER SUMMARY</h1>
 
-          {/* Plan Details */}
           <div className="flex justify-between items-start">
             <div>
               <h2 className="font-bold capitalize">{plan} Plan</h2>
@@ -121,15 +136,20 @@ export default function Payment() {
           </h1>
 
           <div className="space-y-[40px] mb-[30px] text-xl font-dosis">
-            <label>Card number</label>
-            <div className="h-17 mt-1">
-              <input
-                id="cardNumber"
-                type="text"
-                placeholder="XXXX-XXXX-XXXX-XXXX"
-                className="bg-custom-bg-light leading-[32px] w-full h-full font-medium placeholder-custom-text-grey appearance-none px-5 py-2 border border-custom-stroke-grey rounded-lg shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                maxLength={16}
-              />{" "}
+            <div>
+              <label>Card number</label>
+              <div className="h-17 mt-1">
+                <input
+                  id="cardNumber"
+                  type="text"
+                  placeholder="XXXX-XXXX-XXXX-XXXX"
+                  className="bg-custom-bg-light leading-[32px] w-full h-full font-medium placeholder-custom-text-grey appearance-none px-5 py-2 border border-custom-stroke-grey rounded-lg shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  value={cardNumber}
+                  onChange={handleCardNumberChange}
+                  maxLength={19}
+                  inputMode="numeric"
+                />
+              </div>
             </div>
 
             <div className="grid grid-cols-2 gap-10">
@@ -141,7 +161,10 @@ export default function Payment() {
                     type="text"
                     placeholder="MM/YY"
                     className="bg-custom-bg-light leading-[32px] w-full h-full font-medium placeholder-custom-text-grey appearance-none px-5 py-2 border border-custom-stroke-grey rounded-lg shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    value={expiryDate}
+                    onChange={handleExpiryDateChange}
                     maxLength={5}
+                    inputMode="numeric"
                   />
                 </div>
               </div>
@@ -153,18 +176,25 @@ export default function Payment() {
                     placeholder="XXX"
                     className="bg-custom-bg-light leading-[32px] w-full h-full font-medium placeholder-custom-text-grey appearance-none px-5 py-2 border border-custom-stroke-grey rounded-lg shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                     maxLength={3}
+                    value={cvv}
+                    onChange={(e) => setCvv(e.target.value)}
+                    inputMode="numeric"
                   />
                 </div>
               </div>
             </div>
 
-            <label>Name on card</label>
-            <div className="h-17 mt-1">
-              <input
-                id="nameOnCard"
-                type="text"
-                className="bg-custom-bg-light leading-[32px] w-full h-full font-medium placeholder-custom-text-grey appearance-none px-5 py-2 border border-custom-stroke-grey rounded-lg shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-              />
+            <div>
+              <label>Name on card</label>
+              <div className="h-17 mt-1">
+                <input
+                  id="nameOnCard"
+                  type="text"
+                  className="bg-custom-bg-light leading-[32px] w-full h-full font-medium placeholder-custom-text-grey appearance-none px-5 py-2 border border-custom-stroke-grey rounded-lg shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  value={nameOnCard}
+                  onChange={(e) => setNameOnCard(e.target.value)}
+                />
+              </div>
             </div>
           </div>
 
