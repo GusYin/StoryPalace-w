@@ -220,7 +220,7 @@ export default function Payment() {
                   className={`bg-custom-bg-light leading-[32px] w-full h-full font-medium placeholder-custom-text-grey appearance-none px-5 py-2 border ${
                     isCardValid
                       ? "border-custom-stroke-grey"
-                      : "border-[#ef4444]"
+                      : "border-custom-error"
                   } rounded-lg shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors`}
                   value={cardNumber}
                   onChange={handleCardNumberChange}
