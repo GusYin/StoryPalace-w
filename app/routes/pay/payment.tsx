@@ -32,6 +32,62 @@ const PRICE_MAP = {
   },
 };
 
+type CardBrand =
+  | "visa"
+  | "mastercard"
+  | "amex"
+  | "discover"
+  | "diners"
+  | "jcb"
+  | "generic";
+
+interface CardValidationResult {
+  isValid: boolean;
+  brand: CardBrand;
+  error?: string;
+  isPotentiallyValid: boolean;
+}
+
+export function validateCreditCard(cardNumber: string): CardValidationResult {
+  const cleaned = cardNumber.replace(/[-\s]/g, "");
+  const brand = getCardBrand(cleaned);
+
+  // Basic length check
+  const validLengths: Record<CardBrand, number[]> = {
+    visa: [13, 16, 19],
+    mastercard: [16],
+    amex: [15],
+    discover: [16],
+    diners: [14, 15, 16, 18, 19],
+    jcb: [15, 16],
+    generic: [13, 14, 15, 16, 18, 19], // Fallback lengths
+  };
+
+  if (!validLengths[brand].includes(cleaned.length)) {
+    return {
+      isValid: false,
+      brand,
+      error: `Invalid length for ${brand} card`,
+      isPotentiallyValid: cleaned.length < Math.max(...validLengths[brand]),
+    };
+  }
+
+  if (!luhnCheck(cleaned)) {
+    return {
+      isValid: false,
+      brand,
+      error: "Invalid card number (Luhn check failed)",
+      isPotentiallyValid: false,
+    };
+  }
+
+  return {
+    isValid: true,
+    brand,
+    isPotentiallyValid: true,
+  };
+}
+
 const luhnCheck = (cardNumber: string): boolean => {
   const cleaned = cardNumber.replace(/\D/g, "");
   let sum = 0;
@@ -106,9 +162,7 @@ export default function Payment() {
   const [isExpiryValid, setIsExpiryValid] = useState(true);
   const [isCvvValid, setIsCvvValid] = useState(true);
   const [isNameValid, setIsNameValid] = useState(true);
-  const [cardBrand, setCardBrand] = useState<
-    "visa" | "mastercard" | "amex" | "discover" | "diners" | "jcb" | "generic"
-  >("generic");
+  const [cardBrand, setCardBrand] = useState<CardBrand>("generic");
 
   const isValidPlan = plan === "basic" || plan === "premium";
   const isValidFrequency =
@@ -160,14 +214,12 @@ export default function Payment() {
   const pay = async () => {
     try {
       // Validate all fields first
-      const cleanedCardNumber = cardNumber.replace(/-/g, "");
-      const isCardValid =
-        cleanedCardNumber.length === 16 && luhnCheck(cleanedCardNumber);
+      const isCardValid = validateCreditCard(cardNumber.replace(/-/g, ""));
       const isExpiryValid = validateExpiryDate(expiryDate);
       const isCvvValid = validateCVV(cvv, cardBrand);
       const isNameValid = validateName(nameOnCard);
 
-      setIsCardValid(isCardValid);
+      setIsCardValid(isCardValid.isValid);
       setIsExpiryValid(isExpiryValid);
       setIsCvvValid(isCvvValid);
       setIsNameValid(isNameValid);
@@ -313,7 +365,7 @@ export default function Payment() {
                     type={showCvv ? "text" : "password"}
                     placeholder="XXX"
                     className={`bg-custom-bg-light leading-[32px] w-full h-full font-medium placeholder-custom-text-grey appearance-none px-5 py-2 border ${
-                      isNameValid
+                      isCvvValid
                         ? "border-custom-stroke-grey"
                         : "border-custom-error"
                     } rounded-lg shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors`}
