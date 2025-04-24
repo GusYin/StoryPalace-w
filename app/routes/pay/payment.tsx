@@ -121,7 +121,7 @@ export default function Payment() {
 
       if (cleanedCardNumber.length !== 16 || !luhnCheck(cleanedCardNumber)) {
         setIsCardValid(false);
-        toast.error("❌ Invalid credit card number");
+        toast.error("Invalid credit card number");
         return;
       }
 
@@ -140,7 +140,7 @@ export default function Payment() {
       window.location.href = `https://checkout.stripe.com/pay/${sessionId}`;
     } catch (error) {
       console.error("Subscription error:", error);
-      toast.error("❌ Subscription failed. Please try again.");
+      toast.error("Subscription failed. Please try again.");
     } finally {
       setIsSubscribing(false);
     }
