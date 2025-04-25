@@ -22,6 +22,10 @@ type Params = {
     "plan": string;
     "monthlyOrYearly": string;
   };
+  "/payment-figma/:plan/:monthlyOrYearly": {
+    "plan": string;
+    "monthlyOrYearly": string;
+  };
   "/payment/:plan/:monthlyOrYearly": {
     "plan": string;
     "monthlyOrYearly": string;
