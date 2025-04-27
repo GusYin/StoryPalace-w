@@ -108,7 +108,7 @@ export const stripeWebhook = functions.https.onRequest(
           endpointSecret
         );
       } catch (err: any) {
-        console.log(`⚠️ Webhook signature verification failed.`, err.message);
+        console.log("⚠️ Webhook signature verification failed.", err.message);
         response
           .status(400)
           .send(`⚠️ Webhook signature verification failed: ${err.message}`);
@@ -124,6 +124,10 @@ export const stripeWebhook = functions.https.onRequest(
           {
             const subscription = event.data.object as Stripe.Subscription;
             const subscriptionStatus = subscription.status;
+
+            functions.logger.log(
+              `User Stripe subcription changed to ${subscriptionStatus}`
+            );
           }
           break;
         case "customer.subscription.deleted":

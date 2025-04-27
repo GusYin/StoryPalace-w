@@ -25,10 +25,11 @@ module.exports = {
   rules: {
     quotes: ["error", "double"],
     "import/no-unresolved": 0,
-    indent: ["error", 2],
     "object-curly-spacing": "off",
     "require-jsdoc": "off",
     "max-len": "off",
     "quote-props": "off",
+    indent: "off",
+    "operator-linebreak": "off",
   },
 };

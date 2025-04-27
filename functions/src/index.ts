@@ -13,3 +13,4 @@ initializeApp();
 export * from "./voice-clone";
 export * from "./story";
 export * from "./user";
+export * from "./pay";
