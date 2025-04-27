@@ -1,11 +1,13 @@
-import { CheckoutProvider, PaymentElement } from "@stripe/react-stripe-js";
+import {
+  EmbeddedCheckout,
+  EmbeddedCheckoutProvider,
+} from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import { httpsCallable } from "firebase/functions";
 import { functions } from "~/firebase/firebase";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { toast, ToastContainer } from "react-toastify";
-import ButtonWithLoading from "~/components/button-with-loading";
 import AuthHeader from "~/components/header-auth";
 import FullScreenLoadingSpinnerTeal from "~/components/loading-spinner-teal";
 
@@ -14,13 +16,9 @@ type SubscriptionParams = {
   monthlyOrYearly: "monthly" | "yearly";
 };
 
-interface PaymentIntentResponse {
-  clientSecret: string;
-}
-
 const PRICE_MAP = {
   basic: {
-    monthly: 19.99,
+    monthly: 9.99,
     yearly: 59.88,
   },
   premium: {
@@ -36,18 +34,6 @@ const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 export default function Payment() {
   const { plan, monthlyOrYearly } = useParams<SubscriptionParams>();
   const [loading, setLoading] = useState(true);
-  const [isSubscribing, setIsSubscribing] = useState(false);
-
-  const pay = async () => {
-    setIsSubscribing(true);
-    try {
-      // Add your payment logic here
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsSubscribing(false);
-    }
-  };
 
   const isValidPlan = plan === "basic" || plan === "premium";
   const isValidFrequency =
@@ -56,11 +42,11 @@ export default function Payment() {
 
   const fetchClientSecret = async (): Promise<string> => {
     try {
-      const createPaymentIntent = httpsCallable(
+      const createCheckoutSession = httpsCallable(
         functions,
-        "createPaymentIntent"
+        "createCheckoutSession"
       );
-      const result = await createPaymentIntent({
+      const result = await createCheckoutSession({
         planId: `${plan}_${monthlyOrYearly}`,
       });
 
@@ -112,7 +98,7 @@ export default function Payment() {
           </div>
         </div>
         <FullScreenLoadingSpinnerTeal loading={loading} />
-        <CheckoutProvider
+        <EmbeddedCheckoutProvider
           stripe={stripePromise}
           options={{ fetchClientSecret }}
         >
@@ -121,19 +107,10 @@ export default function Payment() {
               CARD INFORMATION
             </h1>
             <div className="space-y-[40px] mb-[30px] text-xl font-dosis">
-              <form>
-                <PaymentElement />
-                <ButtonWithLoading
-                  isLoading={isSubscribing}
-                  onClick={pay}
-                  className="w-full bg-custom-teal text-white py-4 rounded-4xl hover:bg-[#056955] transition-colors"
-                >
-                  Pay
-                </ButtonWithLoading>
-              </form>
+              <EmbeddedCheckout />
             </div>
           </div>
-        </CheckoutProvider>
+        </EmbeddedCheckoutProvider>
       </main>
     </div>
   );

@@ -5,6 +5,11 @@ import { isUserAuthenticatedAndEmailVerified } from "./util";
 
 export interface UserData {
   plan: string;
+  billingCycle?: "monthly" | "yearly";
+  stripeProductId?: string;
+  stripeSubscriptionId?: string;
+  stripeSubscriptionStatus?: string;
+  stripeCustomerId?: string;
   trialEndDate?: admin.firestore.Timestamp;
   email: string;
   displayName: string;
@@ -120,52 +125,3 @@ export const getUserPlan = functionsV2.https.onCall(
     return await getUserPlanDocument(request.auth?.uid);
   }
 );
-
-// functions/src/index.ts
-export const upgradePlan = functionsV2.https.onCall(async (request) => {
-  if (!request.auth || !request.auth.token.email_verified) {
-    throw new functionsV2.https.HttpsError(
-      "unauthenticated",
-      "Authentication required"
-    );
-  }
-
-  const { plan } = request.data;
-  if (!["basic", "premium"].includes(plan)) {
-    throw new functionsV2.https.HttpsError("invalid-argument", "Invalid plan");
-  }
-
-  // Add payment verification logic here
-  const paymentValid = await verifyPayment(request.auth.uid, plan);
-
-  if (!paymentValid) {
-    throw new functionsV2.https.HttpsError(
-      "permission-denied",
-      "Payment verification failed"
-    );
-  }
-
-  const sevenDayFromNow = admin.firestore.Timestamp.fromDate(
-    new Date(Date.now() + 7 * 86400000)
-  );
-
-  await admin
-    .firestore()
-    .collection("users")
-    .doc(request.auth.uid)
-    .update({
-      plan,
-      trialEndDate: plan === "basic" ? sevenDayFromNow : null,
-    });
-
-  return { status: "success", newPlan: plan };
-});
-
-async function verifyPayment(uid: string, plan: string): Promise<boolean> {
-  // Simulate payment verification logic
-  // In a real-world scenario, this would involve calling a payment gateway API
-  console.log(`Verifying payment for user ${uid} and plan ${plan}`);
-
-  // For demonstration purposes, assume payment is always valid
-  return true;
-}
