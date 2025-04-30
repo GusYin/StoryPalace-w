@@ -2,15 +2,16 @@ import Stripe from "stripe";
 import * as functions from "firebase-functions/v2";
 import * as admin from "firebase-admin";
 import { isUserAuthenticatedAndEmailVerified } from "./util";
-import { defineString } from "firebase-functions/params";
 
-const STRIPE_API_SECRET_KEY = defineString("STRIPE_API_SECRET_KEY");
-const STRIPE_CHECKOUT_RETURN_URL = defineString("STRIPE_CHECKOUT_RETURN_URL");
+const stripeSecret = process.env.STRIPE_API_SECRET_KEY!;
+const stripeWebhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
+const checkoutReturnUrl = process.env.STRIPE_CHECKOUT_RETURN_URL!;
 
-export const stripe = new Stripe(STRIPE_API_SECRET_KEY.value(), {
-  typescript: true,
-  apiVersion: "2025-03-31.basil" as any,
-});
+const createStripeClient = () =>
+  new Stripe(stripeSecret, {
+    typescript: true,
+    apiVersion: "2025-03-31.basil" as any,
+  });
 
 type SubscriptionPlan =
   | "basic_monthly"
@@ -61,6 +62,8 @@ export const createCheckoutSession = functions.https.onCall(async (request) => {
   }
 
   try {
+    const stripe = createStripeClient();
+
     // Create Stripe Checkout Session
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
@@ -72,7 +75,7 @@ export const createCheckoutSession = functions.https.onCall(async (request) => {
       ],
       ui_mode: "embedded",
       client_reference_id: request.auth?.uid,
-      return_url: `${STRIPE_CHECKOUT_RETURN_URL.value()}?session_id={CHECKOUT_SESSION_ID}`,
+      return_url: `${checkoutReturnUrl}?session_id={CHECKOUT_SESSION_ID}`,
     });
 
     // Return client secret to the client
@@ -94,7 +97,9 @@ export const createCheckoutSession = functions.https.onCall(async (request) => {
 export const stripeWebhook = functions.https.onRequest(
   async (request, response) => {
     let event: Stripe.Event = request.body;
-    const endpointSecret = functions.config().stripe.webhook_secret;
+    const endpointSecret = stripeWebhookSecret;
+
+    const stripe = createStripeClient();
 
     // Only verify the event if you have an endpoint secret defined.
     // Otherwise use the basic event deserialized with JSON.parse
