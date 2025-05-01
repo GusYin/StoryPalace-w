@@ -67,6 +67,7 @@ export const createCheckoutSession = functions.https.onCall(async (request) => {
 
     // Create Stripe Checkout Session
     const session = await stripe.checkout.sessions.create({
+      customer_email: request.auth?.token.email,
       mode: "subscription",
       line_items: [
         {
