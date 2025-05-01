@@ -6,7 +6,7 @@ import { loadStripe } from "@stripe/stripe-js";
 import { httpsCallable } from "firebase/functions";
 import { functions } from "~/firebase/firebase";
 import { useState } from "react";
-import { useNavigate, useParams } from "react-router";
+import { useParams } from "react-router";
 import { toast, ToastContainer } from "react-toastify";
 import AuthHeader from "~/components/header-auth";
 import FullScreenLoadingSpinnerTeal from "~/components/loading-spinner-teal";
@@ -79,24 +79,6 @@ export default function Payment() {
       />
 
       <main className="font-dosis text-xl text-black flex flex-col items-center justify-center">
-        <div className="w-full max-w-[500px] mt-12 px-[30px]">
-          <h1 className="font-semibold text-start mb-8">ORDER SUMMARY</h1>
-
-          <div className="flex justify-between items-start">
-            <div>
-              <h2 className="font-bold capitalize">{plan} Plan</h2>
-              <p className="leading-[32px] font-light">
-                {monthlyOrYearly === "yearly"
-                  ? "Yearly Subscription"
-                  : "Monthly Subscription"}
-              </p>
-            </div>
-            <div>
-              <h2 className="invisible font-bold capitalize">d</h2>
-              <span className="leading-[32px] font-light">${price}</span>
-            </div>
-          </div>
-        </div>
         <FullScreenLoadingSpinnerTeal loading={loading} />
         <EmbeddedCheckoutProvider
           stripe={stripePromise}
@@ -104,7 +86,7 @@ export default function Payment() {
         >
           <div className="relative rounded-2xl bg-container-grey w-full max-w-[500px] mt-12 mb-12 p-[30px]">
             <h1 className="font-semibold text-start mb-[30px]">
-              CARD INFORMATION
+              ORDER SUMMARY
             </h1>
             <div className="space-y-[40px] mb-[30px] text-xl font-dosis">
               <EmbeddedCheckout />

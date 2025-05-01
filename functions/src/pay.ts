@@ -2,6 +2,7 @@ import Stripe from "stripe";
 import * as functions from "firebase-functions/v2";
 import * as admin from "firebase-admin";
 import { isUserAuthenticatedAndEmailVerified } from "./util";
+import { HttpsError } from "firebase-functions/https";
 
 const stripeSecret = process.env.STRIPE_API_SECRET_KEY!;
 const stripeWebhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
@@ -93,6 +94,67 @@ export const createCheckoutSession = functions.https.onCall(async (request) => {
     throw new functions.https.HttpsError("internal", errorMessage);
   }
 });
+
+interface SessionStatusResponse {
+  status: string | null;
+  paymentStatus: string;
+  planDetails: {
+    plan: PlanType;
+    billingCycle: BillingCycle;
+  };
+  customerEmail: string | null;
+}
+
+export const getCheckoutSessionStatus = functions.https.onCall(
+  async (request): Promise<SessionStatusResponse> => {
+    await isUserAuthenticatedAndEmailVerified(request);
+
+    // Validate input
+    if (!request.data.sessionId) {
+      throw new HttpsError("invalid-argument", "Missing session ID");
+    }
+
+    try {
+      const stripe = createStripeClient();
+
+      // Retrieve Checkout Session
+      const session = await stripe.checkout.sessions.retrieve(
+        request.data.sessionId
+      );
+
+      // Retrieve customer details
+      const customer = await stripe.customers.retrieve(
+        session.customer as string
+      );
+
+      const lineItems = await stripe.checkout.sessions.listLineItems(
+        session.id,
+        {
+          expand: ["data.price"],
+        }
+      );
+
+      const price = lineItems.data[0].price as Stripe.Price;
+      const priceId = price.id;
+      const planDetails = PRICE_ID_MAP_REVERSE[priceId];
+
+      return {
+        status: session.status,
+        paymentStatus: session.payment_status,
+        planDetails: planDetails,
+        customerEmail: !("deleted" in customer) ? customer.email : null,
+      };
+    } catch (error) {
+      functions.logger.error("Session status fetch failed:", error);
+
+      throw new HttpsError(
+        "internal",
+        "Failed to retrieve session status",
+        error instanceof Error ? error.message : "Unknown error"
+      );
+    }
+  }
+);
 
 export const stripeWebhook = functions.https.onRequest(
   async (request, response) => {
