@@ -283,9 +283,6 @@ export default function PricingPage() {
             <div className="flex flex-col h-full text-black font-dosis bg-container-grey py-8 px-5 rounded-xl">
               <div className="flex items-center justify-between mb-15">
                 <h2 className="text-xl font-bold">Basic</h2>
-                <span className="bg-black text-white text-lg font-semibold px-3 py-1 rounded-full">
-                  Try the 7 days Free Trial
-                </span>
               </div>
 
               {/* Content wrapper with flex-grow */}
@@ -382,8 +379,8 @@ export default function PricingPage() {
               <div className="flex flex-col h-full text-black font-dosis bg-container-grey py-8 px-5 rounded-xl">
                 <div className="flex items-center justify-between mb-15">
                   <h2 className="text-xl font-bold">Premium</h2>
-                  <span className="bg-black text-white text-lg font-semibold px-3 py-1 rounded-full">
-                    Custom Voices
+                  <span className="bg-black text-white text-normal font-semibold px-3 py-1 rounded-full">
+                    Try the 7 days Free Trail
                   </span>
                 </div>
 
