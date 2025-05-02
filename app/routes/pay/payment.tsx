@@ -38,7 +38,6 @@ export default function Payment() {
   const isValidPlan = plan === "basic" || plan === "premium";
   const isValidFrequency =
     monthlyOrYearly === "monthly" || monthlyOrYearly === "yearly";
-  const price = plan && monthlyOrYearly ? PRICE_MAP[plan][monthlyOrYearly] : 0;
 
   const fetchClientSecret = async (): Promise<string> => {
     try {
