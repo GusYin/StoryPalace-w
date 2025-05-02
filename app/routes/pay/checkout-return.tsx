@@ -19,9 +19,8 @@ interface SessionStatus {
   };
 }
 
-export const CheckoutReturnPage = () => {
+export default function CheckoutReturnPage() {
   const navigate = useNavigate();
-
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [session, setSession] = useState<SessionStatus | null>(null);
@@ -151,4 +150,4 @@ export const CheckoutReturnPage = () => {
       </main>
     </div>
   );
-};
+}

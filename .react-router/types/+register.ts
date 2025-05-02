@@ -22,7 +22,7 @@ type Params = {
     "plan": string;
     "monthlyOrYearly": string;
   };
-  "/checkout-return": {};
+  "/checkout/return": {};
   "/payment/:plan/:monthlyOrYearly": {
     "plan": string;
     "monthlyOrYearly": string;
