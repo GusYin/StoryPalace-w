@@ -6,10 +6,9 @@ import { loadStripe } from "@stripe/stripe-js";
 import { httpsCallable } from "firebase/functions";
 import { functions } from "~/firebase/firebase";
 import { useState } from "react";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { toast, ToastContainer } from "react-toastify";
 import AuthHeader from "~/components/header-auth";
-import FullScreenLoadingSpinnerTeal from "~/components/loading-spinner-teal";
 
 type SubscriptionParams = {
   plan: "basic" | "premium";
@@ -32,6 +31,7 @@ const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
 // Update your main component export
 export default function Payment() {
+  const navigate = useNavigate();
   const { plan, monthlyOrYearly } = useParams<SubscriptionParams>();
   const [loading, setLoading] = useState(true);
 
@@ -79,20 +79,42 @@ export default function Payment() {
       />
 
       <main className="font-dosis text-xl text-black flex flex-col items-center justify-center">
-        <FullScreenLoadingSpinnerTeal loading={loading} />
-        <EmbeddedCheckoutProvider
-          stripe={stripePromise}
-          options={{ fetchClientSecret }}
-        >
-          <div className="relative rounded-2xl bg-container-grey w-full max-w-[500px] mt-12 mb-12 p-[30px]">
-            <h1 className="font-semibold text-start mb-[30px]">
-              ORDER SUMMARY
-            </h1>
-            <div className="space-y-[40px] mb-[30px] text-xl font-dosis">
-              <EmbeddedCheckout />
-            </div>
-          </div>
-        </EmbeddedCheckoutProvider>
+        <div className="flex flex-col items-center justify-center mt-12">
+          {isValidPlan && isValidFrequency ? (
+            <EmbeddedCheckoutProvider
+              stripe={stripePromise}
+              options={{ fetchClientSecret }}
+            >
+              <div className="relative rounded-2xl bg-container-grey w-full mb-12 p-[30px]">
+                <h1 className="font-semibold text-center mb-[30px]">
+                  ORDER SUMMARY
+                </h1>
+                <div className="space-y-[40px] mb-[30px] text-xl font-dosis">
+                  <EmbeddedCheckout />
+                </div>
+              </div>
+            </EmbeddedCheckoutProvider>
+          ) : (
+            <>
+              <h1 className="text-2xl font-semibold mb-4">
+                Invalid Plan or Frequency
+              </h1>
+              <div className="relative rounded-2xl w-full max-w-[500px] mb-12 p-[30px]">
+                <p className="">
+                  Invalid plan or frequency please check your selection.
+                </p>
+                <button
+                  onClick={() => {
+                    navigate("/pricing");
+                  }}
+                  className="mt-4 w-full bg-custom-teal text-white py-4 rounded-4xl hover:bg-[#056955] transition-colors font-normal"
+                >
+                  Select a Plan
+                </button>
+              </div>
+            </>
+          )}
+        </div>
       </main>
     </div>
   );
