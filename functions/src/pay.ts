@@ -191,8 +191,15 @@ export const stripeWebhook = functions.https.onRequest(
           }
           break;
         case "customer.subscription.deleted":
-          break;
+          {
+            const subscription = event.data.object as Stripe.Subscription;
+            const subscriptionStatus = subscription.status;
 
+            functions.logger.log(
+              `User Stripe subcription changed to ${subscriptionStatus}`
+            );
+          }
+          break;
         case "checkout.session.completed":
           {
             const session = event.data.object as Stripe.Checkout.Session;
