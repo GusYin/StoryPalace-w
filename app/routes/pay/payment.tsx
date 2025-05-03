@@ -15,17 +15,6 @@ type SubscriptionParams = {
   monthlyOrYearly: "monthly" | "yearly";
 };
 
-const PRICE_MAP = {
-  basic: {
-    monthly: 9.99,
-    yearly: 59.88,
-  },
-  premium: {
-    monthly: 29.99,
-    yearly: 155.88,
-  },
-};
-
 // Add Stripe initialization
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
