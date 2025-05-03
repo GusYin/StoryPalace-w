@@ -153,6 +153,106 @@ export default function PricingPage() {
         return;
       }
 
+      // Check if user is upgrading from monthly to yearly
+      if (
+        userPlan?.plan === PricingPlan.Basic &&
+        userPlan?.billingCycle === "monthly" &&
+        monthlyOrYearly === "yearly"
+      ) {
+        toast.warn(
+          <div className="flex flex-col gap-y-4 p-4">
+            <div className="flex items-start gap-3">
+              <div className="flex flex-col gap-2">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Confirm Plan Change
+                </h3>
+                <p className="text-gray-700">
+                  Upgrading to Basic yearly plan will cancel your monthly plan
+                  immediately. Funds paid for the Basic monthly plan cannot be
+                  refunded.
+                </p>
+                <p className="text-gray-700">
+                  Your Basic yearl plan will start immediately after payment.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-3 w-auto mt-2">
+              <button
+                onClick={() =>
+                  navigate(`/order-summary/basic/${monthlyOrYearly}`)
+                }
+                className="cursor-pointer p-2 bg-custom-teal text-white rounded-4xl hover:bg-custom-teal-dark transition-colors font-medium whitespace-nowrap w-full text-center"
+              >
+                Confirm Upgrade
+              </button>
+              <button
+                onClick={() => toast.dismiss()}
+                className="cursor-pointer p-2 bg-[#F3F5F5] text-black rounded-4xl hover:bg-gray-200 transition-colors font-medium whitespace-nowrap w-full text-center"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>,
+          {
+            autoClose: false,
+            closeOnClick: false,
+            className: "",
+          }
+        );
+        return;
+      }
+
+      // Check if user is downgrading from yearly to monthly
+      if (
+        userPlan?.plan === PricingPlan.Basic &&
+        userPlan?.billingCycle === "yearly" &&
+        monthlyOrYearly === "monthly"
+      ) {
+        toast.warn(
+          <div className="flex flex-col gap-y-4 p-4">
+            <div className="flex items-start gap-3">
+              <div className="flex flex-col gap-2">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Confirm Plan Change
+                </h3>
+                <p className="text-gray-700">
+                  Downgrading to Basic monthly plan will cancel your yearly plan
+                  immediately. Funds paid for the Basic yearly plan cannot be
+                  refunded.
+                </p>
+                <p className="text-gray-700">
+                  Your Basic monthly plan will start immediately after payment.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-3 w-auto mt-2">
+              <button
+                onClick={() =>
+                  navigate(`/order-summary/basic/${monthlyOrYearly}`)
+                }
+                className="cursor-pointer p-2 bg-custom-teal text-white rounded-4xl hover:bg-custom-teal-dark transition-colors font-medium whitespace-nowrap w-full text-center"
+              >
+                Confirm Downgrade
+              </button>
+              <button
+                onClick={() => toast.dismiss()}
+                className="cursor-pointer p-2 bg-[#F3F5F5] text-black rounded-4xl hover:bg-gray-200 transition-colors font-medium whitespace-nowrap w-full text-center"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>,
+          {
+            autoClose: false,
+            closeOnClick: false,
+            className: "",
+          }
+        );
+        return;
+      }
+
       if (userPlan?.plan === PricingPlan.Premium) {
         // Show confirmation toast for downgrade
         toast.warn(
@@ -163,12 +263,12 @@ export default function PricingPage() {
                   Confirm Plan Change
                 </h3>
                 <p className="text-gray-700">
-                  Downgrading to Basic will cancel your Premium plan. Note that
-                  funds paid for the Premium plan cannot be refunded.
+                  Downgrading to Basic plan will cancel your Premium plan
+                  immediately. Funds paid for the Premium plan cannot be
+                  refunded.
                 </p>
                 <p className="text-gray-700">
-                  Your Basic plan will start after the current Premium plan
-                  payment cycle ends.
+                  Your Basic plan will start immediately after payment.
                 </p>
               </div>
             </div>
@@ -225,6 +325,107 @@ export default function PricingPage() {
       ) {
         toast.info(
           `You are already subscribed to the Premium ${monthlyOrYearly} plan.`
+        );
+        return;
+      }
+
+      // Check if user is upgrading from monthly to yearly
+      if (
+        userPlan?.plan === PricingPlan.Premium &&
+        userPlan?.billingCycle === "monthly" &&
+        monthlyOrYearly === "yearly"
+      ) {
+        toast.warn(
+          <div className="flex flex-col gap-y-4 p-4">
+            <div className="flex items-start gap-3">
+              <div className="flex flex-col gap-2">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Confirm Plan Change
+                </h3>
+                <p className="text-gray-700">
+                  Upgrading to Premium yearly plan will cancel your monthly plan
+                  immediately. Funds paid for the Premium monthly plan cannot be
+                  refunded.
+                </p>
+                <p className="text-gray-700">
+                  Your Premium yearl plan will start immediately after payment.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-3 w-auto mt-2">
+              <button
+                onClick={() =>
+                  navigate(`/order-summary/Premium/${monthlyOrYearly}`)
+                }
+                className="cursor-pointer p-2 bg-custom-teal text-white rounded-4xl hover:bg-custom-teal-dark transition-colors font-medium whitespace-nowrap w-full text-center"
+              >
+                Confirm Upgrade
+              </button>
+              <button
+                onClick={() => toast.dismiss()}
+                className="cursor-pointer p-2 bg-[#F3F5F5] text-black rounded-4xl hover:bg-gray-200 transition-colors font-medium whitespace-nowrap w-full text-center"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>,
+          {
+            autoClose: false,
+            closeOnClick: false,
+            className: "",
+          }
+        );
+        return;
+      }
+
+      // Check if user is downgrading from yearly to monthly
+      if (
+        userPlan?.plan === PricingPlan.Premium &&
+        userPlan?.billingCycle === "yearly" &&
+        monthlyOrYearly === "monthly"
+      ) {
+        toast.warn(
+          <div className="flex flex-col gap-y-4 p-4">
+            <div className="flex items-start gap-3">
+              <div className="flex flex-col gap-2">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Confirm Plan Change
+                </h3>
+                <p className="text-gray-700">
+                  Downgrading to Premium monthly plan will cancel your yearly
+                  plan immediately. Funds paid for the Premium yearly plan
+                  cannot be refunded.
+                </p>
+                <p className="text-gray-700">
+                  Your Premium monthly plan will start immediately after
+                  payment.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-3 w-auto mt-2">
+              <button
+                onClick={() =>
+                  navigate(`/order-summary/Premium/${monthlyOrYearly}`)
+                }
+                className="cursor-pointer p-2 bg-custom-teal text-white rounded-4xl hover:bg-custom-teal-dark transition-colors font-medium whitespace-nowrap w-full text-center"
+              >
+                Confirm Downgrade
+              </button>
+              <button
+                onClick={() => toast.dismiss()}
+                className="cursor-pointer p-2 bg-[#F3F5F5] text-black rounded-4xl hover:bg-gray-200 transition-colors font-medium whitespace-nowrap w-full text-center"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>,
+          {
+            autoClose: false,
+            closeOnClick: false,
+            className: "",
+          }
         );
         return;
       }
