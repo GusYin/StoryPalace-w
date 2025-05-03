@@ -226,8 +226,25 @@ export const stripeWebhook = functions.https.onRequest(
             const subscription = event.data.object as Stripe.Subscription;
             const subscriptionStatus = subscription.status;
 
+            // Get user ID from subscription metadata
+            const userId = subscription.metadata.client_reference_id;
+
+            if (!userId) {
+              functions.logger.error(
+                "No user ID found in subscription metadata"
+              );
+              break;
+            }
+
+            const userRef = admin.firestore().collection("users").doc(userId);
+
+            await userRef.update({
+              stripeSubscriptionStatus: subscriptionStatus,
+              trialEndDate: admin.firestore.FieldValue.delete(),
+            });
+
             functions.logger.log(
-              `User Stripe subcription changed to ${subscriptionStatus}`
+              `Marked subscription as ${subscriptionStatus} for user ${userId}`
             );
           }
           break;
@@ -269,6 +286,12 @@ export const stripeWebhook = functions.https.onRequest(
               const subscription = await stripe.subscriptions.retrieve(
                 stripeSubscriptionId
               );
+
+              await stripe.subscriptions.update(stripeSubscriptionId, {
+                metadata: {
+                  client_reference_id: userId,
+                },
+              });
 
               // Map Stripe price IDs to your plan names and billing cycles
               const planDetails = PRICE_ID_MAP_REVERSE[priceId];
