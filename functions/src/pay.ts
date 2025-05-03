@@ -24,10 +24,10 @@ type BillingCycle = "monthly" | "yearly";
 type PlanType = "basic" | "premium";
 
 const PRICE_ID_MAP = {
-  basic_monthly: "price_1RHw4hH1JUbZrwFEal7Dj7kf",
-  basic_yearly: "price_1RIEmHH1JUbZrwFEHmQcRouF",
-  premium_monthly: "price_1RIFAHH1JUbZrwFESMAm5RGV",
-  premium_yearly: "price_1RIFAHH1JUbZrwFErT9Uw6Cf",
+  basic_monthly: process.env.STRIPE_BASIC_MONTHLY_PRICE_ID!,
+  basic_yearly: process.env.STRIPE_BASIC_YEARLY_PRICE_ID!,
+  premium_monthly: process.env.STRIPE_PREMIUM_MONTHLY_PRICE_ID!,
+  premium_yearly: process.env.STRIPE_PREMIUM_YEARLY_PRICE_ID!,
 } as const satisfies Record<SubscriptionPlan, string>;
 
 const PRICE_ID_MAP_REVERSE: {
