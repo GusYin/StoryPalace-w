@@ -64,12 +64,12 @@ export const createCheckoutSession = functions.https.onCall(async (request) => {
 
   try {
     const stripe = createStripeClient();
-
-    // Check existing subscription
     const userId = request.auth?.uid as string;
     const userRef = admin.firestore().collection("users").doc(userId);
     const userDoc = await userRef.get();
 
+    // Check if user already signed up for the
+    // the same stripe subscription and same price id
     if (userDoc.exists) {
       const userData = userDoc.data();
       const currentPriceId = PRICE_ID_MAP[planId];
@@ -96,9 +96,11 @@ export const createCheckoutSession = functions.https.onCall(async (request) => {
         }
       }
     }
+
     // Create Stripe Checkout Session
     const session = await stripe.checkout.sessions.create({
       customer_email: request.auth?.token.email,
+      customer_creation: "if_required",
       mode: "subscription",
       line_items: [
         {
@@ -210,14 +212,12 @@ export const stripeWebhook = functions.https.onRequest(
     try {
       // Handle the event
       switch (event.type) {
-        case "customer.subscription.created":
-        case "customer.subscription.updated":
+        case "invoice.payment_failed":
           {
-            const subscription = event.data.object as Stripe.Subscription;
-            const subscriptionStatus = subscription.status;
+            const invoice = event.data.object as Stripe.Invoice;
 
             functions.logger.log(
-              `User Stripe subcription changed to ${subscriptionStatus}`
+              `Payment failed for user ${invoice.customer_name} with invoice ID ${invoice.id}`
             );
           }
           break;
