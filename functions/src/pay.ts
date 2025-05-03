@@ -66,7 +66,7 @@ export const createCheckoutSession = functions.https.onCall(async (request) => {
     const stripe = createStripeClient();
 
     // Check existing subscription
-    const userId = request.auth?.uid!;
+    const userId = request.auth?.uid as string;
     const userRef = admin.firestore().collection("users").doc(userId);
     const userDoc = await userRef.get();
 
@@ -88,9 +88,10 @@ export const createCheckoutSession = functions.https.onCall(async (request) => {
         );
 
         if (hasActiveSubscription && hasSamePrice) {
+          const planDetails = PRICE_ID_MAP_REVERSE[currentPriceId];
           throw new functions.https.HttpsError(
             "already-exists",
-            "User has already subscribed to this plan"
+            `User has already subscribed to this plan: ${planDetails.plan} with billing cycle ${planDetails.billingCycle}`
           );
         }
       }

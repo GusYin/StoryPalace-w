@@ -54,6 +54,17 @@ export default function Payment() {
       return clientSecret;
     } catch (error) {
       console.error("Error create checkout session:", error);
+
+      if (
+        error instanceof Error &&
+        error.message.includes("User has already subscribed")
+      ) {
+        toast.error(
+          "You've already subscribed to this plan. Please try subscribing to a different plan."
+        );
+        return "";
+      }
+
       toast.error("Failed to create checkout session. Please try again.");
       return "";
     } finally {
