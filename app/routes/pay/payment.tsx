@@ -53,8 +53,8 @@ export default function Payment() {
 
       return clientSecret;
     } catch (error) {
-      console.error("Error fetching client secret:", error);
-      toast.error("Failed to fetch payment details. Please try again.");
+      console.error("Error create checkout session:", error);
+      toast.error("Failed to create checkout session. Please try again.");
       return "";
     } finally {
       setLoading(false);

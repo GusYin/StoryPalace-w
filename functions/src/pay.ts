@@ -65,6 +65,36 @@ export const createCheckoutSession = functions.https.onCall(async (request) => {
   try {
     const stripe = createStripeClient();
 
+    // Check existing subscription
+    const userId = request.auth?.uid!;
+    const userRef = admin.firestore().collection("users").doc(userId);
+    const userDoc = await userRef.get();
+
+    if (userDoc.exists) {
+      const userData = userDoc.data();
+      const currentPriceId = PRICE_ID_MAP[planId];
+
+      // Check if user already has this price ID in their active subscriptions
+      if (userData?.stripeSubscriptionId) {
+        const subscription = await stripe.subscriptions.retrieve(
+          userData.stripeSubscriptionId
+        );
+
+        const hasActiveSubscription = ["active", "trialing"].includes(
+          subscription.status
+        );
+        const hasSamePrice = subscription.items.data.some(
+          (item) => item.price.id === currentPriceId
+        );
+
+        if (hasActiveSubscription && hasSamePrice) {
+          throw new functions.https.HttpsError(
+            "already-exists",
+            "User has already subscribed to this plan"
+          );
+        }
+      }
+    }
     // Create Stripe Checkout Session
     const session = await stripe.checkout.sessions.create({
       customer_email: request.auth?.token.email,
