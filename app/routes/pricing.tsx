@@ -31,7 +31,11 @@ export default function PricingPage() {
     try {
       const getUserPlan = httpsCallable<
         {},
-        { plan: "free" | "basic" | "premium"; trialEndDate?: string }
+        {
+          plan: "free" | "basic" | "premium";
+          billingCycle?: "monthly" | "yearly";
+          trialEndDate?: string;
+        }
       >(functions, "getUserPlan");
 
       const result = await getUserPlan({});
@@ -138,9 +142,14 @@ export default function PricingPage() {
 
       const userPlan = await fetchUserPlan();
 
-      if (userPlan?.plan === PricingPlan.Basic) {
+      if (
+        userPlan?.plan === PricingPlan.Basic &&
+        userPlan?.billingCycle === monthlyOrYearly
+      ) {
         // User already has a Basic plan
-        toast.info("You are already subscribed to the Basic plan.");
+        toast.info(
+          `You are already subscribed to the Basic ${monthlyOrYearly} plan.`
+        );
         return;
       }
 
@@ -210,8 +219,13 @@ export default function PricingPage() {
 
       const userPlan = await fetchUserPlan();
 
-      if (userPlan?.plan === PricingPlan.Premium) {
-        toast.info("You are already subscribed to the Premium plan.");
+      if (
+        userPlan?.plan === PricingPlan.Premium &&
+        userPlan?.billingCycle === monthlyOrYearly
+      ) {
+        toast.info(
+          `You are already subscribed to the Premium ${monthlyOrYearly} plan.`
+        );
         return;
       }
 

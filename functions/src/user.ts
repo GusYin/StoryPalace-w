@@ -89,6 +89,7 @@ export const onUserDelete = functionsV1.auth.user().onDelete(async (user) => {
 
 interface PlanResponse {
   plan: string;
+  billingCycle?: "monthly" | "yearly";
   trialEndDate?: admin.firestore.Timestamp;
 }
 
@@ -107,6 +108,7 @@ export const getUserPlanDocument = async (uid?: string) => {
     const userData = userDoc.data() as UserData;
     return {
       plan: userData.plan,
+      billingCycle: userData.billingCycle,
       trialEndDate: userData.trialEndDate,
     };
   } catch (error) {
