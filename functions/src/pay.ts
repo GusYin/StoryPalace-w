@@ -118,7 +118,7 @@ export const createCheckoutSession = functions.https.onCall(async (request) => {
     // even it is the same user paying for a different subscription.
     const session = await stripe.checkout.sessions.create({
       customer: stripeCustomerId, // Use existing customer
-      //customer_email: userEmail,
+      // customer_email: userEmail,
       mode: "subscription",
       line_items: [
         {
@@ -230,44 +230,41 @@ export const stripeWebhook = functions.https.onRequest(
     try {
       // Handle the event
       switch (event.type) {
-        case "invoice.payment_failed":
-          {
-            const invoice = event.data.object as Stripe.Invoice;
-
-            functions.logger.log(
-              `Payment failed for user ${invoice.customer_name} with invoice ID ${invoice.id}`
-            );
-          }
-          break;
         case "customer.subscription.deleted":
           {
             const subscription = event.data.object as Stripe.Subscription;
             const subscriptionStatus = subscription.status;
             const customerId = subscription.customer as string;
 
-            // Get Firebase UID from customer metadata
+            // Try to get the Firebase UID from metadata, if not found,
+            // use the client_reference_id from the subscription
             const customer = await stripe.customers.retrieve(customerId);
-
-            // Try to get the Firebase UID from metadata
-            // If not found, use the client_reference_id from the subscription
             const userId = !("deleted" in customer)
               ? customer.metadata.firebaseUID
               : subscription.metadata.client_reference_id;
 
             if (!userId) {
               functions.logger.error(
-                "No Firebase user ID found in Stripe customer metadata"
+                "No Firebase UID in Stripe customer metadata",
+                {
+                  subscriptionId: subscription.id,
+                  customerId,
+                }
               );
               break;
             }
 
             await admin.firestore().collection("users").doc(userId).update({
+              plan: "free",
+              billingCycle: admin.firestore.FieldValue.delete(),
+              stripeProductId: admin.firestore.FieldValue.delete(),
+              stripeSubscriptionId: admin.firestore.FieldValue.delete(),
               stripeSubscriptionStatus: subscriptionStatus,
               trialEndDate: admin.firestore.FieldValue.delete(),
             });
 
             functions.logger.log(
-              `Marked subscription as ${subscriptionStatus} for user ${userId}`
+              `Downgraded user ${userId} to free plan due to subscription ${subscriptionStatus}`
             );
           }
           break;
@@ -348,6 +345,57 @@ export const stripeWebhook = functions.https.onRequest(
               response.status(500).send("Error processing subscription");
               return;
             }
+          }
+          break;
+
+        // Handle failed subscription occuring payment
+        case "customer.subscription.updated":
+          {
+            const subscription = event.data.object as Stripe.Subscription;
+            const subscriptionStatus = subscription.status;
+            const customerId = subscription.customer as string;
+
+            // Try to get the Firebase UID from metadata, if not found,
+            // use the client_reference_id from the subscription
+            const customer = await stripe.customers.retrieve(customerId);
+            const userId = !("deleted" in customer)
+              ? customer.metadata.firebaseUID
+              : subscription.metadata.client_reference_id;
+
+            if (!userId) {
+              functions.logger.error(
+                "No Firebase UID in Stripe customer metadata",
+                {
+                  subscriptionId: subscription.id,
+                  customerId,
+                }
+              );
+              break;
+            }
+
+            if (
+              subscriptionStatus === "canceled" ||
+              subscriptionStatus === "unpaid"
+            ) {
+              // Handle subscription cancellation or unpaid status
+              const userRef = admin.firestore().collection("users").doc(userId);
+              await userRef.update({
+                plan: "free",
+                billingCycle: admin.firestore.FieldValue.delete(),
+                stripeProductId: admin.firestore.FieldValue.delete(),
+                stripeSubscriptionId: admin.firestore.FieldValue.delete(),
+                stripeSubscriptionStatus: subscriptionStatus,
+                trialEndDate: admin.firestore.FieldValue.delete(),
+              });
+
+              functions.logger.log(
+                `Downgraded user ${userId} to free plan due to subscription ${subscriptionStatus}`
+              );
+            }
+
+            functions.logger.log(
+              `Subscription change to ${subscription.status} for user ${userId}`
+            );
           }
           break;
 

@@ -4,7 +4,7 @@ import * as functionsV1 from "firebase-functions/v1";
 import { isUserAuthenticatedAndEmailVerified } from "./util";
 
 export interface UserData {
-  plan: string;
+  plan: "free" | "basic" | "premium";
   billingCycle?: "monthly" | "yearly";
   stripeProductId?: string;
   stripeSubscriptionId?: string;
