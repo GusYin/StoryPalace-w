@@ -65,6 +65,7 @@ export const createCheckoutSession = functions.https.onCall(async (request) => {
   try {
     const stripe = createStripeClient();
     const userId = request.auth?.uid as string;
+    const userEmail = request.auth?.token.email;
     const userRef = admin.firestore().collection("users").doc(userId);
     const userDoc = await userRef.get();
 
@@ -97,10 +98,27 @@ export const createCheckoutSession = functions.https.onCall(async (request) => {
       }
     }
 
-    // Create Stripe Checkout Session
+    let stripeCustomerId = userDoc.data()?.stripeCustomerId;
+
+    // Create new customer if doesn't exist
+    if (!stripeCustomerId) {
+      const customer = await stripe.customers.create({
+        email: userEmail,
+        metadata: { firebaseUID: userId }, // Store Firebase UID in Stripe
+      });
+      stripeCustomerId = customer.id;
+
+      // Save Stripe customer ID to Firestore
+      await userRef.set({ stripeCustomerId }, { merge: true });
+    }
+
+    // If not provided with an existing Stripe customer ID,
+    // creating a new Stripe checkout seesion with "subscription"
+    // mode will create a new customer every single time,
+    // even it is the same user paying for a different subscription.
     const session = await stripe.checkout.sessions.create({
-      customer_email: request.auth?.token.email,
-      customer_creation: "if_required",
+      customer: stripeCustomerId, // Use existing customer
+      //customer_email: userEmail,
       mode: "subscription",
       line_items: [
         {
@@ -109,7 +127,7 @@ export const createCheckoutSession = functions.https.onCall(async (request) => {
         },
       ],
       ui_mode: "embedded",
-      client_reference_id: request.auth?.uid,
+      client_reference_id: userId,
       return_url: `${checkoutReturnUrl}?session_id={CHECKOUT_SESSION_ID}`,
     });
 
@@ -225,20 +243,25 @@ export const stripeWebhook = functions.https.onRequest(
           {
             const subscription = event.data.object as Stripe.Subscription;
             const subscriptionStatus = subscription.status;
+            const customerId = subscription.customer as string;
 
-            // Get user ID from subscription metadata
-            const userId = subscription.metadata.client_reference_id;
+            // Get Firebase UID from customer metadata
+            const customer = await stripe.customers.retrieve(customerId);
+
+            // Try to get the Firebase UID from metadata
+            // If not found, use the client_reference_id from the subscription
+            const userId = !("deleted" in customer)
+              ? customer.metadata.firebaseUID
+              : subscription.metadata.client_reference_id;
 
             if (!userId) {
               functions.logger.error(
-                "No user ID found in subscription metadata"
+                "No Firebase user ID found in Stripe customer metadata"
               );
               break;
             }
 
-            const userRef = admin.firestore().collection("users").doc(userId);
-
-            await userRef.update({
+            await admin.firestore().collection("users").doc(userId).update({
               stripeSubscriptionStatus: subscriptionStatus,
               trialEndDate: admin.firestore.FieldValue.delete(),
             });
