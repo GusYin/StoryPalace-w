@@ -100,6 +100,11 @@ export const createCheckoutSession = functions.https.onCall(async (request) => {
 
     let stripeCustomerId = userDoc.data()?.stripeCustomerId;
 
+    stripeCustomerId &&
+      functions.logger.log(
+        `User ${userId} has an existing Stripe customer ID: ${stripeCustomerId}`
+      );
+
     // Create new customer if doesn't exist
     if (!stripeCustomerId) {
       const customer = await stripe.customers.create({
@@ -110,6 +115,10 @@ export const createCheckoutSession = functions.https.onCall(async (request) => {
 
       // Save Stripe customer ID to Firestore
       await userRef.set({ stripeCustomerId }, { merge: true });
+
+      functions.logger.log(
+        `Created new Stripe customer for user ${userId}: ${stripeCustomerId}`
+      );
     }
 
     // If not provided with an existing Stripe customer ID,
@@ -118,7 +127,6 @@ export const createCheckoutSession = functions.https.onCall(async (request) => {
     // even it is the same user paying for a different subscription.
     const session = await stripe.checkout.sessions.create({
       customer: stripeCustomerId, // Use existing customer
-      // customer_email: userEmail,
       mode: "subscription",
       line_items: [
         {
