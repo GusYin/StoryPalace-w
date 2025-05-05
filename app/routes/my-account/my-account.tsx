@@ -240,7 +240,7 @@ const MyAccount: React.FC = () => {
               YOUR PLAN
             </h3>
             <span className="capitalize-plan text-black font-bold text-4xl">
-              Story Palace {userPlan?.plan}
+              Story Palace {userPlan?.plan} {userPlan?.billingCycle}
             </span>
           </div>
           {userPlan?.plan === PricingPlan.Premium ? (
