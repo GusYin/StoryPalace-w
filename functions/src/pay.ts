@@ -69,6 +69,7 @@ export const createCheckoutSession = functions.https.onCall(async (request) => {
     const userRef = admin.firestore().collection("users").doc(userId);
     const userDoc = await userRef.get();
 
+    // Double subscription prevention check
     // Check if user already signed up for the
     // the same stripe subscription and same price id
     if (userDoc.exists) {
@@ -381,17 +382,15 @@ export const stripeWebhook = functions.https.onRequest(
               break;
             }
 
-            if (
-              subscriptionStatus === "canceled" ||
-              subscriptionStatus === "unpaid"
-            ) {
+            // https://dashboard.stripe.com/settings/billing/automatic
+            // https://docs.stripe.com/billing/subscriptions/overview#failed-payments
+            // when all retries are exhausted, the subscription will be set to "unpaid"
+            if (subscriptionStatus === "unpaid") {
               // Handle subscription cancellation or unpaid status
               const userRef = admin.firestore().collection("users").doc(userId);
               await userRef.update({
                 plan: "free",
                 billingCycle: admin.firestore.FieldValue.delete(),
-                stripeProductId: admin.firestore.FieldValue.delete(),
-                stripeSubscriptionId: admin.firestore.FieldValue.delete(),
                 stripeSubscriptionStatus: subscriptionStatus,
                 trialEndDate: admin.firestore.FieldValue.delete(),
               });
