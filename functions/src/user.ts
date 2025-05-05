@@ -10,6 +10,7 @@ export interface UserData {
   stripeSubscriptionId?: string;
   stripeSubscriptionStatus?: string;
   stripeCustomerId?: string;
+  stripeSubscriptionUnpaidSince?: admin.firestore.Timestamp;
   trialEndDate?: admin.firestore.Timestamp;
   email: string;
   displayName: string;

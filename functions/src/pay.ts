@@ -392,6 +392,7 @@ export const stripeWebhook = functions.https.onRequest(
                 plan: "free",
                 billingCycle: admin.firestore.FieldValue.delete(),
                 stripeSubscriptionStatus: subscriptionStatus,
+                stripeSubscriptionUnpaidSince: admin.firestore.Timestamp.now(),
                 trialEndDate: admin.firestore.FieldValue.delete(),
               });
 

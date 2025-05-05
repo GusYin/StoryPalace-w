@@ -9,18 +9,19 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import AuthHeader from "~/components/header-auth";
 import Footer from "~/components/footer";
-import { auth, logout } from "~/firebase/firebase";
+import { auth, logout, functions } from "~/firebase/firebase";
 import { PricingPlan } from "~/lib/constant";
 import { httpsCallable } from "firebase/functions";
-import { functions } from "~/firebase/firebase";
 import ButtonWithLoading from "~/components/button-with-loading";
 import { toast, ToastContainer } from "react-toastify";
+import { Timestamp } from "firebase/firestore";
 
 interface UserPlanResponse {
   plan: "free" | "basic" | "premium";
   billingCycle?: "monthly" | "yearly";
   stripeSubscriptionStatus?: string;
-  trialEndDate?: any;
+  stripeSubscriptionUnpaidSince?: Timestamp;
+  trialEndDate?: Timestamp;
 }
 
 const MyAccount: React.FC = () => {
@@ -31,7 +32,6 @@ const MyAccount: React.FC = () => {
   const [newPassword, setNewPassword] = React.useState("");
   const [showChangePassword, setShowChangePassword] = React.useState(false);
   const [userPlan, setUserPlan] = useState<UserPlanResponse | null>(null);
-  const [trialEndDate, setTrialEndDate] = useState<Date | null>(null);
   const [isDeletingAccount, setIsDeletingAccount] = useState<boolean>(false);
   const [deleteAccountInlineError, setDeleteAccountInlineError] =
     React.useState("");
@@ -65,10 +65,6 @@ const MyAccount: React.FC = () => {
         const result = await getUserPlan({});
 
         setUserPlan(result.data);
-
-        if (result.data.trialEndDate) {
-          setTrialEndDate(new Date(result.data.trialEndDate));
-        }
       } catch (error) {
         console.error("Error fetching user data:", error);
         toast.error("Failed to load account information. Please try again.");
