@@ -195,8 +195,10 @@ const MyAccount: React.FC = () => {
             const unpaidSinceTime = unpaidSinceDate.getTime();
             const currentTime = Date.now();
             const oneWeekInMs = 7 * 24 * 60 * 60 * 1000;
-            const isOverOneWeek = currentTime - unpaidSinceTime >= oneWeekInMs;
-            return isOverOneWeek ? (
+            const isWithinOneWeek =
+              currentTime - unpaidSinceTime <= oneWeekInMs;
+
+            return isWithinOneWeek ? (
               <div className="bg-red-50 border-l-4 border-red-400 mb-8 p-5 rounded-xl shadow-xs">
                 <div className="flex">
                   <div className="flex-shrink-0">
