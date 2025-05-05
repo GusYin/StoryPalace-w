@@ -16,6 +16,13 @@ import { functions } from "~/firebase/firebase";
 import ButtonWithLoading from "~/components/button-with-loading";
 import { toast, ToastContainer } from "react-toastify";
 
+interface UserPlanResponse {
+  plan: "free" | "basic" | "premium";
+  billingCycle?: "monthly" | "yearly";
+  stripeSubscriptionStatus?: string;
+  trialEndDate?: any;
+}
+
 const MyAccount: React.FC = () => {
   const navigate = useNavigate();
   const [editingName, setEditingName] = React.useState(false);
@@ -23,7 +30,7 @@ const MyAccount: React.FC = () => {
   const [currentPassword, setCurrentPassword] = React.useState("");
   const [newPassword, setNewPassword] = React.useState("");
   const [showChangePassword, setShowChangePassword] = React.useState(false);
-  const [userPlan, setUserPlan] = useState<string | null>(null);
+  const [userPlan, setUserPlan] = useState<UserPlanResponse | null>(null);
   const [trialEndDate, setTrialEndDate] = useState<Date | null>(null);
   const [isDeletingAccount, setIsDeletingAccount] = useState<boolean>(false);
   const [deleteAccountInlineError, setDeleteAccountInlineError] =
@@ -50,22 +57,21 @@ const MyAccount: React.FC = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const getUserPlan = httpsCallable<
-          {},
-          { plan: "free" | "basic" | "premium"; trialEndDate?: string }
-        >(functions, "getUserPlan");
+        const getUserPlan = httpsCallable<{}, UserPlanResponse>(
+          functions,
+          "getUserPlan"
+        );
 
         const result = await getUserPlan({});
 
-        setUserPlan(result.data.plan);
+        setUserPlan(result.data);
 
         if (result.data.trialEndDate) {
           setTrialEndDate(new Date(result.data.trialEndDate));
         }
       } catch (error) {
         console.error("Error fetching user data:", error);
-        toast.error("Failed to load account information");
-        setUserPlan("free");
+        toast.error("Failed to load account information. Please try again.");
       }
     };
 
@@ -184,6 +190,49 @@ const MyAccount: React.FC = () => {
           </h2>
         </div>
 
+        {/* unpaid callout Section */}
+        {userPlan?.stripeSubscriptionStatus === "unpaid" && (
+          <div className="bg-red-50 border-l-4 border-red-400 mb-8 p-5 rounded-xl shadow-xs">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <svg
+                  className="h-5 w-5 text-red-400"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <h1 className="font-medium text-red-800">
+                  Subscription Cancelled
+                </h1>
+                <div className="mt-2 text-sm text-red-700">
+                  <p>
+                    Your subscription has been cancelled due to failed payments.
+                    You've been downgraded to the free plan. To regain premium
+                    access, please update your payment method and resubscribe.
+                  </p>
+                </div>
+                <div className="mt-4">
+                  <div className="-mx-2 -my-1.5 flex">
+                    <button
+                      onClick={() => navigate("/pricing")}
+                      className="cursor-pointer underline bg-red-50 px-2 py-1.5 rounded-md text-sm font-medium text-red-800 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-red-50 focus:ring-red-600 transition-colors"
+                    >
+                      Resubscribe Now
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Plan Section */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-[#F3F7F6] p-5 rounded-xl shadow-xs">
           <div className="mb-4 sm:mb-0">
@@ -191,20 +240,22 @@ const MyAccount: React.FC = () => {
               YOUR PLAN
             </h3>
             <span className="capitalize-plan text-black font-bold text-4xl">
-              Story Palace {userPlan}
+              Story Palace {userPlan?.plan}
             </span>
           </div>
-          {userPlan === PricingPlan.Premium ? (
+          {userPlan?.plan === PricingPlan.Premium ? (
             <button className="w-full sm:w-auto md:w-80 bg-gray-600 text-white px-3 py-3 rounded-3xl hover:bg-gray-700 transition-colors">
               Manage Plan
             </button>
           ) : (
-            <button
-              onClick={() => navigate("/upgrade")}
-              className="text-xl w-full sm:w-auto md:w-80 bg-custom-teal text-white px-3 py-3 rounded-3xl hover:bg-blue-600 transition-colors"
-            >
-              Upgrade Plan
-            </button>
+            <></>
+
+            // <button
+            //   onClick={() => navigate("/upgrade")}
+            //   className="text-xl w-full sm:w-auto md:w-80 bg-custom-teal text-white px-3 py-3 rounded-3xl hover:bg-blue-600 transition-colors"
+            // >
+            //   Upgrade Plan
+            // </button>
           )}
         </div>
 

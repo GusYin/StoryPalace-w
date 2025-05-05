@@ -109,6 +109,7 @@ export const getUserPlanDocument = async (uid?: string) => {
     return {
       plan: userData.plan,
       billingCycle: userData.billingCycle,
+      stripeSubscriptionStatus: userData.stripeSubscriptionStatus,
       trialEndDate: userData.trialEndDate,
     };
   } catch (error) {
