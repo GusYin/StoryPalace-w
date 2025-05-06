@@ -14,6 +14,7 @@ export default [
   route("reset-password", "routes/reset-password.tsx"),
   route("pricing", "routes/pricing.tsx"),
   layout("components/protected-route.tsx", [
+    route("admin-story-upload", "routes/admin/admin-story-upload.tsx"),
     route("auth-redirect", "routes/auth-redirect.tsx"),
     route("my-account", "routes/my-account/my-account.tsx"),
     route(

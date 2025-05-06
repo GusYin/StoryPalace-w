@@ -14,6 +14,7 @@ type Params = {
   "/verify-email": {};
   "/reset-password": {};
   "/pricing": {};
+  "/admin-story-upload": {};
   "/auth-redirect": {};
   "/my-account": {};
   "/order-summary/:plan/:monthlyOrYearly": {
