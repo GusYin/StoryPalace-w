@@ -175,146 +175,146 @@ export default function AdminStoryUpload() {
   );
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md">
-      <h1 className="text-2xl font-bold mb-6">Upload New Story</h1>
+    <div className="min-h-screen bg-white">
+      <div className="font-dosis w-full mx-auto space-y-8 mt-14 mb-14 px-4 sm:px-6 lg:px-20">
+        <h1 className="text-center text-xl font-bold mb-6">Upload New Story</h1>
 
-      <form action={formAction} className="space-y-6">
-        {/* Story Metadata */}
-        <div className="bg-gray-50 p-4 rounded-lg">
-          <h2 className="text-lg font-semibold mb-4">Story Metadata</h2>
+        <form action={formAction} className="space-y-6">
+          {/* Story Metadata */}
+          <div className="bg-[#F3F7F6] p-4 rounded-lg">
+            <h2 className="text-lg font-semibold mb-4">Story Metadata</h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Title*
-              </label>
-              <input
-                name="story.title"
-                required
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Episode Series*
-              </label>
-              <input
-                name="story.episodeSeries"
-                required
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              />
-            </div>
-
-            {/* Add other story fields... */}
-          </div>
-        </div>
-
-        {/* Episodes */}
-        <div className="bg-gray-50 p-4 rounded-lg">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold">Episodes</h2>
-            <button
-              type="button"
-              onClick={handleAddEpisode}
-              className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
-            >
-              Add Episode
-            </button>
-          </div>
-
-          {episodeIds.map((id, index) => (
-            <div key={id} className="mb-6 border-b pb-6">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="font-medium">
-                  Episode {id.replace("episode-", "")}
-                </h3>
-                <button
-                  type="button"
-                  onClick={() =>
-                    setEpisodeIds((prev) => prev.filter((_, i) => i !== index))
-                  }
-                  className="text-red-500 hover:text-red-700"
-                >
-                  Remove
-                </button>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-custom-text-grey">Title*</label>
+                <input
+                  name="story.title"
+                  required
+                  className="bg-white px-3 py-3 mt-1 block w-full rounded-md border border-[#829793] shadow-sm"
+                />
               </div>
 
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Episode Title*
-                  </label>
-                  <input
-                    name={`episodes[${index}].title`}
-                    required
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                  />
+              <div>
+                <label className="block text-custom-text-grey">
+                  Episode Series*
+                </label>
+                <input
+                  name="story.episodeSeries"
+                  required
+                  className="bg-white px-3 py-3 mt-1 block w-full rounded-md border border-[#829793] shadow-sm"
+                />
+              </div>
+
+              {/* Add other story fields... */}
+            </div>
+          </div>
+
+          {/* Episodes */}
+          <div className="bg-[#F3F7F6] p-4 rounded-lg">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-semibold">Episodes</h2>
+              <button
+                type="button"
+                onClick={handleAddEpisode}
+                className="cursor-pointer w-auto bg-custom-teal text-white px-6 py-3 rounded-3xl hover:bg-blue-600 transition-colors"
+              >
+                Add Episode
+              </button>
+            </div>
+
+            {episodeIds.map((id, index) => (
+              <div key={id} className="mb-6 border-b pb-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="font-medium">
+                    Episode {id.replace("episode-", "")}
+                  </h3>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setEpisodeIds((prev) =>
+                        prev.filter((_, i) => i !== index)
+                      )
+                    }
+                    className="cursor-pointer border border-[#829793] px-3 py-3 rounded-3xl w-auto bg-white text-black hover:text-blue-600 transition-colors"
+                  >
+                    Remove
+                  </button>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Content*
-                  </label>
-                  <textarea
-                    name={`episodes[${index}].content`}
-                    required
-                    rows={4}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                  />
-                </div>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-custom-text-grey">
+                      Episode Title*
+                    </label>
+                    <input
+                      name={`episodes[${index}].title`}
+                      required
+                      className="bg-white px-3 py-3 mt-1 block w-full rounded-md border border-[#829793] shadow-sm"
+                    />
+                  </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Audio Files*
-                  </label>
-                  <input
-                    type="file"
-                    multiple
-                    name={`episodes[${index}].audioFiles`}
-                    required
-                    className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                  />
+                  <div>
+                    <label className="block text-custom-text-grey">
+                      Content*
+                    </label>
+                    <textarea
+                      name={`episodes[${index}].content`}
+                      required
+                      rows={4}
+                      className="bg-white px-3 py-3 mt-1 block w-full rounded-md border border-[#829793] shadow-sm"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-custom-text-grey">
+                      Audio Files*
+                    </label>
+                    <input
+                      type="file"
+                      multiple
+                      name={`episodes[${index}].audioFiles`}
+                      required
+                      className="cursor-pointer mt-1 block w-full file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-custom-teal file:text-white hover:file:bg-custom-bg-lighter-dark"
+                    />
+                  </div>
                 </div>
               </div>
+            ))}
+          </div>
+
+          {/* Cover Image */}
+          <div className="bg-[#F3F7F6] p-4 rounded-lg">
+            <label className="block text-custom-text-grey">Cover Image*</label>
+            <input
+              type="file"
+              name="coverImage"
+              accept="image/*"
+              required
+              className="cursor-pointer mt-1 block w-full file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-custom-teal file:text-white hover:file:bg-custom-bg-lighter-dark"
+            />
+          </div>
+
+          {/* Status Feedback */}
+          {state.error && (
+            <div className="text-red-500 p-4 rounded-lg bg-red-50">
+              {state.error}
             </div>
-          ))}
-        </div>
+          )}
+          {state.success && (
+            <div className="text-green-500 p-4 rounded-lg bg-green-50">
+              Story uploaded successfully!
+            </div>
+          )}
 
-        {/* Cover Image */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Cover Image*
-          </label>
-          <input
-            type="file"
-            name="coverImage"
-            accept="image/*"
-            required
-            className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-          />
-        </div>
-
-        {/* Status Feedback */}
-        {state.error && (
-          <div className="text-red-500 p-4 rounded-lg bg-red-50">
-            {state.error}
-          </div>
-        )}
-        {state.success && (
-          <div className="text-green-500 p-4 rounded-lg bg-green-50">
-            Story uploaded successfully!
-          </div>
-        )}
-
-        <button
-          type="submit"
-          disabled={isPending}
-          className="w-full bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
-        >
-          {isPending ? `Uploading... ${progress}%` : "Upload Story"}
-        </button>
-      </form>
+          <button
+            type="submit"
+            disabled={isPending}
+            className="cursor-pointer w-auto bg-custom-teal text-white px-6 py-3 rounded-3xl hover:bg-blue-600 transition-colors"
+          >
+            {isPending ? `Uploading... ${progress}%` : "Upload Story"}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }
