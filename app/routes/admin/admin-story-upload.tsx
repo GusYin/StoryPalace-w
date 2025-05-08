@@ -8,11 +8,35 @@ type FormState = {
   success: boolean;
 };
 
+const PlusIcon = ({ className }: { className?: string }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    strokeWidth={1.5}
+    stroke="currentColor"
+    className={className}
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M12 4.5v15m7.5-7.5h-15"
+    />
+  </svg>
+);
+
 export default function AdminStoryUpload() {
   const [episodeIds, setEpisodeIds] = useState<string[]>([]);
   const [nextEpisodeNumber, setNextEpisodeNumber] = useState(1);
   const [progress, setProgress] = useState(0);
   const storage = getStorage();
+  const [categories, setCategories] = useState([
+    "adventure",
+    "fantasy",
+    "nature",
+    "friendship",
+  ]);
+  const [newCategory, setNewCategory] = useState("");
 
   const handleAddEpisode = () => {
     if (nextEpisodeNumber > 999) {
@@ -251,23 +275,67 @@ export default function AdminStoryUpload() {
                 <label className="block text-custom-text-grey mb-2">
                   Categories
                 </label>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                  {["adventure", "fantasy", "nature", "friendship"].map(
-                    (category) => (
-                      <label
-                        key={category}
-                        className="flex items-center space-x-2"
-                      >
-                        <input
-                          type="checkbox"
-                          name="story.categories"
-                          value={category}
-                          className="rounded border-[#829793] text-custom-teal focus:ring-custom-teal"
-                        />
-                        <span className="capitalize">{category}</span>
-                      </label>
-                    )
-                  )}
+                <div className="flex flex-wrap gap-2 items-center">
+                  {/* Existing Categories */}
+                  {categories.map((category) => (
+                    <label
+                      key={category}
+                      className="relative has-[:checked]:bg-custom-teal has-[:checked]:text-white transition-colors rounded-full border border-[#829793] bg-white cursor-pointer"
+                    >
+                      <input
+                        type="checkbox"
+                        name="story.categories"
+                        value={category}
+                        className="sr-only"
+                      />
+                      <span className="px-4 py-2 block text-sm capitalize">
+                        {category}
+                      </span>
+                    </label>
+                  ))}
+
+                  {/* New Category Input */}
+                  <div className="relative group">
+                    <input
+                      type="text"
+                      value={newCategory}
+                      onChange={(e) =>
+                        setNewCategory(e.target.value.toLowerCase())
+                      }
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && newCategory.trim()) {
+                          e.preventDefault();
+                          if (!categories.includes(newCategory.trim())) {
+                            setCategories((prev) => [
+                              ...prev,
+                              newCategory.trim(),
+                            ]);
+                          }
+                          setNewCategory("");
+                        }
+                      }}
+                      placeholder="Add new..."
+                      className="px-4 py-2 text-sm bg-transparent border-b-2 border-[#829793] focus:outline-none focus:border-custom-teal w-32"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (
+                          newCategory.trim() &&
+                          !categories.includes(newCategory.trim())
+                        ) {
+                          setCategories((prev) => [
+                            ...prev,
+                            newCategory.trim(),
+                          ]);
+                          setNewCategory("");
+                        }
+                      }}
+                      className="absolute right-0 top-1/2 -translate-y-1/2 text-[#829793] group-hover:text-custom-teal transition-colors"
+                    >
+                      <PlusIcon className="w-5 h-5" />
+                    </button>
+                  </div>
                 </div>
               </div>
 
