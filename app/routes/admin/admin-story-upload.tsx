@@ -42,7 +42,7 @@ export default function AdminStoryUpload() {
           title: formData.get("story.title"),
           description: formData.get("story.description"),
           episodeSeries: formData.get("story.episodeSeries"),
-          language: formData.get("story.language") || "en-US",
+          language: formData.get("story.language") || "en-NZ",
           recommendedAge: formData.get("story.recommendedAge"),
           categories: formData
             .getAll("story.categories")
@@ -181,6 +181,7 @@ export default function AdminStoryUpload() {
 
         <form action={formAction} className="space-y-6">
           {/* Story Metadata */}
+          {/* Story Metadata */}
           <div className="bg-[#F3F7F6] p-4 rounded-lg">
             <h2 className="text-lg font-semibold mb-4">Story Metadata</h2>
 
@@ -200,12 +201,89 @@ export default function AdminStoryUpload() {
                 </label>
                 <input
                   name="story.episodeSeries"
+                  placeholder="e.g., 2+ yr | 7 episodes"
                   required
                   className="bg-white px-3 py-3 mt-1 block w-full rounded-md border border-[#829793] shadow-sm"
                 />
               </div>
 
-              {/* Add other story fields... */}
+              {/* Description */}
+              <div className="md:col-span-2">
+                <label className="block text-custom-text-grey">
+                  Description*
+                </label>
+                <textarea
+                  name="story.description"
+                  required
+                  rows={3}
+                  className="bg-white px-3 py-3 mt-1 block w-full rounded-md border border-[#829793] shadow-sm"
+                />
+              </div>
+
+              {/* Language */}
+              <div>
+                <label className="block text-custom-text-grey">Language*</label>
+                <select
+                  name="story.language"
+                  defaultValue="en-US"
+                  className="bg-white px-3 py-3 mt-1 block w-full rounded-md border border-[#829793] shadow-sm"
+                >
+                  <option value="en-US">English</option>
+                  <option value="fr-FR">French</option>
+                </select>
+              </div>
+
+              {/* Recommended Age */}
+              <div>
+                <label className="block text-custom-text-grey">
+                  Recommended Age
+                </label>
+                <input
+                  name="story.recommendedAge"
+                  type="text"
+                  placeholder="e.g., 5-12"
+                  className="bg-white px-3 py-3 mt-1 block w-full rounded-md border border-[#829793] shadow-sm"
+                />
+              </div>
+
+              {/* Categories */}
+              <div className="md:col-span-2">
+                <label className="block text-custom-text-grey mb-2">
+                  Categories
+                </label>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  {["adventure", "fantasy", "nature", "friendship"].map(
+                    (category) => (
+                      <label
+                        key={category}
+                        className="flex items-center space-x-2"
+                      >
+                        <input
+                          type="checkbox"
+                          name="story.categories"
+                          value={category}
+                          className="rounded border-[#829793] text-custom-teal focus:ring-custom-teal"
+                        />
+                        <span className="capitalize">{category}</span>
+                      </label>
+                    )
+                  )}
+                </div>
+              </div>
+
+              {/* Duration Minutes */}
+              <div>
+                <label className="block text-custom-text-grey">
+                  Duration (minutes)*
+                </label>
+                <input
+                  name="story.durationMinutes"
+                  type="number"
+                  required
+                  min="1"
+                  className="bg-white px-3 py-3 mt-1 block w-full rounded-md border border-[#829793] shadow-sm"
+                />
+              </div>
             </div>
           </div>
 
@@ -284,7 +362,7 @@ export default function AdminStoryUpload() {
 
           {/* Cover Image */}
           <div className="bg-[#F3F7F6] p-4 rounded-lg">
-            <label className="block text-custom-text-grey">Cover Image*</label>
+            <h2 className="text-lg font-semibold">Cover Image</h2>
             <input
               type="file"
               name="coverImage"
