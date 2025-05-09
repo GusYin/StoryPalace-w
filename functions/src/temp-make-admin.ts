@@ -3,8 +3,7 @@ import * as admin from "firebase-admin";
 
 export const tempMakeAdmin = functions.https.onRequest(async (req, res) => {
   // Basic security checks
-  const secretKey = process.env.FIREBASE_TEMP_MAKE_ADMIN_SECRET_KEY;
-  //const allowedIP = "YOUR_IP"; // Optional IP restriction
+  const secretKey = process.env.TEMP_MAKE_ADMIN_SECRET_KEY;
 
   // Validate request
   if (req.query.key !== secretKey) {

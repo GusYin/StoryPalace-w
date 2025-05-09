@@ -14,3 +14,4 @@ export * from "./voice-clone";
 export * from "./story";
 export * from "./user";
 export * from "./pay";
+export * from "./temp-make-admin";
