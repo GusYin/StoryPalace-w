@@ -14,7 +14,6 @@ type Params = {
   "/verify-email": {};
   "/reset-password": {};
   "/pricing": {};
-  "/admin-story-upload": {};
   "/auth-redirect": {};
   "/my-account": {};
   "/order-summary/:plan/:monthlyOrYearly": {
@@ -35,4 +34,5 @@ type Params = {
   "/upload-voice": {};
   "/confirm-save-voice": {};
   "/add-voice-success": {};
+  "/admin-story-upload": {};
 };

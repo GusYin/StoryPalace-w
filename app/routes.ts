@@ -14,7 +14,6 @@ export default [
   route("reset-password", "routes/reset-password.tsx"),
   route("pricing", "routes/pricing.tsx"),
   layout("components/protected-route.tsx", [
-    route("admin-story-upload", "routes/admin/admin-story-upload.tsx"),
     route("auth-redirect", "routes/auth-redirect.tsx"),
     route("my-account", "routes/my-account/my-account.tsx"),
     route(
@@ -30,5 +29,8 @@ export default [
     route("upload-voice", "routes/add-a-voice/upload-voice.tsx"),
     route("confirm-save-voice", "routes/add-a-voice/confirm-save-voice.tsx"),
     route("add-voice-success", "routes/add-a-voice/add-voice-success.tsx"),
+  ]),
+  layout("routes/admin/admin-route.tsx", [
+    route("admin-story-upload", "routes/admin/admin-story-upload.tsx"),
   ]),
 ] satisfies RouteConfig;
