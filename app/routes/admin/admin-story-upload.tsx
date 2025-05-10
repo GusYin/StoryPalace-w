@@ -271,6 +271,18 @@ export default function AdminStoryUpload() {
                 </p>
               </div>
 
+              {/* Cover Image */}
+              <div className="bg-[#F3F7F6] p-4 rounded-lg">
+                <h2 className="text-lg font-semibold">Cover Image</h2>
+                <input
+                  type="file"
+                  name="coverImage"
+                  accept="image/*"
+                  required
+                  className="cursor-pointer mt-1 block w-full file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-custom-teal file:text-white hover:file:bg-custom-bg-lighter-dark"
+                />
+              </div>
+
               {/* Description */}
               <div className="md:col-span-2">
                 <label className="block text-custom-text-grey">
@@ -466,18 +478,6 @@ export default function AdminStoryUpload() {
                 </div>
               </div>
             ))}
-          </div>
-
-          {/* Cover Image */}
-          <div className="bg-[#F3F7F6] p-4 rounded-lg">
-            <h2 className="text-lg font-semibold">Cover Image</h2>
-            <input
-              type="file"
-              name="coverImage"
-              accept="image/*"
-              required
-              className="cursor-pointer mt-1 block w-full file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-custom-teal file:text-white hover:file:bg-custom-bg-lighter-dark"
-            />
           </div>
 
           {/* Status Feedback */}
