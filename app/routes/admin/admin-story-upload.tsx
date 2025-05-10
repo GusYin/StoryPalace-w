@@ -37,6 +37,10 @@ export default function AdminStoryUpload() {
     "friendship",
   ]);
   const [newCategory, setNewCategory] = useState("");
+  const [episodeSeries, setEpisodeSeries] = useState({
+    years: "",
+    episodes: "",
+  });
 
   const handleAddEpisode = () => {
     if (nextEpisodeNumber > 999) {
@@ -53,7 +57,8 @@ export default function AdminStoryUpload() {
   const [state, formAction, isPending] = useActionState<FormState, FormData>(
     async (prevState, formData) => {
       try {
-        const storyId = formData.get("story.title") as string;
+        const storyTitle = formData.get("story.title") as string;
+        const storyId = storyTitle.trim().toLowerCase().replace(/\s+/g, "_");
         const storageRef = ref(storage, `stories/${storyId}/`);
 
         // Handle cover image
@@ -223,12 +228,47 @@ export default function AdminStoryUpload() {
                 <label className="block text-custom-text-grey">
                   Episode Series*
                 </label>
-                <input
-                  name="story.episodeSeries"
-                  placeholder="e.g., 2+ yr | 7 episodes"
-                  required
-                  className="bg-white px-3 py-3 mt-1 block w-full rounded-md border border-[#829793] shadow-sm"
-                />
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    placeholder="2+"
+                    className="bg-white px-3 py-3 mt-1 block w-20 rounded-md border border-[#829793] shadow-sm"
+                    value={episodeSeries.years}
+                    onChange={(e) => {
+                      const years = e.target.value.replace(/[^0-9+]/g, "");
+                      setEpisodeSeries((prev) => ({
+                        ...prev,
+                        years: years,
+                      }));
+                    }}
+                  />
+                  <span className="mx-2">|</span>
+                  <input
+                    type="text"
+                    placeholder="7"
+                    className="bg-white px-3 py-3 mt-1 block w-20 rounded-md border border-[#829793] shadow-sm"
+                    value={episodeSeries.episodes}
+                    onChange={(e) => {
+                      const episodes = e.target.value.replace(/[^0-9]/g, "");
+                      setEpisodeSeries((prev) => ({
+                        ...prev,
+                        episodes: episodes,
+                      }));
+                    }}
+                  />
+                  <input
+                    type="hidden"
+                    name="story.episodeSeries"
+                    value={`${episodeSeries.years}+ yr | ${episodeSeries.episodes} episodes`}
+                  />
+                </div>
+                <p className="text-sm text-gray-500 mt-1">
+                  {`${episodeSeries.years}+ yr | ${episodeSeries.episodes} episodes`}
+                </p>
+                <p className="text-sm text-gray-500 mt-1">
+                  Example: "2+ yr | 7 episodes" - Type numbers only, formatting
+                  is automatic
+                </p>
               </div>
 
               {/* Description */}
