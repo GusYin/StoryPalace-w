@@ -316,6 +316,7 @@ export default function AdminStoryUpload() {
                         type="checkbox"
                         name="story.categories"
                         value={category}
+                        defaultChecked={category === newCategory.trim()} // Auto-check new categories
                         className="sr-only"
                       />
                       <span className="px-3 py-1 block text-sm capitalize">
@@ -330,21 +331,28 @@ export default function AdminStoryUpload() {
                       onChange={(e) =>
                         setNewCategory(e.target.value.toLowerCase())
                       }
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          const trimmed = newCategory.trim();
+                          if (trimmed && !categories.includes(trimmed)) {
+                            setCategories((prev) => [...prev, trimmed]);
+                            setNewCategory(trimmed); // Preserve value to trigger defaultChecked
+                            setTimeout(() => setNewCategory(""), 0); // Clear after render
+                          }
+                        }
+                      }}
                       placeholder="Add new..."
                       className="p-2 text-sm border rounded"
                     />
                     <button
                       type="button"
                       onClick={() => {
-                        if (
-                          newCategory.trim() &&
-                          !categories.includes(newCategory.trim())
-                        ) {
-                          setCategories((prev) => [
-                            ...prev,
-                            newCategory.trim(),
-                          ]);
-                          setNewCategory("");
+                        const trimmed = newCategory.trim();
+                        if (trimmed && !categories.includes(trimmed)) {
+                          setCategories((prev) => [...prev, trimmed]);
+                          setNewCategory(trimmed);
+                          setTimeout(() => setNewCategory(""), 0);
                         }
                       }}
                       className="absolute right-2 top-2.5 text-gray-500 hover:text-blue-500"
