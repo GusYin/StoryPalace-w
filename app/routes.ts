@@ -32,5 +32,6 @@ export default [
   ]),
   layout("routes/admin/admin-route.tsx", [
     route("admin-story-upload", "routes/admin/admin-story-upload.tsx"),
+    route("admin-story-edit", "routes/admin/admin-story-edit.tsx"),
   ]),
 ] satisfies RouteConfig;

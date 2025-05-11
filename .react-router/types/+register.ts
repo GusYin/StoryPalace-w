@@ -35,4 +35,5 @@ type Params = {
   "/confirm-save-voice": {};
   "/add-voice-success": {};
   "/admin-story-upload": {};
+  "/admin-story-edit": {};
 };

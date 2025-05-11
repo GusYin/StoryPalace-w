@@ -1,39 +1,15 @@
-import { useEffect, useState } from "react";
-import {
-  getStorage,
-  ref,
-  getDownloadURL,
-  uploadBytes,
-  deleteObject,
-  listAll,
-} from "firebase/storage";
-import { httpsCallable } from "firebase/functions";
+import { useState } from "react";
+import { getStorage, ref, uploadBytes, deleteObject } from "firebase/storage";
 import { functions } from "~/firebase/firebase";
-import { PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
-
-type Episode = {
-  id: string;
-  title: string;
-  content: string;
-  audioFiles: File[];
-  durationSeconds: number;
-  keywords: string[];
-  existingAudios: string[];
-};
-
-type StoryMetadata = {
-  title: string;
-  description: string;
-  episodeSeries: string;
-  language: string;
-  recommendedAge: string;
-  categories: string[];
-  author: string;
-  durationMinutes: number;
-  coverExtension: string;
-  coverUrl?: string;
-  newCoverFile?: File;
-};
+import { httpsCallable } from "firebase/functions";
+import type {
+  Story,
+  StoryMetadata,
+  Episode,
+  EpisodeMetadata,
+} from "../library";
+import { DeleteIcon } from "~/components/icons/delete-icon";
+import { PlusIcon } from "~/components/icons/plus-icon";
 
 export default function AdminStoryEdit() {
   const [storyId, setStoryId] = useState("");
@@ -41,58 +17,35 @@ export default function AdminStoryEdit() {
   const [episodes, setEpisodes] = useState<Episode[]>([]);
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [newCategory, setNewCategory] = useState("");
   const storage = getStorage();
 
+  const getStoryFunction = httpsCallable<{ storyId: string }, { story: Story }>(
+    functions,
+    "getStory"
+  );
+
   const fetchStoryData = async () => {
+    if (!storyId) return alert("Please enter a Story ID");
+
     try {
       setLoading(true);
-      const storageRef = ref(storage, `stories/${storyId}/metadata.json`);
-      const url = await getDownloadURL(storageRef);
-      const response = await fetch(url);
-      const data: StoryMetadata = await response.json();
+      const result = await getStoryFunction({ storyId });
+      const { story } = result.data;
 
-      // Fetch cover image
-      const coverExt = data.coverExtension || "jpg";
-      const coverRef = ref(storage, `stories/${storyId}/cover.${coverExt}`);
-      data.coverUrl = await getDownloadURL(coverRef);
+      setMetadata({
+        ...story.metadata,
+        categories: story.metadata.categories || [],
+      });
 
-      // Fetch episodes
-      const episodesRef = ref(storage, `stories/${storyId}/episodes/`);
-      const episodeDirs = (await listAll(episodesRef)).prefixes;
-
-      const fetchedEpisodes: Episode[] = await Promise.all(
-        episodeDirs.map(async (dir) => {
-          const metaRef = ref(dir, "metadata.json");
-          const contentRef = ref(dir, "content.txt");
-          const audioRef = ref(dir, "audios/");
-
-          const [metaUrl, contentUrl, audios] = await Promise.all([
-            getDownloadURL(metaRef),
-            getDownloadURL(contentRef),
-            listAll(audioRef),
-          ]);
-
-          const [metaRes, contentRes] = await Promise.all([
-            fetch(metaUrl),
-            fetch(contentUrl),
-          ]);
-
-          const episodeMeta = await metaRes.json();
-          const content = await contentRes.text();
-
-          return {
-            id: dir.name,
-            ...episodeMeta,
-            content,
-            existingAudios: audios.items.map((i) => i.name),
-            audioFiles: [],
-          };
-        })
-      );
-
-      setMetadata(data);
       setEpisodes(
-        fetchedEpisodes.sort((a, b) => a.title.localeCompare(b.title))
+        story.episodes.map((ep) => ({
+          ...ep,
+          metadata: {
+            ...ep.metadata,
+            keywords: ep.metadata.keywords || [],
+          },
+        }))
       );
     } catch (error) {
       console.error("Error fetching story:", error);
@@ -108,60 +61,36 @@ export default function AdminStoryEdit() {
 
     try {
       setLoading(true);
-      const storageRef = ref(storage, `stories/${storyId}/`);
-
-      // Update cover image
-      if (metadata.newCoverFile) {
-        const coverExt = metadata.newCoverFile.name.split(".").pop();
-        await uploadBytes(
-          ref(storageRef, `cover.${coverExt}`),
-          metadata.newCoverFile
-        );
-      }
+      const storageRef = ref(storage, `stories/${storyId}`);
 
       // Update metadata
-      const updatedMetadata = {
-        ...metadata,
-        coverExtension:
-          metadata.newCoverFile?.name.split(".").pop() ||
-          metadata.coverExtension,
-      };
-      delete updatedMetadata.coverUrl;
-      delete updatedMetadata.newCoverFile;
-
-      const metadataBlob = new Blob([JSON.stringify(updatedMetadata)], {
+      const metadataBlob = new Blob([JSON.stringify(metadata)], {
         type: "application/json",
       });
       await uploadBytes(ref(storageRef, "metadata.json"), metadataBlob);
 
       // Update episodes
       for (const [index, episode] of episodes.entries()) {
-        const episodeRef = ref(storageRef, `episodes/${episode.id}/`);
+        const episodeRef = ref(storageRef, `episodes/${episode.id}`);
 
-        // Upload metadata
-        const episodeMeta = {
-          title: episode.title,
-          durationSeconds: episode.durationSeconds,
-          keywords: episode.keywords,
+        // Upload episode metadata
+        const episodeMeta: EpisodeMetadata = {
+          title: episode.metadata.title,
+          order: episode.metadata.order,
+          durationSeconds: episode.metadata.durationSeconds,
+          keywords: episode.metadata.keywords?.filter((k) => k.trim() !== ""),
         };
-        const metaBlob = new Blob([JSON.stringify(episodeMeta)], {
-          type: "application/json",
-        });
-        await uploadBytes(ref(episodeRef, "metadata.json"), metaBlob);
+
+        await uploadBytes(
+          ref(episodeRef, "metadata.json"),
+          new Blob([JSON.stringify(episodeMeta)], { type: "application/json" })
+        );
 
         // Upload content
-        const contentBlob = new Blob([episode.content], {
-          type: "text/plain",
-        });
-        await uploadBytes(ref(episodeRef, "content.txt"), contentBlob);
-
-        // Upload new audio files
-        if (episode.audioFiles.length > 0) {
-          const audioRef = ref(episodeRef, "audios/");
-          for (const audioFile of episode.audioFiles) {
-            await uploadBytes(ref(audioRef, audioFile.name), audioFile);
-          }
-        }
+        await uploadBytes(
+          ref(episodeRef, "content.txt"),
+          new Blob([episode.contentUrl], { type: "text/plain" })
+        );
 
         setProgress(Math.round(((index + 1) / episodes.length) * 100));
       }
@@ -178,23 +107,21 @@ export default function AdminStoryEdit() {
 
   return (
     <div className="min-h-screen bg-white p-8">
-      <h1 className="text-2xl font-bold mb-6">Edit Existing Story</h1>
+      <h1 className="text-2xl font-bold mb-6">Edit Story</h1>
 
       <div className="mb-6">
-        <label className="block mb-2">Enter Story ID:</label>
+        <label className="block mb-2">Story ID:</label>
         <div className="flex gap-2">
           <input
             type="text"
             value={storyId}
-            onChange={(e) =>
-              setStoryId(e.target.value.replace(/[^a-z0-9_]/g, ""))
-            }
-            className="border p-2 flex-1"
-            placeholder="story_id_here"
+            onChange={(e) => setStoryId(e.target.value)}
+            className="border p-2 flex-1 rounded"
+            placeholder="story_id"
           />
           <button
             onClick={fetchStoryData}
-            className="bg-blue-500 text-white px-4 py-2 rounded"
+            className="bg-blue-500 text-white px-4 py-2 rounded disabled:opacity-50"
             disabled={loading}
           >
             {loading ? "Loading..." : "Load Story"}
@@ -206,50 +133,34 @@ export default function AdminStoryEdit() {
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Story Metadata */}
           <div className="bg-gray-50 p-4 rounded-lg">
-            <h2 className="text-lg font-semibold mb-4">Story Metadata</h2>
+            <h2 className="text-lg font-semibold mb-4">Story Details</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Title */}
               <div>
-                <label className="block text-sm font-medium">Title*</label>
+                <label className="block mb-2">Title*</label>
                 <input
                   value={metadata.title}
                   onChange={(e) =>
                     setMetadata({ ...metadata, title: e.target.value })
                   }
                   required
-                  className="mt-1 block w-full rounded-md border border-gray-300 p-2"
+                  className="w-full p-2 border rounded"
                 />
               </div>
 
-              {/* Cover Image */}
               <div>
-                <label className="block text-sm font-medium">Cover Image</label>
+                <label className="block mb-2">Author</label>
                 <input
-                  type="file"
-                  accept="image/*"
+                  value={metadata.author || ""}
                   onChange={(e) =>
-                    setMetadata({
-                      ...metadata,
-                      newCoverFile: e.target.files?.[0],
-                    })
+                    setMetadata({ ...metadata, author: e.target.value })
                   }
-                  className="mt-1 block w-full"
+                  className="w-full p-2 border rounded"
                 />
-                {metadata.coverUrl && (
-                  <img
-                    src={metadata.coverUrl}
-                    alt="Current cover"
-                    className="mt-2 w-32 h-32 object-cover"
-                  />
-                )}
               </div>
 
-              {/* Description */}
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium">
-                  Description*
-                </label>
+                <label className="block mb-2">Description*</label>
                 <textarea
                   value={metadata.description}
                   onChange={(e) =>
@@ -257,73 +168,117 @@ export default function AdminStoryEdit() {
                   }
                   required
                   rows={3}
-                  className="mt-1 block w-full rounded-md border border-gray-300 p-2"
+                  className="w-full p-2 border rounded"
                 />
               </div>
 
-              {/* Language */}
               <div>
-                <label className="block text-sm font-medium">Language*</label>
+                <label className="block mb-2">Episode Series*</label>
+                <input
+                  value={metadata.episodeSeries}
+                  onChange={(e) =>
+                    setMetadata({ ...metadata, episodeSeries: e.target.value })
+                  }
+                  required
+                  className="w-full p-2 border rounded"
+                />
+              </div>
+
+              <div>
+                <label className="block mb-2">Language</label>
                 <select
-                  value={metadata.language}
+                  value={metadata.language || "en-US"}
                   onChange={(e) =>
                     setMetadata({ ...metadata, language: e.target.value })
                   }
-                  className="mt-1 block w-full rounded-md border border-gray-300 p-2"
+                  className="w-full p-2 border rounded"
                 >
                   <option value="en-US">English</option>
                   <option value="es-ES">Spanish</option>
                   <option value="fr-FR">French</option>
+                  <option value="de-DE">German</option>
                 </select>
               </div>
 
-              {/* Recommended Age */}
               <div>
-                <label className="block text-sm font-medium">
-                  Recommended Age
-                </label>
+                <label className="block mb-2">Recommended Age</label>
                 <input
-                  type="text"
-                  value={metadata.recommendedAge}
+                  value={metadata.recommendedAge || ""}
                   onChange={(e) =>
                     setMetadata({ ...metadata, recommendedAge: e.target.value })
                   }
-                  className="mt-1 block w-full rounded-md border border-gray-300 p-2"
+                  className="w-full p-2 border rounded"
                 />
               </div>
 
-              {/* Categories */}
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium">Categories</label>
-                <div className="flex flex-wrap gap-2 mt-1">
-                  {metadata.categories.map((category) => (
-                    <span
-                      key={category}
-                      className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
-                    >
-                      {category}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              {/* Duration */}
               <div>
-                <label className="block text-sm font-medium">
-                  Duration (minutes)*
-                </label>
+                <label className="block mb-2">Duration (minutes)</label>
                 <input
                   type="number"
-                  value={metadata.durationMinutes}
+                  value={metadata.durationMinutes || ""}
                   onChange={(e) =>
                     setMetadata({
                       ...metadata,
                       durationMinutes: Number(e.target.value),
                     })
                   }
-                  required
-                  className="mt-1 block w-full rounded-md border border-gray-300 p-2"
+                  className="w-full p-2 border rounded"
                 />
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="block mb-2">Categories</label>
+                <div className="flex flex-wrap gap-2 mb-2">
+                  {metadata.categories?.map((category, index) => (
+                    <div
+                      key={index}
+                      className="bg-blue-100 px-3 py-1 rounded-full flex items-center"
+                    >
+                      <span>{category}</span>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setMetadata({
+                            ...metadata,
+                            categories: metadata.categories?.filter(
+                              (_, i) => i !== index
+                            ),
+                          })
+                        }
+                        className="ml-2 text-red-500 hover:text-red-700"
+                      >
+                        <DeleteIcon className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={newCategory}
+                    onChange={(e) => setNewCategory(e.target.value)}
+                    placeholder="Add new category"
+                    className="flex-1 p-2 border rounded"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (newCategory.trim()) {
+                        setMetadata({
+                          ...metadata,
+                          categories: [
+                            ...(metadata.categories || []),
+                            newCategory.trim(),
+                          ],
+                        });
+                        setNewCategory("");
+                      }
+                    }}
+                    className="bg-blue-500 text-white px-4 py-2 rounded"
+                  >
+                    <PlusIcon />
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -343,68 +298,122 @@ export default function AdminStoryEdit() {
                     }
                     className="text-red-500 hover:text-red-700"
                   >
-                    <TrashIcon className="w-5 h-5" />
+                    <DeleteIcon />
                   </button>
                 </div>
 
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium">Title*</label>
+                    <label className="block mb-2">Title*</label>
                     <input
-                      value={episode.title}
+                      value={episode.metadata.title}
                       onChange={(e) => {
                         const newEpisodes = [...episodes];
-                        newEpisodes[index].title = e.target.value;
+                        newEpisodes[index].metadata.title = e.target.value;
                         setEpisodes(newEpisodes);
                       }}
                       required
-                      className="mt-1 block w-full rounded-md border border-gray-300 p-2"
+                      className="w-full p-2 border rounded"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium">
-                      Content*
-                    </label>
-                    <textarea
-                      value={episode.content}
+                    <label className="block mb-2">Order</label>
+                    <input
+                      type="number"
+                      value={episode.metadata.order || ""}
                       onChange={(e) => {
                         const newEpisodes = [...episodes];
-                        newEpisodes[index].content = e.target.value;
+                        newEpisodes[index].metadata.order = Number(
+                          e.target.value
+                        );
                         setEpisodes(newEpisodes);
                       }}
-                      required
-                      rows={4}
-                      className="mt-1 block w-full rounded-md border border-gray-300 p-2"
+                      className="w-full p-2 border rounded"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium">
-                      Audio Files
+                    <label className="block mb-2">Duration (seconds)</label>
+                    <input
+                      type="number"
+                      value={episode.metadata.durationSeconds || ""}
+                      onChange={(e) => {
+                        const newEpisodes = [...episodes];
+                        newEpisodes[index].metadata.durationSeconds = Number(
+                          e.target.value
+                        );
+                        setEpisodes(newEpisodes);
+                      }}
+                      className="w-full p-2 border rounded"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block mb-2">
+                      Keywords (comma-separated)
                     </label>
+                    <input
+                      value={episode.metadata.keywords?.join(", ") || ""}
+                      onChange={(e) => {
+                        const newEpisodes = [...episodes];
+                        newEpisodes[index].metadata.keywords = e.target.value
+                          .split(",")
+                          .map((k) => k.trim())
+                          .filter((k) => k !== "");
+                        setEpisodes(newEpisodes);
+                      }}
+                      className="w-full p-2 border rounded"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block mb-2">Audio Files</label>
+                    <div className="space-y-2">
+                      {episode.audioUrls.map((audioUrl, audioIndex) => (
+                        <div
+                          key={audioIndex}
+                          className="flex items-center justify-between bg-gray-100 p-2 rounded"
+                        >
+                          <span className="truncate">
+                            {audioUrl.split("/").pop()}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={async () => {
+                              try {
+                                await deleteObject(ref(storage, audioUrl));
+                                const newEpisodes = [...episodes];
+                                newEpisodes[index].audioUrls = newEpisodes[
+                                  index
+                                ].audioUrls.filter((_, i) => i !== audioIndex);
+                                setEpisodes(newEpisodes);
+                              } catch (error) {
+                                console.error("Error deleting audio:", error);
+                              }
+                            }}
+                            className="text-red-500 hover:text-red-700 ml-2"
+                          >
+                            <DeleteIcon />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
                     <input
                       type="file"
                       multiple
                       onChange={(e) => {
                         const newEpisodes = [...episodes];
-                        newEpisodes[index].audioFiles = Array.from(
-                          e.target.files || []
-                        );
+                        newEpisodes[index].audioUrls = [
+                          ...newEpisodes[index].audioUrls,
+                          ...Array.from(e.target.files || []).map((f) =>
+                            URL.createObjectURL(f)
+                          ),
+                        ];
                         setEpisodes(newEpisodes);
                       }}
-                      className="mt-1 block w-full"
+                      className="mt-2 w-full"
                     />
-                    <div className="mt-2 space-y-1">
-                      {episode.existingAudios?.map((audio) => (
-                        <span
-                          key={audio}
-                          className="block text-sm text-gray-600"
-                        >
-                          {audio}
-                        </span>
-                      ))}
-                    </div>
                   </div>
                 </div>
               </div>
@@ -414,7 +423,7 @@ export default function AdminStoryEdit() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 disabled:bg-gray-400"
+            className="w-full bg-green-500 text-white py-3 rounded hover:bg-green-600 disabled:bg-gray-400"
           >
             {loading ? `Saving... ${progress}%` : "Save Changes"}
           </button>
