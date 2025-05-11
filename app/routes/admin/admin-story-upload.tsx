@@ -8,15 +8,19 @@ type FormState = {
   success: boolean;
 };
 
-type EpisodeAudioFiles = {
+type EpisodeData = {
   audioFiles: File[];
+  keywords: string[];
+  newKeyword: string;
+  durationSeconds: number;
 };
 
 export default function AdminStoryUpload() {
+  const storage = getStorage();
+
   const [episodeIds, setEpisodeIds] = useState<string[]>([]);
   const [nextEpisodeNumber, setNextEpisodeNumber] = useState(1);
   const [progress, setProgress] = useState(0);
-  const storage = getStorage();
   const [categories, setCategories] = useState([
     "adventure",
     "fantasy",
@@ -28,9 +32,7 @@ export default function AdminStoryUpload() {
     years: "",
     episodes: "",
   });
-  const [episodeAudioFiles, setEpisodeAudioFiles] = useState<
-    EpisodeAudioFiles[]
-  >([]);
+  const [episodeData, setEpisodeData] = useState<EpisodeData[]>([]);
 
   const handleAddEpisode = () => {
     if (nextEpisodeNumber > 999) {
@@ -41,14 +43,22 @@ export default function AdminStoryUpload() {
       .toString()
       .padStart(3, "0")}`;
     setEpisodeIds((prev) => [...prev, newEpisodeId]);
-    setEpisodeAudioFiles((prev) => [...prev, { audioFiles: [] }]);
+    setEpisodeData((prev) => [
+      ...prev,
+      {
+        audioFiles: [],
+        keywords: [],
+        newKeyword: "",
+        durationSeconds: 0,
+      },
+    ]);
     setNextEpisodeNumber((prev) => prev + 1);
   };
 
   const handleAudioFilesChange = (index: number, files: FileList | null) => {
     if (files) {
       const newFiles = Array.from(files);
-      setEpisodeAudioFiles((prev) =>
+      setEpisodeData((prev) =>
         prev.map((episode, i) =>
           i === index
             ? { ...episode, audioFiles: [...episode.audioFiles, ...newFiles] }
@@ -59,13 +69,45 @@ export default function AdminStoryUpload() {
   };
 
   const handleRemoveAudioFile = (episodeIndex: number, fileIndex: number) => {
-    setEpisodeAudioFiles((prev) =>
+    setEpisodeData((prev) =>
       prev.map((episode, i) =>
         i === episodeIndex
           ? {
               ...episode,
               audioFiles: episode.audioFiles.filter(
                 (_, idx) => idx !== fileIndex
+              ),
+            }
+          : episode
+      )
+    );
+  };
+
+  const handleAddKeyword = (index: number) => {
+    const keyword = episodeData[index].newKeyword.trim();
+    if (keyword) {
+      setEpisodeData((prev) =>
+        prev.map((episode, i) =>
+          i === index
+            ? {
+                ...episode,
+                keywords: [...episode.keywords, keyword],
+                newKeyword: "",
+              }
+            : episode
+        )
+      );
+    }
+  };
+
+  const handleRemoveKeyword = (episodeIndex: number, keywordIndex: number) => {
+    setEpisodeData((prev) =>
+      prev.map((episode, i) =>
+        i === episodeIndex
+          ? {
+              ...episode,
+              keywords: episode.keywords.filter(
+                (_, idx) => idx !== keywordIndex
               ),
             }
           : episode
@@ -468,12 +510,91 @@ export default function AdminStoryUpload() {
                     />
                   </div>
 
+                  {/* Duration Input */}
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium mb-1">
+                      Duration (seconds)*
+                    </label>
+                    <input
+                      type="number"
+                      name={`episodes[${index}].durationSeconds`}
+                      value={episodeData[index]?.durationSeconds || 0}
+                      onChange={(e) => {
+                        const newData = [...episodeData];
+                        newData[index].durationSeconds = Number(e.target.value);
+                        setEpisodeData(newData);
+                      }}
+                      className="w-full p-2 border rounded"
+                      min="0"
+                    />
+                  </div>
+
+                  {/* Keywords Section */}
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium mb-1">
+                      Keywords
+                    </label>
+                    <div className="flex flex-wrap gap-2 items-center">
+                      {episodeData[index]?.keywords?.map(
+                        (keyword, keywordIndex) => (
+                          <div
+                            key={keywordIndex}
+                            className="bg-blue-100 px-3 py-1 rounded-full flex items-center"
+                          >
+                            <span className="text-sm">{keyword}</span>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                handleRemoveKeyword(index, keywordIndex)
+                              }
+                              className="ml-2 text-red-500 hover:text-red-700"
+                            >
+                              <DeleteIcon className="w-4 h-4" />
+                            </button>
+                          </div>
+                        )
+                      )}
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={episodeData[index]?.newKeyword || ""}
+                          onChange={(e) => {
+                            const newData = [...episodeData];
+                            newData[index].newKeyword = e.target.value;
+                            setEpisodeData(newData);
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              e.preventDefault();
+                              handleAddKeyword(index);
+                            }
+                          }}
+                          placeholder="Add keyword"
+                          className="p-2 text-sm border rounded"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleAddKeyword(index)}
+                          className="bg-blue-500 text-white px-2 py-1 rounded"
+                        >
+                          <PlusIcon className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                    <input
+                      type="hidden"
+                      name={`episodes[${index}].keywords`}
+                      value={episodeData[index]?.keywords?.join(",") || ""}
+                    />
+                  </div>
+
+                  {/* Audio Files Section */}
                   <div>
                     <label className="block text-sm font-medium mb-1">
                       Audio Files*
                     </label>
                     <div className="space-y-2 mb-2">
-                      {episodeAudioFiles[index]?.audioFiles?.map(
+                      {episodeData[index]?.audioFiles?.map(
                         (file, fileIndex) => (
                           <div
                             key={fileIndex}
