@@ -235,10 +235,12 @@ export const getStoriesMetadata = functions.https.onCall(async (request) => {
     const [, , storyApiResponse] = (await bucket.getFiles({
       prefix: storagePath,
       delimiter: "/",
-      maxResults: pageSize,
+      maxResults: pageSize + 1,
       pageToken: pageToken,
       autoPaginate: false,
     })) as [any, any, { prefixes?: string[]; nextPageToken?: string }];
+
+    functions.logger.log(`Story prefixes ${storyApiResponse?.prefixes}`);
 
     const storyFolderPrefixes =
       storyApiResponse?.prefixes?.filter((p) => p !== storagePath) || [];
@@ -325,7 +327,7 @@ export const getStories = functions.https.onCall(async (request) => {
     const [, , storyApiResponse] = (await bucket.getFiles({
       prefix: storagePath,
       delimiter: "/",
-      maxResults: pageSize,
+      maxResults: pageSize + 1,
       pageToken: pageToken,
       autoPaginate: false,
     })) as [any, any, { prefixes?: string[]; nextPageToken?: string }];
