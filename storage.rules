@@ -18,36 +18,36 @@ service firebase.storage {
                          && request.auth.token.email_verified;
     }
 
-    // Rules for story content
+    // Rules for story content - no public read access
     match /stories/{storyId}/{allPaths=**} {
-      // Allow public read access since we're using signed URLs
-      // but restrict write access to admin-only
-      allow read: if request.auth != null;
-      allow write: if request.auth != null && request.auth.token.admin == true;
+      // Restrict both read and write to admin-only
+      allow read, write: if request.auth != null 
+                         && request.auth.token.admin == true;
     }
 
     match /stories/{storyId}/metadata.json {
       // Additional validation for metadata files
-      allow write: if request.auth != null && request.auth.token.admin == true
+      allow write: if request.auth != null 
+                   && request.auth.token.admin == true
                    && request.resource.contentType.matches('application/json');
     }
 
+    // Uncomment and modify these as needed for specific validation
     // match /stories/{storyId}/{cover} {
-    //   // Validate cover image properties
     //   allow write: if request.auth.token.admin == true
-    //                && request.resource.size < 5 * 1024 * 1024; // 5MB max
+    //                && request.resource.size < 5 * 1024 * 1024 // 5MB max
+    //                && request.resource.contentType.matches('image/.*');
     // }
 
-    match /stories/{storyId}/episodes/{episodeId}/content.txt {
-      // Validate text content
-      allow write: if request.auth != null && request.auth.token.admin == true
-                   && request.resource.contentType.matches('text/plain')
-                   // && request.resource.size < 1 * 1024 * 1024; // 1MB max
-    }
+    // match /stories/{storyId}/episodes/{episodeId}/content.txt {
+    //   allow write: if request.auth.token.admin == true
+    //                && request.resource.contentType.matches('text/plain')
+    //                && request.resource.size < 1 * 1024 * 1024; // 1MB max
+    // }
 
     // match /stories/{storyId}/episodes/{episodeId}/audios/{audioFile} {
-    //   // Validate audio files
     //   allow write: if request.auth.token.admin == true
+    //                && request.resource.contentType.matches('audio/.*')
     //                && request.resource.size < 10 * 1024 * 1024; // 10MB max
     // }
   }

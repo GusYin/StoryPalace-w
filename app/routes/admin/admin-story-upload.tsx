@@ -173,9 +173,6 @@ export default function AdminStoryUpload() {
           setProgress(Math.round(((index + 1) / episodes.length) * 100));
         }
 
-        // Update Firestore index
-        await httpsCallable(functions, "updateStoryIndex")({ storyId });
-
         return { error: null, success: true };
       } catch (error) {
         return {
@@ -224,7 +221,8 @@ export default function AdminStoryUpload() {
                         years: years,
                       }));
                     }}
-                  />
+                  />{" "}
+                  + yr
                   <span className="mx-2">|</span>
                   <input
                     type="text"
@@ -238,7 +236,8 @@ export default function AdminStoryUpload() {
                         episodes: episodes,
                       }));
                     }}
-                  />
+                  />{" "}
+                  episodes
                   <input
                     type="hidden"
                     name="story.episodeSeries"
@@ -246,7 +245,7 @@ export default function AdminStoryUpload() {
                   />
                 </div>
                 <p className="text-sm text-gray-500 mt-1">
-                  Example: "2+ yr | 7 episodes" - Type numbers only
+                  {`${episodeSeries.years}+ yr | ${episodeSeries.episodes} episodes`}
                 </p>
               </div>
 
