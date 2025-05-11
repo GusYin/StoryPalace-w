@@ -1,12 +1,15 @@
 import { useActionState, useState } from "react";
 import { getStorage, ref, uploadBytes } from "firebase/storage";
-import { httpsCallable } from "firebase/functions";
-import { functions } from "~/firebase/firebase";
 import { PlusIcon } from "~/components/icons/plus-icon";
+import { DeleteIcon } from "~/components/icons/delete-icon";
 
 type FormState = {
   error: string | null;
   success: boolean;
+};
+
+type EpisodeAudioFiles = {
+  audioFiles: File[];
 };
 
 export default function AdminStoryUpload() {
@@ -25,6 +28,9 @@ export default function AdminStoryUpload() {
     years: "",
     episodes: "",
   });
+  const [episodeAudioFiles, setEpisodeAudioFiles] = useState<
+    EpisodeAudioFiles[]
+  >([]);
 
   const handleAddEpisode = () => {
     if (nextEpisodeNumber > 999) {
@@ -35,7 +41,36 @@ export default function AdminStoryUpload() {
       .toString()
       .padStart(3, "0")}`;
     setEpisodeIds((prev) => [...prev, newEpisodeId]);
+    setEpisodeAudioFiles((prev) => [...prev, { audioFiles: [] }]);
     setNextEpisodeNumber((prev) => prev + 1);
+  };
+
+  const handleAudioFilesChange = (index: number, files: FileList | null) => {
+    if (files) {
+      const newFiles = Array.from(files);
+      setEpisodeAudioFiles((prev) =>
+        prev.map((episode, i) =>
+          i === index
+            ? { ...episode, audioFiles: [...episode.audioFiles, ...newFiles] }
+            : episode
+        )
+      );
+    }
+  };
+
+  const handleRemoveAudioFile = (episodeIndex: number, fileIndex: number) => {
+    setEpisodeAudioFiles((prev) =>
+      prev.map((episode, i) =>
+        i === episodeIndex
+          ? {
+              ...episode,
+              audioFiles: episode.audioFiles.filter(
+                (_, idx) => idx !== fileIndex
+              ),
+            }
+          : episode
+      )
+    );
   };
 
   const [state, formAction, isPending] = useActionState<FormState, FormData>(
@@ -437,11 +472,35 @@ export default function AdminStoryUpload() {
                     <label className="block text-sm font-medium mb-1">
                       Audio Files*
                     </label>
+                    <div className="space-y-2 mb-2">
+                      {episodeAudioFiles[index]?.audioFiles?.map(
+                        (file, fileIndex) => (
+                          <div
+                            key={fileIndex}
+                            className="flex items-center justify-between bg-gray-100 p-2 rounded"
+                          >
+                            <span className="truncate">{file.name}</span>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                handleRemoveAudioFile(index, fileIndex)
+                              }
+                              className="text-red-500 hover:text-red-700 ml-2"
+                            >
+                              <DeleteIcon className="w-4 h-4" />
+                            </button>
+                          </div>
+                        )
+                      )}
+                    </div>
                     <input
                       type="file"
                       multiple
                       name={`episodes[${index}].audioFiles`}
                       required
+                      onChange={(e) =>
+                        handleAudioFilesChange(index, e.target.files)
+                      }
                       className="w-full p-2 border rounded"
                     />
                   </div>
