@@ -9,23 +9,6 @@ type FormState = {
   success: boolean;
 };
 
-// const PlusIcon = ({ className }: { className?: string }) => (
-//   <svg
-//     xmlns="http://www.w3.org/2000/svg"
-//     fill="none"
-//     viewBox="0 0 24 24"
-//     strokeWidth={1.5}
-//     stroke="currentColor"
-//     className={className}
-//   >
-//     <path
-//       strokeLinecap="round"
-//       strokeLinejoin="round"
-//       d="M12 4.5v15m7.5-7.5h-15"
-//     />
-//   </svg>
-// );
-
 export default function AdminStoryUpload() {
   const [episodeIds, setEpisodeIds] = useState<string[]>([]);
   const [nextEpisodeNumber, setNextEpisodeNumber] = useState(1);
@@ -205,35 +188,34 @@ export default function AdminStoryUpload() {
   );
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="font-dosis w-full mx-auto space-y-8 mt-14 mb-14 px-4 sm:px-6 lg:px-20">
-        <h1 className="text-center text-xl font-bold mb-6">Upload New Story</h1>
+    <div className="min-h-screen bg-white p-8">
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-2xl font-bold mb-6">Upload New Story</h1>
 
         <form action={formAction} className="space-y-6">
           {/* Story Metadata */}
-          {/* Story Metadata */}
-          <div className="bg-[#F3F7F6] p-4 rounded-lg">
+          <div className="bg-gray-50 p-4 rounded-lg">
             <h2 className="text-lg font-semibold mb-4">Story Metadata</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-custom-text-grey">Title*</label>
+                <label className="block text-sm font-medium mb-1">Title*</label>
                 <input
                   name="story.title"
                   required
-                  className="bg-white px-3 py-3 mt-1 block w-full rounded-md border border-[#829793] shadow-sm"
+                  className="w-full p-2 border rounded"
                 />
               </div>
 
               <div>
-                <label className="block text-custom-text-grey">
+                <label className="block text-sm font-medium mb-1">
                   Episode Series*
                 </label>
                 <div className="flex items-center gap-2">
                   <input
                     type="text"
                     placeholder="2+"
-                    className="bg-white px-3 py-3 mt-1 block w-20 rounded-md border border-[#829793] shadow-sm"
+                    className="w-20 p-2 border rounded"
                     value={episodeSeries.years}
                     onChange={(e) => {
                       const years = e.target.value.replace(/[^0-9+]/g, "");
@@ -247,7 +229,7 @@ export default function AdminStoryUpload() {
                   <input
                     type="text"
                     placeholder="7"
-                    className="bg-white px-3 py-3 mt-1 block w-20 rounded-md border border-[#829793] shadow-sm"
+                    className="w-20 p-2 border rounded"
                     value={episodeSeries.episodes}
                     onChange={(e) => {
                       const episodes = e.target.value.replace(/[^0-9]/g, "");
@@ -264,76 +246,71 @@ export default function AdminStoryUpload() {
                   />
                 </div>
                 <p className="text-sm text-gray-500 mt-1">
-                  {`${episodeSeries.years}+ yr | ${episodeSeries.episodes} episodes`}
-                </p>
-                <p className="text-sm text-gray-500 mt-1">
-                  Example: "2+ yr | 7 episodes" - Type numbers only, formatting
-                  is automatic
+                  Example: "2+ yr | 7 episodes" - Type numbers only
                 </p>
               </div>
 
-              {/* Cover Image */}
-              <div className="bg-[#F3F7F6] p-4 rounded-lg">
-                <h2 className="text-lg font-semibold">Cover Image</h2>
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium mb-1">
+                  Cover Image*
+                </label>
                 <input
                   type="file"
                   name="coverImage"
                   accept="image/*"
                   required
-                  className="cursor-pointer mt-1 block w-full file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-custom-teal file:text-white hover:file:bg-custom-bg-lighter-dark"
+                  className="w-full p-2 border rounded"
                 />
               </div>
 
-              {/* Description */}
               <div className="md:col-span-2">
-                <label className="block text-custom-text-grey">
+                <label className="block text-sm font-medium mb-1">
                   Description*
                 </label>
                 <textarea
                   name="story.description"
                   required
                   rows={3}
-                  className="bg-white px-3 py-3 mt-1 block w-full rounded-md border border-[#829793] shadow-sm"
+                  className="w-full p-2 border rounded"
                 />
               </div>
 
-              {/* Language */}
               <div>
-                <label className="block text-custom-text-grey">Language*</label>
+                <label className="block text-sm font-medium mb-1">
+                  Language*
+                </label>
                 <select
                   name="story.language"
                   defaultValue="en-US"
-                  className="bg-white px-3 py-3 mt-1 block w-full rounded-md border border-[#829793] shadow-sm"
+                  className="w-full p-2 border rounded"
                 >
                   <option value="en-US">English</option>
                   <option value="fr-FR">French</option>
+                  <option value="es-ES">Spanish</option>
                 </select>
               </div>
 
-              {/* Recommended Age */}
               <div>
-                <label className="block text-custom-text-grey">
+                <label className="block text-sm font-medium mb-1">
                   Recommended Age
                 </label>
                 <input
                   name="story.recommendedAge"
                   type="text"
                   placeholder="e.g., 5-12"
-                  className="bg-white px-3 py-3 mt-1 block w-full rounded-md border border-[#829793] shadow-sm"
+                  className="w-full p-2 border rounded"
                 />
               </div>
 
-              {/* Categories */}
               <div className="md:col-span-2">
-                <label className="block text-custom-text-grey mb-2">
+                <label className="block text-sm font-medium mb-1">
                   Categories
                 </label>
                 <div className="flex flex-wrap gap-2 items-center">
-                  {/* Existing Categories */}
                   {categories.map((category) => (
                     <label
                       key={category}
-                      className="relative has-[:checked]:bg-custom-teal has-[:checked]:text-white transition-colors rounded-full border border-[#829793] bg-white cursor-pointer"
+                      className="relative has-[:checked]:bg-blue-500 has-[:checked]:text-white transition-colors rounded-full border bg-white cursor-pointer"
                     >
                       <input
                         type="checkbox"
@@ -341,34 +318,20 @@ export default function AdminStoryUpload() {
                         value={category}
                         className="sr-only"
                       />
-                      <span className="px-4 py-2 block text-sm capitalize">
+                      <span className="px-3 py-1 block text-sm capitalize">
                         {category}
                       </span>
                     </label>
                   ))}
-
-                  {/* New Category Input */}
-                  <div className="relative group">
+                  <div className="relative">
                     <input
                       type="text"
                       value={newCategory}
                       onChange={(e) =>
                         setNewCategory(e.target.value.toLowerCase())
                       }
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" && newCategory.trim()) {
-                          e.preventDefault();
-                          if (!categories.includes(newCategory.trim())) {
-                            setCategories((prev) => [
-                              ...prev,
-                              newCategory.trim(),
-                            ]);
-                          }
-                          setNewCategory("");
-                        }
-                      }}
                       placeholder="Add new..."
-                      className="px-4 py-2 text-sm bg-transparent border-b-2 border-[#829793] focus:outline-none focus:border-custom-teal w-32"
+                      className="p-2 text-sm border rounded"
                     />
                     <button
                       type="button"
@@ -384,7 +347,7 @@ export default function AdminStoryUpload() {
                           setNewCategory("");
                         }
                       }}
-                      className="absolute right-0 top-1/2 -translate-y-1/2 text-[#829793] group-hover:text-custom-teal transition-colors"
+                      className="absolute right-2 top-2.5 text-gray-500 hover:text-blue-500"
                     >
                       <PlusIcon className="w-5 h-5" />
                     </button>
@@ -392,9 +355,8 @@ export default function AdminStoryUpload() {
                 </div>
               </div>
 
-              {/* Duration Minutes */}
               <div>
-                <label className="block text-custom-text-grey">
+                <label className="block text-sm font-medium mb-1">
                   Duration (minutes)*
                 </label>
                 <input
@@ -402,20 +364,20 @@ export default function AdminStoryUpload() {
                   type="number"
                   required
                   min="1"
-                  className="bg-white px-3 py-3 mt-1 block w-full rounded-md border border-[#829793] shadow-sm"
+                  className="w-full p-2 border rounded"
                 />
               </div>
             </div>
           </div>
 
           {/* Episodes */}
-          <div className="bg-[#F3F7F6] p-4 rounded-lg">
+          <div className="bg-gray-50 p-4 rounded-lg">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-lg font-semibold">Episodes</h2>
               <button
                 type="button"
                 onClick={handleAddEpisode}
-                className="cursor-pointer w-auto bg-custom-teal text-white px-6 py-3 rounded-3xl hover:bg-blue-600 transition-colors"
+                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
               >
                 Add Episode
               </button>
@@ -434,7 +396,7 @@ export default function AdminStoryUpload() {
                         prev.filter((_, i) => i !== index)
                       )
                     }
-                    className="cursor-pointer border border-[#829793] px-3 py-3 rounded-3xl w-auto bg-white text-black hover:text-blue-600 transition-colors"
+                    className="text-red-500 hover:text-red-700"
                   >
                     Remove
                   </button>
@@ -442,30 +404,30 @@ export default function AdminStoryUpload() {
 
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-custom-text-grey">
-                      Episode Title*
+                    <label className="block text-sm font-medium mb-1">
+                      Title*
                     </label>
                     <input
                       name={`episodes[${index}].title`}
                       required
-                      className="bg-white px-3 py-3 mt-1 block w-full rounded-md border border-[#829793] shadow-sm"
+                      className="w-full p-2 border rounded"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-custom-text-grey">
+                    <label className="block text-sm font-medium mb-1">
                       Content*
                     </label>
                     <textarea
                       name={`episodes[${index}].content`}
                       required
                       rows={4}
-                      className="bg-white px-3 py-3 mt-1 block w-full rounded-md border border-[#829793] shadow-sm"
+                      className="w-full p-2 border rounded"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-custom-text-grey">
+                    <label className="block text-sm font-medium mb-1">
                       Audio Files*
                     </label>
                     <input
@@ -473,7 +435,7 @@ export default function AdminStoryUpload() {
                       multiple
                       name={`episodes[${index}].audioFiles`}
                       required
-                      className="cursor-pointer mt-1 block w-full file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-custom-teal file:text-white hover:file:bg-custom-bg-lighter-dark"
+                      className="w-full p-2 border rounded"
                     />
                   </div>
                 </div>
@@ -496,7 +458,7 @@ export default function AdminStoryUpload() {
           <button
             type="submit"
             disabled={isPending}
-            className="cursor-pointer w-auto bg-custom-teal text-white px-6 py-3 rounded-3xl hover:bg-blue-600 transition-colors"
+            className="w-full bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 disabled:bg-gray-400"
           >
             {isPending ? `Uploading... ${progress}%` : "Upload Story"}
           </button>
