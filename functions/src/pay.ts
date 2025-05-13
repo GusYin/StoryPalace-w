@@ -460,7 +460,7 @@ export const stripeWebhook = functions.https.onRequest(
 export const cancelSubscription = functions.https.onCall(async (request) => {
   await isUserAuthenticatedAndEmailVerified(request);
 
-  const userId = request.auth?.uid!;
+  const userId = request.auth?.uid as string;
   const userDoc = await admin.firestore().collection("users").doc(userId).get();
   const userData = userDoc.data();
 
