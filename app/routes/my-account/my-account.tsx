@@ -46,6 +46,32 @@ const MyAccount: React.FC = () => {
     email?: string | null;
   } | null>(null);
 
+  const [isLoadingCancel, setIsLoadingCancel] = useState(false);
+
+  // Handle subscription cancellation
+  const handleCancelSubscription = async () => {
+    setIsLoadingCancel(true);
+    try {
+      const cancelSubscription = httpsCallable(functions, "cancelSubscription");
+      await cancelSubscription({});
+
+      // Refresh user plan data
+      const getUserPlan = httpsCallable<{}, UserPlanResponse>(
+        functions,
+        "getUserPlan"
+      );
+      const result = await getUserPlan({});
+      setUserPlan(result.data);
+
+      toast.success("Subscription cancelled successfully");
+    } catch (error) {
+      console.error("Error cancelling subscription:", error);
+      toast.error("Failed to cancel subscription. Please try again.");
+    } finally {
+      setIsLoadingCancel(false);
+    }
+  };
+
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       setUserDisplay({ name: user?.displayName, email: user?.email });
@@ -432,6 +458,19 @@ const MyAccount: React.FC = () => {
           >
             Log out
           </button>
+
+          {userPlan?.stripeSubscriptionStatus === "active" ? (
+            <div>
+              <ButtonWithLoading
+                isLoading={isLoadingCancel}
+                onClick={handleCancelSubscription}
+                className="cursor-pointer w-[200px] text-[#EF4444] hover:text-red-700 px-4 py-2 border border-[#EF4444] rounded-3xl hover:bg-red-50 transition-colors"
+              >
+                Cancel Subscription
+              </ButtonWithLoading>
+            </div>
+          ) : null}
+
           <div className="">
             <button
               onClick={handleDeleteAccount}

@@ -242,7 +242,6 @@ export const stripeWebhook = functions.https.onRequest(
         case "customer.subscription.deleted":
           {
             const subscription = event.data.object as Stripe.Subscription;
-            const subscriptionStatus = subscription.status;
             const customerId = subscription.customer as string;
 
             // Try to get the Firebase UID from metadata, if not found,
@@ -263,18 +262,28 @@ export const stripeWebhook = functions.https.onRequest(
               break;
             }
 
-            await admin.firestore().collection("users").doc(userId).update({
-              plan: "free",
-              billingCycle: admin.firestore.FieldValue.delete(),
-              stripeProductId: admin.firestore.FieldValue.delete(),
-              stripeSubscriptionId: admin.firestore.FieldValue.delete(),
-              stripeSubscriptionStatus: subscriptionStatus,
-              trialEndDate: admin.firestore.FieldValue.delete(),
-            });
+            const userRef = admin.firestore().collection("users").doc(userId);
+            const userDoc = await userRef.get();
+            const userData = userDoc.data();
 
-            functions.logger.log(
-              `Downgraded user ${userId} to free plan due to subscription ${subscriptionStatus}`
-            );
+            // Only downgrade if the deleted subscription is the current one
+            if (userData?.stripeSubscriptionId === subscription.id) {
+              await userRef.update({
+                plan: "free",
+                billingCycle: admin.firestore.FieldValue.delete(),
+                stripeProductId: admin.firestore.FieldValue.delete(),
+                stripeSubscriptionId: admin.firestore.FieldValue.delete(),
+                stripeSubscriptionStatus: subscription.status,
+                trialEndDate: admin.firestore.FieldValue.delete(),
+              });
+              functions.logger.log(
+                `Downgraded user ${userId} to free plan due to subscription deletion`
+              );
+            } else {
+              functions.logger.log(
+                `Ignored deleted subscription ${subscription.id} (current: ${userData?.stripeSubscriptionId}) for user ${userId}`
+              );
+            }
           }
           break;
         case "checkout.session.completed":
@@ -289,6 +298,29 @@ export const stripeWebhook = functions.https.onRequest(
             }
 
             try {
+              // Get user document and data
+              const userRef = admin.firestore().collection("users").doc(userId);
+              const userDoc = await userRef.get();
+              const userData = userDoc.data();
+
+              // Cancel existing subscription if present
+              if (userData?.stripeSubscriptionId) {
+                try {
+                  await stripe.subscriptions.cancel(
+                    userData.stripeSubscriptionId
+                  );
+                  functions.logger.log(
+                    `Canceled existing subscription ${userData.stripeSubscriptionId} for user ${userId}`
+                  );
+                } catch (error) {
+                  functions.logger.error(
+                    `Error canceling existing subscription ${userData.stripeSubscriptionId} for user ${userId}:`,
+                    error
+                  );
+                }
+              }
+
+              // Process new subscription
               // Get expanded line items with price and product details
               const lineItems = await stripe.checkout.sessions.listLineItems(
                 session.id,
@@ -331,7 +363,6 @@ export const stripeWebhook = functions.https.onRequest(
               }
 
               // Update user document in Firestore
-              const userRef = admin.firestore().collection("users").doc(userId);
               await userRef.update({
                 plan: planDetails.plan,
                 billingCycle: planDetails.billingCycle,
@@ -425,3 +456,44 @@ export const stripeWebhook = functions.https.onRequest(
     }
   }
 );
+
+export const cancelSubscription = functions.https.onCall(async (request) => {
+  await isUserAuthenticatedAndEmailVerified(request);
+
+  const userId = request.auth?.uid!;
+  const userDoc = await admin.firestore().collection("users").doc(userId).get();
+  const userData = userDoc.data();
+
+  if (!userData?.stripeSubscriptionId) {
+    throw new functions.https.HttpsError(
+      "not-found",
+      "No active subscription found"
+    );
+  }
+
+  try {
+    const stripe = createStripeClient();
+
+    // Cancel subscription
+    const canceledSubscription = await stripe.subscriptions.cancel(
+      userData.stripeSubscriptionId
+    );
+
+    // Update Firestore
+    await admin.firestore().collection("users").doc(userId).update({
+      plan: "free",
+      stripeSubscriptionStatus: "canceled",
+      billingCycle: admin.firestore.FieldValue.delete(),
+      trialEndDate: admin.firestore.FieldValue.delete(),
+      stripeSubscriptionUnpaidSince: admin.firestore.FieldValue.delete(),
+    });
+
+    return { status: canceledSubscription.status };
+  } catch (error) {
+    functions.logger.error("Error canceling subscription:", error);
+    throw new functions.https.HttpsError(
+      "internal",
+      "Failed to cancel subscription"
+    );
+  }
+});
