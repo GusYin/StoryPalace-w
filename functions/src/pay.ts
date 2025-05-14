@@ -479,6 +479,10 @@ export const cancelSubscription = functions.https.onCall(async (request) => {
       userData.stripeSubscriptionId
     );
 
+    functions.logger.log(
+      `User: ${userId} subscription cancelled: ${canceledSubscription}`
+    );
+
     // Update Firestore
     await admin.firestore().collection("users").doc(userId).update({
       plan: "free",
