@@ -26,32 +26,56 @@ interface UserPlanResponse {
 
 const MyAccount: React.FC = () => {
   const navigate = useNavigate();
-  const [editingName, setEditingName] = React.useState(false);
-  const [newName, setNewName] = React.useState("");
-  const [currentPassword, setCurrentPassword] = React.useState("");
-  const [newPassword, setNewPassword] = React.useState("");
-  const [showChangePassword, setShowChangePassword] = React.useState(false);
+  const [editingName, setEditingName] = useState(false);
+  const [newName, setNewName] = useState("");
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [showChangePassword, setShowChangePassword] = useState(false);
   const [userPlan, setUserPlan] = useState<UserPlanResponse | null>(null);
   const [isDeletingAccount, setIsDeletingAccount] = useState<boolean>(false);
-  const [deleteAccountInlineError, setDeleteAccountInlineError] =
-    React.useState("");
+  const [deleteAccountInlineError, setDeleteAccountInlineError] = useState("");
 
   // Add these new states for delete account flow
-  const [showDeleteAccountModal, setShowDeleteAccountModal] =
-    React.useState(false);
-  const [deleteAccountPassword, setDeleteAccountPassword] = React.useState("");
+  const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false);
+  const [deleteAccountPassword, setDeleteAccountPassword] = useState("");
 
   const [userDisplay, setUserDisplay] = useState<{
     name?: string | null;
     email?: string | null;
   } | null>(null);
 
-  const [isLoadingCancel, setIsLoadingCancel] = useState(false);
+  const [showCancelSubscriptionModal, setShowCancelSubscriptionModal] =
+    useState(false);
+  const [cancelSubscriptionPassword, setCancelSubscriptionPassword] =
+    useState("");
+  const [cancelSubscriptionInlineError, setCancelSubscriptionInlineError] =
+    useState("");
+  const [isLoadingCancelSubscription, setIsLoadingCancelSubscription] =
+    useState(false);
 
   // Handle subscription cancellation
-  const handleCancelSubscription = async () => {
-    setIsLoadingCancel(true);
+  const handleConfirmCancelSubscription = async () => {
+    if (!cancelSubscriptionPassword.trim()) {
+      setCancelSubscriptionInlineError("Password is required");
+      return;
+    }
+
+    setIsLoadingCancelSubscription(true);
     try {
+      const user = auth.currentUser;
+      if (!user || !user.email) {
+        toast.error("No authenticated user found");
+        return;
+      }
+
+      // Reauthenticate user
+      const credential = EmailAuthProvider.credential(
+        user.email,
+        cancelSubscriptionPassword
+      );
+      await reauthenticateWithCredential(user, credential);
+
+      // Cancel subscription
       const cancelSubscription = httpsCallable(functions, "cancelSubscription");
       await cancelSubscription({});
 
@@ -64,11 +88,18 @@ const MyAccount: React.FC = () => {
       setUserPlan(result.data);
 
       toast.success("Subscription cancelled successfully");
-    } catch (error) {
+      setShowCancelSubscriptionModal(false);
+    } catch (error: any) {
       console.error("Error cancelling subscription:", error);
-      toast.error("Failed to cancel subscription. Please try again.");
+      if (error.code === "auth/invalid-credential") {
+        setCancelSubscriptionInlineError("Incorrect password");
+      } else {
+        toast.error("Failed to cancel subscription. Please try again.");
+      }
     } finally {
-      setIsLoadingCancel(false);
+      setIsLoadingCancelSubscription(false);
+      setCancelSubscriptionPassword("");
+      setCancelSubscriptionInlineError("");
     }
   };
 
@@ -275,7 +306,7 @@ const MyAccount: React.FC = () => {
               YOUR PLAN
             </h3>
             <span className="capitalize-plan text-black font-bold text-4xl">
-              Story Palace {userPlan?.plan} {userPlan?.billingCycle}
+              Story Palace {userPlan?.plan}
             </span>
           </div>
           {userPlan?.plan === PricingPlan.Premium ? (
@@ -461,15 +492,64 @@ const MyAccount: React.FC = () => {
 
           {userPlan?.stripeSubscriptionStatus === "active" ? (
             <div>
-              <ButtonWithLoading
-                isLoading={isLoadingCancel}
-                onClick={handleCancelSubscription}
+              <button
+                onClick={() => setShowCancelSubscriptionModal(true)}
                 className="cursor-pointer w-[200px] text-[#EF4444] hover:text-red-700 px-4 py-2 border border-[#EF4444] rounded-3xl hover:bg-red-50 transition-colors"
               >
                 Cancel Subscription
-              </ButtonWithLoading>
+              </button>
             </div>
           ) : null}
+
+          {showCancelSubscriptionModal && (
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
+              <div className="bg-white p-6 rounded-xl space-y-4">
+                <h3 className="font-bold">Confirm Subscription Cancellation</h3>
+                <div className="space-y-1">
+                  <input
+                    type="password"
+                    placeholder="Enter your password to confirm"
+                    value={cancelSubscriptionPassword}
+                    onChange={(e) => {
+                      setCancelSubscriptionPassword(e.target.value);
+                      setCancelSubscriptionInlineError("");
+                    }}
+                    className={`font-dosis bg-[#F3F7F7] border ${
+                      cancelSubscriptionInlineError
+                        ? "border-custom-error"
+                        : "border-[#829793]"
+                    } p-2 w-full rounded-xl transition-colors`}
+                  />
+                  {cancelSubscriptionInlineError && (
+                    <p className="text-red-500 text-sm">
+                      {cancelSubscriptionInlineError}
+                    </p>
+                  )}
+                </div>
+                <div className="text-xl flex gap-2">
+                  <ButtonWithLoading
+                    description="Cancelling..."
+                    isLoading={isLoadingCancelSubscription}
+                    onClick={handleConfirmCancelSubscription}
+                    className="cursor-pointer w-auto text-custom-error hover:text-red-700 hover:bg-red-50 border border-[#EF4444] px-5 py-3 rounded-3xl transition-colors"
+                  >
+                    Confirm
+                  </ButtonWithLoading>
+                  <button
+                    disabled={isLoadingCancelSubscription}
+                    onClick={() => {
+                      setShowCancelSubscriptionModal(false);
+                      setCancelSubscriptionPassword("");
+                      setCancelSubscriptionInlineError("");
+                    }}
+                    className="cursor-pointer border border-[#829793] px-3 py-3 rounded-3xl w-auto bg-white text-black hover:text-blue-600 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="">
             <button
