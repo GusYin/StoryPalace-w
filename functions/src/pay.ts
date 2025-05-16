@@ -77,6 +77,9 @@ export const createCheckoutSession = functions.https.onCall(async (request) => {
       const currentPriceId = PRICE_ID_MAP[planId];
 
       // Check if user already has this price ID in their active subscriptions
+      // however, if user already has a different subscription, we don't eagerly
+      // cancel it in the checkout session creation. We only cancel it after
+      // the checkout session is completed i.e. payment success.
       if (userData?.stripeSubscriptionId) {
         const subscription = await stripe.subscriptions.retrieve(
           userData.stripeSubscriptionId
@@ -303,7 +306,9 @@ export const stripeWebhook = functions.https.onRequest(
               const userDoc = await userRef.get();
               const userData = userDoc.data();
 
-              // Cancel existing subscription if present
+              // Cancel existing active subscription if present
+              // this subcription must be a different subscription
+              // than the one that was just completed / paid.
               if (userData?.stripeSubscriptionId) {
                 try {
                   await stripe.subscriptions.cancel(
@@ -487,6 +492,8 @@ export const cancelSubscription = functions.https.onCall(async (request) => {
     await admin.firestore().collection("users").doc(userId).update({
       plan: "free",
       stripeSubscriptionStatus: "canceled",
+      stripeSubscriptionId: admin.firestore.FieldValue.delete(),
+      stripeProductId: admin.firestore.FieldValue.delete(),
       billingCycle: admin.firestore.FieldValue.delete(),
       trialEndDate: admin.firestore.FieldValue.delete(),
       stripeSubscriptionUnpaidSince: admin.firestore.FieldValue.delete(),
