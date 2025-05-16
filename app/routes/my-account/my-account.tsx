@@ -313,7 +313,7 @@ const MyAccount: React.FC = () => {
             <span className="capitalize-plan text-black font-bold text-4xl">
               Story Palace{" "}
               {isFetchingPlan ? (
-                <div className="-mt-2 inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-custom-teal"></div>
+                <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-custom-teal"></div>
               ) : (
                 <span className="capitalize">{userPlan?.plan}</span>
               )}
