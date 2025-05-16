@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import { httpsCallable } from "firebase/functions";
 import { functions } from "~/firebase/firebase";
 import AuthHeader from "~/components/header-auth";
-import { toast, ToastContainer } from "react-toastify";
 import FullScreenLoadingSpinnerTeal from "~/components/loading-spinner-teal";
 import { useNavigate } from "react-router";
+import { TickIcon } from "~/components/icons/tick";
 
 type BillingCycle = "monthly" | "yearly";
 type PlanType = "basic" | "premium";
@@ -19,11 +19,56 @@ interface SessionStatus {
   };
 }
 
+type CheckoutStatusDisplayEntry = {
+  title?: string;
+  message?: string | ((session: SessionStatus | null) => string);
+  buttonText?: string;
+  buttonOnClick?: (session: SessionStatus | null) => void;
+  icon?: React.ComponentType;
+  showPaymentStatus?: boolean;
+};
+
 export default function CheckoutReturnPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [session, setSession] = useState<SessionStatus | null>(null);
+
+  const checkoutStatusDisplay: Record<string, CheckoutStatusDisplayEntry> = {
+    complete: {
+      title: "Payment Successful",
+      message: (session) =>
+        `A confirmation has been sent to ${session?.customerEmail ?? ""}`,
+      buttonText: "Explore Library",
+      buttonOnClick: () => navigate("/library"),
+      icon: TickIcon,
+      showPaymentStatus: true,
+    },
+    expired: {
+      title: "Payment Expired",
+      message: "Your payment session has expired. Please try again.",
+      buttonText: "Resubmit Payment",
+      buttonOnClick: (session) =>
+        navigate(
+          `/payment/${session?.planDetails.plan}/${session?.planDetails.billingCycle}`
+        ),
+    },
+    open: {
+      title: "Payment Open",
+      message: "Your payment is still open. Please submit your payment again.",
+      buttonText: "Resubmit Payment",
+      buttonOnClick: (session) =>
+        navigate(
+          `/payment/${session?.planDetails.plan}/${session?.planDetails.billingCycle}`
+        ),
+    },
+    error: {
+      title: "Payment Failed",
+      message: "Your payment failed. Please choose your subscription again.",
+      buttonText: "Go to Pricing",
+      buttonOnClick: () => navigate("/pricing"),
+    },
+  };
 
   useEffect(() => {
     const checkSessionStatus = async () => {
@@ -45,7 +90,6 @@ export default function CheckoutReturnPage() {
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : "Failed to verify payment";
-
         setError(errorMessage);
       } finally {
         setLoading(false);
@@ -55,6 +99,9 @@ export default function CheckoutReturnPage() {
     checkSessionStatus();
   }, []);
 
+  const displayKey = error ? "error" : session?.status || "error";
+  const displayConfig = checkoutStatusDisplay[displayKey];
+
   return (
     <div className="min-h-screen bg-white">
       <AuthHeader />
@@ -62,91 +109,44 @@ export default function CheckoutReturnPage() {
       <main className="font-dosis text-xl text-black flex items-center justify-center">
         <FullScreenLoadingSpinnerTeal loading={loading} />
 
-        <div className="w-full max-w-[390px] md:h-[346px] mt-15">
-          {session?.status === "complete" && (
-            <>
+        {!loading && displayConfig && (
+          <div className="w-full max-w-[390px] md:h-[346px] mt-15">
+            <div className="text-black text-center mb-8 flex flex-col items-center">
+              {displayConfig.icon && (
+                <div className="text-[#F1F8F7] text-[40px] font-fraunces font-semibold shrink-0 w-14 h-14 bg-custom-teal text-white rounded-full flex items-center justify-center">
+                  <displayConfig.icon />
+                </div>
+              )}
               <h1 className="font-semibold font-fraunces text-4xl text-center mb-15">
-                Payment Successful
+                {displayConfig.title}
               </h1>
 
               <p className="mb-4">
-                A confirmation has been sent to{" "}
-                <span className="font-semibold">{session.customerEmail}</span>
+                {typeof displayConfig.message === "function"
+                  ? displayConfig.message(session)
+                  : displayConfig.message}
               </p>
-              <div className="p-4 rounded-md">
-                <p className="text-sm">
-                  Payment status:{" "}
-                  <span className="font-medium capitalize">
-                    {session.paymentStatus}
-                  </span>
-                </p>
-              </div>
+
+              {displayConfig.showPaymentStatus && session?.paymentStatus && (
+                <div className="p-4 rounded-md">
+                  <p className="text-sm">
+                    Payment status:{" "}
+                    <span className="font-medium capitalize">
+                      {session.paymentStatus}
+                    </span>
+                  </p>
+                </div>
+              )}
+
               <button
-                onClick={() => navigate("/library")}
+                onClick={() => displayConfig.buttonOnClick?.(session)}
                 className="w-full bg-custom-teal text-white py-4 rounded-4xl hover:bg-[#056955] transition-colors font-normal"
               >
-                Start Enjoying Your Subscription
+                {displayConfig.buttonText}
               </button>
-            </>
-          )}
-          {session?.status === "expired" && (
-            <>
-              <h1 className="font-semibold font-fraunces text-4xl text-center mb-15">
-                Payment Expired
-              </h1>
-              <p className="mb-4">
-                Your payment session has expired. Please try again.
-              </p>
-              <button
-                onClick={() =>
-                  navigate(
-                    `/payment/${session.planDetails.plan}/${session.planDetails.billingCycle}`
-                  )
-                }
-                className="w-full bg-custom-teal text-white py-4 rounded-4xl hover:bg-[#056955] transition-colors font-normal"
-              >
-                Resubmit Payment
-              </button>
-            </>
-          )}
-          {session?.status === "open" && (
-            <>
-              <h1 className="font-semibold font-fraunces text-4xl text-center mb-15">
-                Payment Open
-              </h1>
-              <p className="mb-4">
-                Your payment is still open. Please submit your payment again.
-              </p>
-              <button
-                onClick={() =>
-                  navigate(
-                    `/payment/${session.planDetails.plan}/${session.planDetails.billingCycle}`
-                  )
-                }
-                className="w-full bg-custom-teal text-white py-4 rounded-4xl hover:bg-[#056955] transition-colors font-normal"
-              >
-                Resubmit Payment
-              </button>
-            </>
-          )}
-          {error && (
-            <>
-              <h1 className="font-semibold font-fraunces text-4xl text-center mb-15">
-                Payment Failed
-              </h1>
-              <p className="mb-4">
-                {" "}
-                Your payment failed. Please choose your subscription again.
-              </p>
-              <button
-                onClick={() => navigate("/pricing")}
-                className="w-full bg-custom-teal text-white py-4 rounded-4xl hover:bg-[#056955] transition-colors font-normal"
-              >
-                Go to Pricing
-              </button>
-            </>
-          )}
-        </div>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );
