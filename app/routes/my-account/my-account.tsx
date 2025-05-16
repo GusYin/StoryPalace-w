@@ -32,6 +32,8 @@ const MyAccount: React.FC = () => {
   const [newPassword, setNewPassword] = useState("");
   const [showChangePassword, setShowChangePassword] = useState(false);
   const [userPlan, setUserPlan] = useState<UserPlanResponse | null>(null);
+  const [isFetchingPlan, setIsFetchingPlan] = useState(true);
+
   const [isDeletingAccount, setIsDeletingAccount] = useState<boolean>(false);
   const [deleteAccountInlineError, setDeleteAccountInlineError] = useState("");
 
@@ -113,6 +115,7 @@ const MyAccount: React.FC = () => {
 
   useEffect(() => {
     const fetchUserData = async () => {
+      setIsFetchingPlan(true);
       try {
         const getUserPlan = httpsCallable<{}, UserPlanResponse>(
           functions,
@@ -125,6 +128,8 @@ const MyAccount: React.FC = () => {
       } catch (error) {
         console.error("Error fetching user data:", error);
         toast.error("Failed to load account information. Please try again.");
+      } finally {
+        setIsFetchingPlan(false);
       }
     };
 
@@ -306,7 +311,12 @@ const MyAccount: React.FC = () => {
               YOUR PLAN
             </h3>
             <span className="capitalize-plan text-black font-bold text-4xl">
-              Story Palace {userPlan?.plan}
+              Story Palace{" "}
+              {isFetchingPlan ? (
+                <div className="-mt-2 inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-custom-teal"></div>
+              ) : (
+                <span className="capitalize">{userPlan?.plan}</span>
+              )}
             </span>
           </div>
           {userPlan?.plan === PricingPlan.Premium ? (
@@ -315,7 +325,6 @@ const MyAccount: React.FC = () => {
             </button>
           ) : (
             <></>
-
             // <button
             //   onClick={() => navigate("/upgrade")}
             //   className="text-xl w-full sm:w-auto md:w-80 bg-custom-teal text-white px-3 py-3 rounded-3xl hover:bg-blue-600 transition-colors"
