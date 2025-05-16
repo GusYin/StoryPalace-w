@@ -132,6 +132,11 @@ export const createCheckoutSession = functions.https.onCall(async (request) => {
     const session = await stripe.checkout.sessions.create({
       customer: stripeCustomerId, // Use existing customer
       mode: "subscription",
+      subscription_data: {
+        metadata: {
+          firebaseUID: userId,
+        },
+      },
       line_items: [
         {
           price: PRICE_ID_MAP[planId],
@@ -242,21 +247,31 @@ export const stripeWebhook = functions.https.onRequest(
     try {
       // Handle the event
       switch (event.type) {
+        // When user cancels the subscription, Stripe will send this event
+        // and the subscription will be set to "canceled" status.
         case "customer.subscription.deleted":
           {
             const subscription = event.data.object as Stripe.Subscription;
             const customerId = subscription.customer as string;
 
-            // Try to get the Firebase UID from metadata, if not found,
-            // use the client_reference_id from the subscription
-            const customer = await stripe.customers.retrieve(customerId);
-            const userId = !("deleted" in customer)
-              ? customer.metadata.firebaseUID
-              : subscription.metadata.client_reference_id;
+            // First try to get the Firebase UID from subscription metadata
+            let userId = subscription.metadata.firebaseUID;
 
+            // If not found in subscription metadata, check customer metadata
+            if (!userId) {
+              const customer = await stripe.customers.retrieve(customerId);
+
+              // Only check customer metadata if the customer record isn't deleted
+              if (!("deleted" in customer)) {
+                userId = customer.metadata.firebaseUID;
+              }
+            }
+
+            // Handle missing user ID case
             if (!userId) {
               functions.logger.error(
-                "No Firebase UID in Stripe customer metadata",
+                `Stripe event: customer.subscription.deleted. 
+                No Firebase UID found in either subscription or customer metadata`,
                 {
                   subscriptionId: subscription.id,
                   customerId,
@@ -353,11 +368,11 @@ export const stripeWebhook = functions.https.onRequest(
                 stripeSubscriptionId
               );
 
-              await stripe.subscriptions.update(stripeSubscriptionId, {
-                metadata: {
-                  client_reference_id: userId,
-                },
-              });
+              // await stripe.subscriptions.update(stripeSubscriptionId, {
+              //   metadata: {
+              //     firebaseUID: userId,
+              //   },
+              // });
 
               // Map Stripe price IDs to your plan names and billing cycles
               const planDetails = PRICE_ID_MAP_REVERSE[priceId];
@@ -398,30 +413,40 @@ export const stripeWebhook = functions.https.onRequest(
           {
             const subscription = event.data.object as Stripe.Subscription;
             const subscriptionStatus = subscription.status;
-            const customerId = subscription.customer as string;
 
-            // Try to get the Firebase UID from metadata, if not found,
-            // use the client_reference_id from the subscription
-            const customer = await stripe.customers.retrieve(customerId);
-            const userId = !("deleted" in customer)
-              ? customer.metadata.firebaseUID
-              : subscription.metadata.client_reference_id;
-
-            if (!userId) {
-              functions.logger.error(
-                "No Firebase UID in Stripe customer metadata",
-                {
-                  subscriptionId: subscription.id,
-                  customerId,
-                }
-              );
-              break;
-            }
-
-            // https://dashboard.stripe.com/settings/billing/automatic
-            // https://docs.stripe.com/billing/subscriptions/overview#failed-payments
-            // when all retries are exhausted, the subscription will be set to "unpaid"
             if (subscriptionStatus === "unpaid") {
+              const customerId = subscription.customer as string;
+
+              // First try to get the Firebase UID from subscription metadata
+              let userId = subscription.metadata.firebaseUID;
+
+              // If not found in subscription metadata, check customer metadata
+              if (!userId) {
+                const customer = await stripe.customers.retrieve(customerId);
+
+                // Only check customer metadata if the customer record isn't deleted
+                if (!("deleted" in customer)) {
+                  userId = customer.metadata.firebaseUID;
+                }
+              }
+
+              // Handle missing user ID case
+              if (!userId) {
+                functions.logger.error(
+                  `Stripe event: customer.subscription.updated. 
+                  No Firebase UID found in either subscription or customer metadata`,
+                  {
+                    subscriptionId: subscription.id,
+                    customerId,
+                  }
+                );
+                break;
+              }
+
+              // https://dashboard.stripe.com/settings/billing/automatic
+              // https://docs.stripe.com/billing/subscriptions/overview#failed-payments
+              // when all retries are exhausted, the subscription will be set to "unpaid"
+
               // Handle subscription cancellation or unpaid status
               const userRef = admin.firestore().collection("users").doc(userId);
               await userRef.update({
@@ -438,7 +463,7 @@ export const stripeWebhook = functions.https.onRequest(
             }
 
             functions.logger.log(
-              `Subscription change to ${subscription.status} for user ${userId}`
+              `Subscription change to ${subscription.status} for user ${subscription.metadata.firebaseUID}`
             );
           }
           break;
