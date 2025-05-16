@@ -22,11 +22,12 @@ interface SessionStatus {
 
 type CheckoutStatusDisplayEntry = {
   title?: string;
-  message?: string | ((session: SessionStatus | null) => string);
+  message?:
+    | React.ReactNode
+    | ((session: SessionStatus | null) => React.ReactNode);
   buttonText?: string;
   buttonOnClick?: (session: SessionStatus | null) => void;
   icon?: React.ComponentType;
-  showPaymentStatus?: boolean;
 };
 
 export default function CheckoutReturnPage() {
@@ -38,14 +39,17 @@ export default function CheckoutReturnPage() {
   const checkoutStatusDisplay: Record<string, CheckoutStatusDisplayEntry> = {
     complete: {
       title: "Payment Successful",
-      message: (session) =>
-        `Thank you for subscribing to Story Palace. ${(
-          <br />
-        )} A confirmation has been sent to ${session?.customerEmail ?? ""}`,
+      message: (session) => (
+        <>
+          <p className="mb-1">Thank you for subscribing to Story Palace.</p>
+          <p className="text-sm text-gray-500">
+            A confirmation has been sent to {session?.customerEmail ?? ""}
+          </p>
+        </>
+      ),
       buttonText: "Explore Library",
       buttonOnClick: () => navigate("/library"),
       icon: TickIcon,
-      showPaymentStatus: true,
     },
     expired: {
       title: "Payment Expired",
@@ -123,22 +127,11 @@ export default function CheckoutReturnPage() {
                 {displayConfig.title}
               </h1>
 
-              <p className="mb-16">
+              <div className="mb-[150px]">
                 {typeof displayConfig.message === "function"
                   ? displayConfig.message(session)
                   : displayConfig.message}
-              </p>
-
-              {displayConfig.showPaymentStatus && session?.paymentStatus && (
-                <div className="p-4 rounded-md">
-                  <p className="text-sm">
-                    Payment status:{" "}
-                    <span className="font-medium capitalize">
-                      {session.paymentStatus}
-                    </span>
-                  </p>
-                </div>
-              )}
+              </div>
 
               <button
                 onClick={() => displayConfig.buttonOnClick?.(session)}
