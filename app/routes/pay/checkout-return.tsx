@@ -5,6 +5,7 @@ import AuthHeader from "~/components/header-auth";
 import FullScreenLoadingSpinnerTeal from "~/components/loading-spinner-teal";
 import { useNavigate } from "react-router";
 import { TickIcon } from "~/components/icons/tick";
+import { EscalationMarkIcon } from "~/components/icons/escalation-mark-icon";
 
 type BillingCycle = "monthly" | "yearly";
 type PlanType = "basic" | "premium";
@@ -38,7 +39,9 @@ export default function CheckoutReturnPage() {
     complete: {
       title: "Payment Successful",
       message: (session) =>
-        `A confirmation has been sent to ${session?.customerEmail ?? ""}`,
+        `Thank you for subscribing to Story Palace. ${(
+          <br />
+        )} A confirmation has been sent to ${session?.customerEmail ?? ""}`,
       buttonText: "Explore Library",
       buttonOnClick: () => navigate("/library"),
       icon: TickIcon,
@@ -48,6 +51,7 @@ export default function CheckoutReturnPage() {
       title: "Payment Expired",
       message: "Your payment session has expired. Please try again.",
       buttonText: "Resubmit Payment",
+      icon: EscalationMarkIcon,
       buttonOnClick: (session) =>
         navigate(
           `/payment/${session?.planDetails.plan}/${session?.planDetails.billingCycle}`
@@ -57,6 +61,7 @@ export default function CheckoutReturnPage() {
       title: "Payment Open",
       message: "Your payment is still open. Please submit your payment again.",
       buttonText: "Resubmit Payment",
+      icon: EscalationMarkIcon,
       buttonOnClick: (session) =>
         navigate(
           `/payment/${session?.planDetails.plan}/${session?.planDetails.billingCycle}`
@@ -65,6 +70,7 @@ export default function CheckoutReturnPage() {
     error: {
       title: "Payment Failed",
       message: "Your payment failed. Please choose your subscription again.",
+      icon: EscalationMarkIcon,
       buttonText: "Go to Pricing",
       buttonOnClick: () => navigate("/pricing"),
     },
@@ -112,16 +118,12 @@ export default function CheckoutReturnPage() {
         {!loading && displayConfig && (
           <div className="w-full max-w-[390px] md:h-[346px] mt-15">
             <div className="text-black text-center mb-8 flex flex-col items-center">
-              {displayConfig.icon && (
-                <div className="text-[#F1F8F7] text-[40px] font-fraunces font-semibold shrink-0 w-14 h-14 bg-custom-teal text-white rounded-full flex items-center justify-center">
-                  <displayConfig.icon />
-                </div>
-              )}
-              <h1 className="font-semibold font-fraunces text-4xl text-center mb-15">
+              {displayConfig.icon && <displayConfig.icon />}
+              <h1 className="font-semibold font-fraunces text-4xl text-center mt-15 mb-5">
                 {displayConfig.title}
               </h1>
 
-              <p className="mb-4">
+              <p className="mb-16">
                 {typeof displayConfig.message === "function"
                   ? displayConfig.message(session)
                   : displayConfig.message}
