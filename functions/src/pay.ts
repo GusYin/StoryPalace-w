@@ -69,36 +69,31 @@ export const createCheckoutSession = functions.https.onCall(async (request) => {
     const userRef = admin.firestore().collection("users").doc(userId);
     const userDoc = await userRef.get();
 
-    // Double subscription prevention check
+    // Duplicate subscription prevention check
     // Check if user already signed up for the
     // the same stripe subscription and same price id
     if (userDoc.exists) {
       const userData = userDoc.data();
-      const currentPriceId = PRICE_ID_MAP[planId];
+      const [plan, billingCycle] = planId.split("_") as [
+        PlanType,
+        BillingCycle
+      ];
 
       // Check if user already has this price ID in their active subscriptions
       // however, if user already has a different subscription, we don't eagerly
       // cancel it in the checkout session creation. We only cancel it after
       // the checkout session is completed i.e. payment success.
-      if (userData?.stripeSubscriptionId) {
-        const subscription = await stripe.subscriptions.retrieve(
-          userData.stripeSubscriptionId
-        );
+      const isSamePlanAndBillingCycle =
+        userData?.stripeSubscriptionId &&
+        ["active", "trialing"].includes(userData?.stripeSubscriptionStatus) &&
+        userData?.plan === plan &&
+        userData?.billingCycle === billingCycle;
 
-        const hasActiveSubscription = ["active", "trialing"].includes(
-          subscription.status
+      if (isSamePlanAndBillingCycle) {
+        throw new functions.https.HttpsError(
+          "already-exists",
+          `User has already subscribed to this plan: ${plan} with billing cycle ${billingCycle}`
         );
-        const hasSamePrice = subscription.items.data.some(
-          (item) => item.price.id === currentPriceId
-        );
-
-        if (hasActiveSubscription && hasSamePrice) {
-          const planDetails = PRICE_ID_MAP_REVERSE[currentPriceId];
-          throw new functions.https.HttpsError(
-            "already-exists",
-            `User has already subscribed to this plan: ${planDetails.plan} with billing cycle ${planDetails.billingCycle}`
-          );
-        }
       }
     }
 
@@ -125,12 +120,13 @@ export const createCheckoutSession = functions.https.onCall(async (request) => {
       );
     }
 
-    // If not provided with an existing Stripe customer ID,
-    // creating a new Stripe checkout seesion with "subscription"
-    // mode will create a new customer every single time,
+    // Important to note if we don't provide the customer ID, Stripe will
+    // create a new customer every time we create a checkout session
     // even it is the same user paying for a different subscription.
+    // Also, the 'subcription' mode will create a new subscription
+    // every time we create a checkout session.
     const session = await stripe.checkout.sessions.create({
-      customer: stripeCustomerId, // Use existing customer
+      customer: stripeCustomerId,
       mode: "subscription",
       subscription_data: {
         metadata: {
