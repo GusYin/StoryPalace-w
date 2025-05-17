@@ -244,76 +244,82 @@ export const stripeWebhook = functions.https.onRequest(
       return;
     }
 
-    functions.logger.log(`Stripe event: ${event.request}`);
-
     try {
       // Handle the event
       switch (event.type) {
+        // Not handle customer.subscription.deleted because it might
+        // get into a race condition with checkout.session.completed.
+
         // When user cancels the subscription, or subscripton is cancelled
         // from the Stripe dashboard by admin. Stripe will send this event
         // and the subscription will be set to "canceled" status.
-        case "customer.subscription.deleted":
-          {
-            const subscription = event.data.object as Stripe.Subscription;
-            const customerId = subscription.customer as string;
+        // case "customer.subscription.deleted":
+        //   {
+        //     const subscription = event.data.object as Stripe.Subscription;
+        //     const customerId = subscription.customer as string;
 
-            // First try to get the Firebase UID from subscription metadata
-            let userId = subscription.metadata.firebaseUID;
+        //     // First try to get the Firebase UID from subscription metadata
+        //     let userId = subscription.metadata.firebaseUID;
 
-            // If not found in subscription metadata, check customer metadata
-            if (!userId) {
-              const customer = await stripe.customers.retrieve(customerId);
+        //     // If not found in subscription metadata, check customer metadata
+        //     if (!userId) {
+        //       const customer = await stripe.customers.retrieve(customerId);
 
-              // Only check customer metadata if the customer record isn't deleted
-              if (!("deleted" in customer)) {
-                userId = customer.metadata.firebaseUID;
-              }
-            }
+        //       // Only check customer metadata if the customer record isn't deleted
+        //       if (!("deleted" in customer)) {
+        //         userId = customer.metadata.firebaseUID;
+        //       }
+        //     }
 
-            // Handle missing user ID case
-            if (!userId) {
-              functions.logger.error(
-                `Stripe event: customer.subscription.deleted. 
-                No Firebase UID found in either subscription or customer metadata`,
-                {
-                  subscriptionId: subscription.id,
-                  customerId,
-                }
-              );
-              break;
-            }
+        //     // Handle missing user ID case
+        //     if (!userId) {
+        //       functions.logger.error(
+        //         `${event.type}.
+        //         No Firebase UID found in either subscription or customer metadata`,
+        //         {
+        //           subscriptionId: subscription.id,
+        //           customerId,
+        //         }
+        //       );
+        //       break;
+        //     }
 
-            const userRef = admin.firestore().collection("users").doc(userId);
-            const userDoc = await userRef.get();
-            const userData = userDoc.data();
+        //     const userRef = admin.firestore().collection("users").doc(userId);
+        //     const userDoc = await userRef.get();
+        //     const userData = userDoc.data();
 
-            // Only downgrade if the deleted subscription is the current one
-            if (userData?.stripeSubscriptionId === subscription.id) {
-              await userRef.update({
-                plan: "free",
-                billingCycle: admin.firestore.FieldValue.delete(),
-                stripeProductId: admin.firestore.FieldValue.delete(),
-                stripeSubscriptionId: admin.firestore.FieldValue.delete(),
-                stripeSubscriptionStatus: subscription.status,
-                trialEndDate: admin.firestore.FieldValue.delete(),
-              });
-              functions.logger.log(
-                `Downgraded user ${userId} to free plan due to subscription deletion`
-              );
-            } else {
-              functions.logger.log(
-                `Ignored deleted subscription ${subscription.id} (current: ${userData?.stripeSubscriptionId}) for user ${userId}`
-              );
-            }
-          }
-          break;
+        //     // Only downgrade if the deleted subscription is the current one
+        //     if (
+        //       userData?.stripeSubscriptionId === subscription.id &&
+        //       userData?.stripeSubscriptionStatus === "active"
+        //     ) {
+        //       await userRef.update({
+        //         plan: "free",
+        //         billingCycle: admin.firestore.FieldValue.delete(),
+        //         stripeProductId: admin.firestore.FieldValue.delete(),
+        //         stripeSubscriptionId: admin.firestore.FieldValue.delete(),
+        //         stripeSubscriptionStatus: subscription.status,
+        //         trialEndDate: admin.firestore.FieldValue.delete(),
+        //       });
+        //       functions.logger.log(
+        //         `${event.type}. Downgraded user ${userId} to free plan due to subscription deletion`
+        //       );
+        //     } else {
+        //       functions.logger.log(
+        //         `${event.type}. Ignored deleted subscription ${subscription.id} (current: ${userData?.stripeSubscriptionId}) for user ${userId}`
+        //       );
+        //     }
+        //   }
+        //   break;
         case "checkout.session.completed":
           {
             const session = event.data.object as Stripe.Checkout.Session;
             const userId = session.client_reference_id;
 
             if (!userId) {
-              functions.logger.error("No user ID found in session");
+              functions.logger.error(
+                `${event.type}. No user ID found in session`
+              );
               response.status(400).send("No user ID found");
               return;
             }
@@ -336,11 +342,11 @@ export const stripeWebhook = functions.https.onRequest(
                     userData.stripeSubscriptionId
                   );
                   functions.logger.log(
-                    `Canceled existing subscription ${userData.stripeSubscriptionId} for user ${userId}`
+                    `${event.type}. Canceled existing subscription ${userData.stripeSubscriptionId} for user ${userId}`
                   );
                 } catch (error) {
                   functions.logger.error(
-                    `Error canceling existing subscription ${userData.stripeSubscriptionId} for user ${userId}:`,
+                    `${event.type}. Error canceling existing subscription ${userData.stripeSubscriptionId} for user ${userId}:`,
                     error
                   );
                 }
@@ -363,7 +369,9 @@ export const stripeWebhook = functions.https.onRequest(
                   : price.product?.id;
 
               if (!priceId || !stripeProductId) {
-                functions.logger.error("Missing price or product information");
+                functions.logger.error(
+                  `${event.type}. Missing price or product information`
+                );
                 response.status(400).send("Invalid price data");
                 return;
               }
@@ -377,7 +385,9 @@ export const stripeWebhook = functions.https.onRequest(
               // Map Stripe price IDs to your plan names and billing cycles
               const planDetails = PRICE_ID_MAP_REVERSE[priceId];
               if (!planDetails) {
-                functions.logger.error(`Unrecognised price ID: ${priceId}`);
+                functions.logger.error(
+                  `${event.type}. Unrecognised price ID: ${priceId}`
+                );
                 response.status(400).send("Unrecognised price ID");
                 return;
               }
@@ -395,11 +405,11 @@ export const stripeWebhook = functions.https.onRequest(
               });
 
               functions.logger.log(
-                `Updated user ${userId} to plan ${planDetails.plan} with billing cycle ${planDetails.billingCycle}`
+                `${event.type}. Updated user ${userId} to plan ${planDetails.plan} with billing cycle ${planDetails.billingCycle}`
               );
             } catch (error) {
               functions.logger.error(
-                "Error processing checkout session:",
+                `${event.type}. Error processing checkout session:`,
                 error
               );
               response.status(500).send("Error processing subscription");
@@ -433,7 +443,7 @@ export const stripeWebhook = functions.https.onRequest(
               // Handle missing user ID case
               if (!userId) {
                 functions.logger.error(
-                  `Stripe event: customer.subscription.updated. 
+                  `${event.type}. 
                   No Firebase UID found in either subscription or customer metadata`,
                   {
                     subscriptionId: subscription.id,
@@ -460,12 +470,12 @@ export const stripeWebhook = functions.https.onRequest(
               });
 
               functions.logger.log(
-                `Downgraded user ${userId} to free plan due to subscription ${subscriptionStatus}`
+                `${event.type}. Downgraded user ${userId} to free plan due to subscription ${subscriptionStatus}`
               );
             }
 
             functions.logger.log(
-              `Subscription change to ${subscription.status} for user ${subscription.metadata.firebaseUID}`
+              `${event.type}. Subscription change to ${subscription.status} for user ${subscription.metadata.firebaseUID}`
             );
           }
           break;
