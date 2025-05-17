@@ -244,10 +244,13 @@ export const stripeWebhook = functions.https.onRequest(
       return;
     }
 
+    functions.logger.log(`Stripe event: ${event.request}`);
+
     try {
       // Handle the event
       switch (event.type) {
-        // When user cancels the subscription, Stripe will send this event
+        // When user cancels the subscription, or subscripton is cancelled
+        // from the Stripe dashboard by admin. Stripe will send this event
         // and the subscription will be set to "canceled" status.
         case "customer.subscription.deleted":
           {
@@ -324,7 +327,10 @@ export const stripeWebhook = functions.https.onRequest(
               // Cancel existing active subscription if present
               // this subcription must be a different subscription
               // than the one that was just completed / paid.
-              if (userData?.stripeSubscriptionId) {
+              if (
+                userData?.stripeSubscriptionId &&
+                userData?.stripeSubscriptionStatus === "active"
+              ) {
                 try {
                   await stripe.subscriptions.cancel(
                     userData.stripeSubscriptionId
@@ -367,12 +373,6 @@ export const stripeWebhook = functions.https.onRequest(
               const subscription = await stripe.subscriptions.retrieve(
                 stripeSubscriptionId
               );
-
-              // await stripe.subscriptions.update(stripeSubscriptionId, {
-              //   metadata: {
-              //     firebaseUID: userId,
-              //   },
-              // });
 
               // Map Stripe price IDs to your plan names and billing cycles
               const planDetails = PRICE_ID_MAP_REVERSE[priceId];
@@ -452,6 +452,8 @@ export const stripeWebhook = functions.https.onRequest(
               await userRef.update({
                 plan: "free",
                 billingCycle: admin.firestore.FieldValue.delete(),
+                stripeProductId: admin.firestore.FieldValue.delete(),
+                stripeSubscriptionId: admin.firestore.FieldValue.delete(),
                 stripeSubscriptionStatus: subscriptionStatus,
                 stripeSubscriptionUnpaidSince: admin.firestore.Timestamp.now(),
                 trialEndDate: admin.firestore.FieldValue.delete(),
@@ -516,7 +518,7 @@ export const cancelSubscription = functions.https.onCall(async (request) => {
     // Update Firestore
     await admin.firestore().collection("users").doc(userId).update({
       plan: "free",
-      stripeSubscriptionStatus: "canceled",
+      stripeSubscriptionStatus: canceledSubscription.status,
       stripeSubscriptionId: admin.firestore.FieldValue.delete(),
       stripeProductId: admin.firestore.FieldValue.delete(),
       billingCycle: admin.firestore.FieldValue.delete(),
