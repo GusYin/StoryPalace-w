@@ -224,6 +224,11 @@ const MyAccount: React.FC = () => {
     }
   };
 
+  const planDisplay = () =>
+    userPlan?.plan && userPlan?.plan !== PricingPlan.Free
+      ? userPlan.plan.charAt(0).toUpperCase() + userPlan.plan.slice(1)
+      : "Story Palace Free";
+
   return (
     <div className="min-h-screen bg-white">
       <AuthHeader />
@@ -311,27 +316,26 @@ const MyAccount: React.FC = () => {
               YOUR PLAN
             </h3>
             <span className="capitalize-plan text-black font-bold text-4xl">
-              Story Palace{" "}
               {isFetchingPlan ? (
                 <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-custom-teal"></div>
               ) : (
-                <span className="capitalize">{userPlan?.plan}</span>
+                `${planDisplay()}`
               )}
             </span>
           </div>
-          {userPlan?.plan === PricingPlan.Premium ? (
-            <button className="w-full sm:w-auto md:w-80 bg-gray-600 text-white px-3 py-3 rounded-3xl hover:bg-gray-700 transition-colors">
-              Manage Plan
-            </button>
-          ) : (
-            <></>
-            // <button
-            //   onClick={() => navigate("/upgrade")}
-            //   className="text-xl w-full sm:w-auto md:w-80 bg-custom-teal text-white px-3 py-3 rounded-3xl hover:bg-blue-600 transition-colors"
-            // >
-            //   Upgrade Plan
-            // </button>
-          )}
+          {!isFetchingPlan &&
+            (userPlan?.plan === PricingPlan.Premium ? (
+              <button className="w-full sm:w-auto md:w-80 bg-gray-600 text-white px-3 py-3 rounded-3xl hover:bg-gray-700 transition-colors">
+                Manage Plan
+              </button>
+            ) : (
+              <button
+                onClick={() => navigate("/pricing")}
+                className="text-xl w-full sm:w-auto md:w-80 bg-custom-teal text-white px-3 py-3 rounded-3xl hover:bg-blue-600 transition-colors"
+              >
+                Upgrade Plan
+              </button>
+            ))}
         </div>
 
         {/* Account Settings */}
