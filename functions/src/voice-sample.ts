@@ -29,9 +29,10 @@ export const generateVoiceUploadUrl = functions.https.onCall(
     throwIfUnauthenticated(request);
 
     const userId = request.auth?.uid;
+    const voiceName = request.data.voiceName || "default";
     const fileName = request.data.fileName || Date.now().toString();
     const contentType = request.data.contentType || "audio/wav";
-    const filePath = `users/${userId}/voice-samples/${fileName}`;
+    const filePath = `users/${userId}/voice-samples/${voiceName}/${fileName}`;
 
     try {
       // Generate signed URL for direct upload

@@ -35,7 +35,7 @@ export interface UploadResultForEachVoiceSample {
   contentType?: string;
 }
 
-export interface VoiceSampled {
+export interface UploadResultForVoiceSamples {
   uniqueVoiceName: string;
   uploadedFiles: UploadResultForEachVoiceSample[];
 }
@@ -54,7 +54,7 @@ async function uploadSingleFile(
 export async function uploadVoiceSamples(
   voiceName: string,
   items: FileToUpload[]
-): Promise<VoiceSampled> {
+): Promise<UploadResultForVoiceSamples> {
   // Ensure the user is authenticated and email is verified
   if (!auth.currentUser?.uid || !auth.currentUser?.emailVerified) {
     throw new Error("User is not authenticated or email is not verified");
