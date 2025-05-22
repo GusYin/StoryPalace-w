@@ -81,7 +81,7 @@ export const createVoiceClone = functions.https.onCall(async (request) => {
     }
 
     // 3. Fetch voice samples from Firebase Storage
-    const prefix = `users/${userId}/voice-samples/${voiceName}`;
+    const prefix = `voice-samples/${userId}/${voiceName}`;
     const [files] = await bucket.getFiles({ prefix });
 
     const samples: VoiceSample[] = [];

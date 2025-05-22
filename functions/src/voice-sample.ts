@@ -45,7 +45,7 @@ export const generateVoiceUploadUrl = functions.https.onCall(
     const voiceName = request.data.voiceName || "default";
     const fileName = request.data.fileName || Date.now().toString();
     const contentType = request.data.contentType || "audio/wav";
-    const filePath = `users/${userId}/voice-samples/${voiceName}/${fileName}`;
+    const filePath = `voice-samples/${userId}/${voiceName}/${fileName}`;
 
     try {
       // Generate signed URL for direct upload

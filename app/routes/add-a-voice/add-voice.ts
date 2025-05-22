@@ -132,7 +132,7 @@ export async function clearPreviousVoiceSamples(
   }
 
   const userId = auth.currentUser.uid;
-  const folderRef = ref(storage, `users/${userId}/voice-samples/${voiceName}`);
+  const folderRef = ref(storage, `voice-samples/${userId}/${voiceName}`);
 
   try {
     // List all files in the voice samples folder
