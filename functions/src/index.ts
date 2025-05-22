@@ -11,6 +11,7 @@ import { initializeApp } from "firebase-admin/app";
 initializeApp();
 
 export * from "./voice-clone";
+export * from "./voice-sample";
 export * from "./story";
 export * from "./user";
 export * from "./pay";
