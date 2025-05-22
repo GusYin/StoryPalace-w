@@ -322,20 +322,20 @@ export const getExistingVoices = functions.https.onCall(async (request) => {
   try {
     const userId = request.auth.uid;
     const voiceClonesRef = db.collection("voiceClones");
-    const snapshot = await voiceClonesRef
+
+    // This query requires a composite index
+    const query = voiceClonesRef
       .where("userId", "==", userId)
-      .orderBy("lastUsed", "desc")
-      .get();
+      .orderBy("lastUsed", "desc");
 
-    const voices = snapshot.docs.map((doc) => {
-      const data = doc.data() as VoiceClone;
-      return {
-        voiceName: data.voiceName,
-        lastUsed: data.lastUsed.toDate(), // Convert Firestore Timestamp to JS Date
-      };
-    });
+    const snapshot = await query.get();
 
-    return { voices };
+    return {
+      voices: snapshot.docs.map((doc) => ({
+        voiceName: doc.data().voiceName,
+        lastUsed: doc.data().lastUsed.toDate(),
+      })),
+    };
   } catch (error) {
     console.error("Error fetching existing voices:", error);
     throw new functions.https.HttpsError(

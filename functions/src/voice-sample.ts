@@ -2,6 +2,7 @@ import * as functions from "firebase-functions/v2";
 import { getFirestore, Timestamp } from "firebase-admin/firestore";
 import { getStorage } from "firebase-admin/storage";
 import { throwIfUnauthenticated } from "./util";
+import { getUserPlanDocument } from "./user";
 
 const db = getFirestore();
 const bucket = getStorage().bucket();
@@ -27,6 +28,18 @@ interface VoiceSample {
 export const generateVoiceUploadUrl = functions.https.onCall(
   async (request) => {
     throwIfUnauthenticated(request);
+
+    const planDoc = await getUserPlanDocument(request.auth?.uid);
+
+    if (
+      planDoc.plan !== "premium" ||
+      planDoc.stripeSubscriptionStatus !== "active"
+    ) {
+      throw new functions.https.HttpsError(
+        "permission-denied",
+        "User is not on Premium plan"
+      );
+    }
 
     const userId = request.auth?.uid;
     const voiceName = request.data.voiceName || "default";

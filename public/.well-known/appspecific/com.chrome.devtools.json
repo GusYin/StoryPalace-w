@@ -1,0 +1,6 @@
+{
+  "devtools": {
+    "enabled": true,
+    "compatibility": "react-vite"
+  }
+}

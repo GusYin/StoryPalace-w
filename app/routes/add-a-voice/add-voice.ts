@@ -1,3 +1,4 @@
+import { httpsCallable } from "firebase/functions";
 import {
   deleteObject,
   getDownloadURL,
@@ -8,7 +9,7 @@ import {
   type UploadTask,
   type UploadTaskSnapshot,
 } from "firebase/storage";
-import { auth, storage } from "~/firebase/firebase";
+import { auth, functions, storage } from "~/firebase/firebase";
 
 export const STORAGE_KEY_VOICE_NAME = "voiceName";
 export const STORAGE_KEY_VOICE_SAMPLES = "voiceSamples";
@@ -40,17 +41,6 @@ export interface UploadResultForVoiceSamples {
   uploadedFiles: UploadResultForEachVoiceSample[];
 }
 
-// Helper function to upload a single file and return UploadResult
-async function uploadSingleFile(
-  uploadTask: UploadTask,
-  fileRef: StorageReference,
-  filePath: string
-): Promise<UploadResultForEachVoiceSample> {
-  await uploadTask;
-  const downloadUrl = await getDownloadURL(fileRef);
-  return { filePath, downloadUrl };
-}
-
 export async function uploadVoiceSamples(
   voiceName: string,
   items: FileToUpload[]
@@ -61,43 +51,62 @@ export async function uploadVoiceSamples(
   }
 
   const userId = auth.currentUser.uid;
+  const generateUploadUrl = httpsCallable(functions, "generateVoiceUploadUrl");
   const uploadPromises: Promise<UploadResultForEachVoiceSample>[] = [];
 
   try {
     // Process each file in the array
-    for (let i = 0; i < items.length; i++) {
-      const item = items[i];
+    for (const item of items) {
       const fileName = `${voiceName}_${item.file.id}`;
       const contentType = item.file.data.type || "audio/wav";
-      const filePath = `users/${userId}/voice-samples/${voiceName}/${fileName}`;
-      const fileRef: StorageReference = ref(storage, filePath);
 
-      // Create and start the upload task
-      const uploadTask: UploadTask = uploadBytesResumable(
-        fileRef,
-        item.file.data,
-        {
-          contentType: contentType,
-          customMetadata: {
-            voiceName: voiceName,
-            originalFileName: item.file.name,
-            duration: item.file.duration.toString(),
-          },
+      // Get secure upload URL from callable function
+      const { data } = await generateUploadUrl({
+        voiceName,
+        fileName,
+        contentType,
+      });
+
+      const { uploadUrl, filePath, downloadUrl } = data as {
+        uploadUrl: string;
+        filePath: string;
+        downloadUrl: string;
+        expires: string;
+      };
+
+      const uploadPromise = new Promise<UploadResultForEachVoiceSample>(
+        async (resolve, reject) => {
+          try {
+            const totalBytes = item.file.data.size;
+            let bytesSent = 0;
+
+            const transformStream = new TransformStream({
+              transform(chunk, controller) {
+                bytesSent += chunk.byteLength; // Track bytes sent
+                item.onProgress?.((bytesSent / totalBytes) * 100); // Update progress
+                controller.enqueue(chunk); // Pass through unchanged
+              },
+            });
+
+            const response = await fetch(uploadUrl, {
+              method: "PUT",
+              headers: {
+                "Content-Type": contentType,
+              },
+              body: item.file.data.stream().pipeThrough(transformStream),
+            });
+
+            if (!response.ok) {
+              throw new Error(`Upload failed: ${response.statusText}`);
+            }
+
+            resolve({ fileName, downloadUrl, filePath, contentType });
+          } catch (error) {
+            reject(error);
+          }
         }
       );
 
-      // Attach progress listener if provided
-      if (item.onProgress) {
-        const onProgress = item.onProgress;
-        uploadTask.on("state_changed", (snapshot: UploadTaskSnapshot) => {
-          const progress =
-            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          onProgress(progress);
-        });
-      }
-
-      // Create a promise for this upload using the helper function
-      const uploadPromise = uploadSingleFile(uploadTask, fileRef, filePath);
       uploadPromises.push(uploadPromise);
     }
 
