@@ -76,7 +76,7 @@ const ConfirmSaveVoicePage = () => {
 
     try {
       // Clear previous uploads - comment out for testing
-      // await clearPreviousVoiceSamples(voiceName);
+      await clearPreviousVoiceSamples(voiceName);
 
       // Upload all voice samples to firebase storage
       const result = await uploadVoiceSamples(voiceName, fileItems);
