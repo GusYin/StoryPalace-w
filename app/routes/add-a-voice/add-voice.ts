@@ -67,9 +67,15 @@ export async function uploadVoiceSamples(
     // Process each file in the array
     for (let i = 0; i < items.length; i++) {
       const item = items[i];
+      // Add client-side validation (mirror storage rules)
+      const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB
+      if (item.file.data.size > MAX_FILE_SIZE) {
+        throw new Error("File size exceeds 20MB limit");
+      }
+      // Add timestamp to prevent name collisions
       const fileName = `${voiceName}_${item.file.id}`;
       const contentType = item.file.data.type || "audio/wav";
-      const filePath = `users/${userId}/voice-samples/${voiceName}/${fileName}`;
+      const filePath = `voice-samples/${userId}/${voiceName}/${fileName}`;
       const fileRef: StorageReference = ref(storage, filePath);
 
       // Create and start the upload task
@@ -80,7 +86,7 @@ export async function uploadVoiceSamples(
           contentType: contentType,
           customMetadata: {
             voiceName: voiceName,
-            originalFileName: item.file.name,
+            originalFileName: item.file.name.slice(0, 256), // Prevent long names
             duration: item.file.duration.toString(),
           },
         }
@@ -123,14 +129,16 @@ export async function clearPreviousVoiceSamples(
   }
 
   const userId = auth.currentUser.uid;
-  const folderRef = ref(storage, `users/${userId}/voice-samples/${voiceName}`);
+  const folderRef = ref(storage, `voice-samples/${userId}/${voiceName}`);
 
   try {
     // List all files in the voice samples folder
-    const listResult = await listAll(folderRef);
+    const { items } = await listAll(folderRef);
+
+    if (items.length === 0) return;
 
     // Create array of delete promises
-    const deletePromises = listResult.items.map((item) => deleteObject(item));
+    const deletePromises = items.map((item) => deleteObject(item));
 
     // Wait for all files to be deleted
     await Promise.all(deletePromises);

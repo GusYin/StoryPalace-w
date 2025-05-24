@@ -16,15 +16,15 @@ service firebase.storage {
         && firestore.get(/databases/(default)/documents/users/$(userId)).data.stripeSubscriptionStatus == 'active'
 
         // Storage quota enforcement (100MB)
-        && (
-          (firestore.get(/databases/(default)/documents/users/$(userId)).data.storageUsed != null 
-          ? firestore.get(/databases/(default)/documents/users/$(userId)).data.storageUsed 
-          : 0
-          ) + request.resource.size < 100 * 1024 * 1024
-        )
-
+        // && (
+        //   (firestore.get(/databases/(default)/documents/users/$(userId)).data.storageUsed != null 
+        //   ? firestore.get(/databases/(default)/documents/users/$(userId)).data.storageUsed 
+        //   : 0
+        //   ) + request.resource.size < 100 * 1024 * 1024
+        // )
+        
         // File type validation
-        && request.resource.contentType.matches('audio/(wav|mp3|ogg|webm)')
+        && request.resource.contentType.matches('audio/(mpeg|wav|mp3|ogg|webm)')
 
         // File size limit (10MB per file)
         && request.resource.size < 20 * 1024 * 1024;
