@@ -322,7 +322,7 @@ const MyAccount: React.FC = () => {
           </div>
           {!isFetchingPlan &&
             (userPlan?.plan === PricingPlan.Premium ? (
-              <button className="w-full sm:w-auto md:w-80 bg-gray-600 text-white px-3 py-3 rounded-3xl hover:bg-gray-700 transition-colors">
+              <button className="text-xl w-full sm:w-auto md:w-80 bg-gray-600 text-white px-3 py-3 rounded-3xl hover:bg-gray-700 transition-colors">
                 Manage Plan
               </button>
             ) : (
