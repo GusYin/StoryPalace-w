@@ -2,43 +2,39 @@ rules_version = '2';
 
 service firebase.storage {
   match /b/{bucket}/o {
-    match /voice-samples/{userId}/{voiceName}/{fileName} {
-      allow write: if 
-        // Base authentication checks
+    // Allow folder listing for voice samples
+    match /voice-samples/{userId}/{voiceName} {
+      allow read: if 
         request.auth != null 
         && request.auth.uid == userId 
         && request.auth.token.email_verified
-
-        // Premium plan verification
-        && firestore.get(/databases/(default)/documents/users/$(userId)).data.plan == 'premium'
-
-        // Active Stripe subscription check
-        && firestore.get(/databases/(default)/documents/users/$(userId)).data.stripeSubscriptionStatus == 'active'
-
-        // Storage quota enforcement (100MB)
-        // && (
-        //   (firestore.get(/databases/(default)/documents/users/$(userId)).data.storageUsed != null 
-        //   ? firestore.get(/databases/(default)/documents/users/$(userId)).data.storageUsed 
-        //   : 0
-        //   ) + request.resource.size < 100 * 1024 * 1024
-        // )
-        
-        // File type validation
-        && request.resource.contentType.matches('audio/(mpeg|wav|mp3|ogg|webm)')
-
-        // File size limit (10MB per file)
-        && request.resource.size < 20 * 1024 * 1024;
-
-        allow read: if 
-        // Authentication checks
-        request.auth != null 
-        && request.auth.uid == userId 
-        && request.auth.token.email_verified
-        
-        // Active premium subscription
         && firestore.exists(/databases/(default)/documents/users/$(userId))
         && firestore.get(/databases/(default)/documents/users/$(userId)).data.plan == 'premium'
         && firestore.get(/databases/(default)/documents/users/$(userId)).data.stripeSubscriptionStatus == 'active'
+
+      // Individual file rules remain nested here
+      match /{fileName} {
+        // Create (upload) permissions
+        allow create: if 
+          request.auth != null 
+          && request.auth.uid == userId 
+          && request.auth.token.email_verified
+          && firestore.get(/databases/(default)/documents/users/$(userId)).data.plan == 'premium'
+          && firestore.get(/databases/(default)/documents/users/$(userId)).data.stripeSubscriptionStatus == 'active'
+          && request.resource.contentType.matches('audio/(mpeg|wav|mp3|ogg|webm)')
+          && request.resource.size < 20 * 1024 * 1024;
+
+        // Delete permissions
+        allow delete: if 
+          request.auth != null 
+          && request.auth.uid == userId 
+          && request.auth.token.email_verified
+          && firestore.exists(/databases/(default)/documents/users/$(userId))
+          && firestore.get(/databases/(default)/documents/users/$(userId)).data.plan == 'premium'
+          && firestore.get(/databases/(default)/documents/users/$(userId)).data.stripeSubscriptionStatus == 'active';
+
+        allow read: if true; // Inherits parent read permissions
+      }
     }
 
     match /tts/{userId}/{allPaths=**} {
