@@ -10,6 +10,7 @@ import "react-toastify/dist/ReactToastify.css";
 import localforage from "localforage";
 import { ref, getDownloadURL } from "firebase/storage";
 import { storage } from "~/firebase/firebase";
+import Spinner from "~/components/spinner";
 
 export interface StoryMetadata {
   title: string;
@@ -119,7 +120,7 @@ export const ImageWithLoader = ({
     <div className="relative w-full h-full">
       {loading && (
         <div className="absolute inset-0 flex items-center justify-center bg-gray-700">
-          <div className="animate-spin h-6 w-6 border-2 border-current border-t-transparent rounded-full"></div>
+          <Spinner />
         </div>
       )}
       {imgSrc && (
@@ -342,7 +343,7 @@ const LibraryPage = () => {
           <div className="">
             {loading ? (
               <div className="absolute inset-0 bg-black/50 backdrop-blur-[.7px] flex items-center justify-center">
-                <div className="animate-spin h-5 w-5 border-2 border-current border-t-transparent rounded-full"></div>
+                <Spinner />
               </div>
             ) : (
               <>
@@ -419,7 +420,7 @@ const LibraryPage = () => {
                 {/* Pagination status */}
                 {isFetchingMore && (
                   <div className="flex justify-center my-8">
-                    <div className="animate-spin h-8 w-8 border-2 border-current border-t-transparent rounded-full"></div>
+                    <Spinner className="h-8 w-8" />
                   </div>
                 )}
 

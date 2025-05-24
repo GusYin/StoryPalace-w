@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router";
 import { StoryPalaceLogoBlack } from "./icons/story-palace-logo-black";
+import Spinner from "./spinner";
 
 const SkeletonHeader = () => {
   const navigate = useNavigate();
@@ -29,7 +30,7 @@ const SkeletonHeader = () => {
             type="button"
             className="cursor-pointer text-custom-text-grey bg-grey-bg-lucile hover:bg-teal-700 focus:outline-hidden focus:ring-4 focus:ring-green-300 rounded-[30px] px-5 py-2.5 text-center dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
           >
-            <div className="animate-spin h-5 w-5 border-2 border-current border-t-transparent rounded-full"></div>
+            <Spinner />
           </button>
         </div>
       </nav>

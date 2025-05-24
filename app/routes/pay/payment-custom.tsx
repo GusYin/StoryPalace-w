@@ -15,6 +15,7 @@ import { MastercardCC } from "~/components/icons/cc-mastercard";
 import { GenericCardCC } from "~/components/icons/cc-generic-card";
 import { DinersCC } from "~/components/icons/cc-diners";
 import { JCBCC } from "~/components/icons/cc-jcb";
+import FullScreenSpinner from "~/components/full-screen-spinner";
 
 type SubscriptionParams = {
   plan: "basic" | "premium";
@@ -253,7 +254,7 @@ export default function Payment() {
   if (loading || !isValidPlan || !isValidFrequency) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-custom-teal"></div>
+        <FullScreenSpinner loading={loading} />
       </div>
     );
   }

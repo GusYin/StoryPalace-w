@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { httpsCallable } from "firebase/functions";
 import { functions } from "~/firebase/firebase";
 import AuthHeader from "~/components/header-auth";
-import FullScreenLoadingSpinnerTeal from "~/components/loading-spinner-teal";
+import FullScreenSpinner from "~/components/full-screen-spinner";
 import { useNavigate } from "react-router";
 import { TickIcon } from "~/components/icons/tick";
 import { EscalationMarkIcon } from "~/components/icons/escalation-mark-icon";
@@ -117,7 +117,7 @@ export default function CheckoutReturnPage() {
       <AuthHeader />
 
       <main className="font-dosis text-xl text-black flex items-center justify-center">
-        <FullScreenLoadingSpinnerTeal loading={loading} />
+        <FullScreenSpinner loading={loading} />
 
         {!loading && displayConfig && (
           <div className="w-full max-w-[390px] md:h-[346px] mt-15">

@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 import { toast, ToastContainer } from "react-toastify";
 import SkeletonHeader from "~/components/header-skeleton";
+import Spinner from "~/components/spinner";
 import { auth } from "~/firebase/firebase";
 
 // Allowed redirect paths for security
@@ -53,7 +54,7 @@ export default function AuthRedirect() {
         theme="light"
       />
       <div className="absolute inset-0 bg-black/20 backdrop-blur-[.7px] flex items-center justify-center">
-        <div className="animate-spin h-5 w-5 border-2 border-current border-t-transparent rounded-full"></div>
+        <Spinner />{" "}
       </div>
     </div>
   );

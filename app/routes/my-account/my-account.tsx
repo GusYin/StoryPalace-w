@@ -15,6 +15,7 @@ import { httpsCallable } from "firebase/functions";
 import ButtonWithLoading from "~/components/button-with-loading";
 import { toast, ToastContainer } from "react-toastify";
 import { Timestamp } from "firebase/firestore";
+import Spinner from "~/components/spinner";
 
 interface UserPlanResponse {
   plan: "free" | "basic" | "premium";
@@ -316,11 +317,7 @@ const MyAccount: React.FC = () => {
               YOUR PLAN
             </h3>
             <span className="capitalize-plan text-black font-bold text-4xl">
-              {isFetchingPlan ? (
-                <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-custom-teal"></div>
-              ) : (
-                `${planDisplay()}`
-              )}
+              {isFetchingPlan ? <Spinner /> : `${planDisplay()}`}
             </span>
           </div>
           {!isFetchingPlan &&

@@ -8,6 +8,7 @@ import type { Story } from "./library";
 import { httpsCallable } from "firebase/functions";
 import { functions } from "~/firebase/firebase";
 import localforage from "localforage";
+import Spinner from "~/components/spinner";
 
 const STORY_TTL = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 
@@ -150,11 +151,7 @@ const StoryPlayerPage = () => {
           <div className="mb-2 md:mb-8 gap-2 md:gap-5 flex flex-col items-center">
             {/* Story Title */}
             <h1 className="tall-mobile-margin-bottom tall-mobile-font-size-3 text-lg md:text-3xl">
-              {loading ? (
-                <div className="animate-spin h-5 w-5 border-2 border-current border-t-transparent rounded-full"></div>
-              ) : (
-                story?.metadata.title
-              )}
+              {loading ? <Spinner /> : story?.metadata.title}
             </h1>
             <div className="tall-mobile-margin-bottom p-2 md:p-5 bg-[#161D1C] rounded-2xl shadow-md overflow-hidden w-full">
               {" "}
@@ -181,7 +178,7 @@ const StoryPlayerPage = () => {
                           inset-0 bg-black/50 backdrop-blur-[.7px] rounded-full 
                           flex items-center justify-center"
                         >
-                          <div className="animate-spin h-5 w-5 border-2 border-current border-t-transparent rounded-full"></div>
+                          <Spinner />{" "}
                         </div>
                       )}
                     </button>

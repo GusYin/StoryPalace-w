@@ -6,6 +6,7 @@ import { functions } from "~/firebase/firebase";
 import { ImageWithLoader, type LightweightStory, type Story } from "./library";
 import localforage from "localforage";
 import { PlayIconBlack } from "~/components/icons/play-icon-black";
+import Spinner from "~/components/spinner";
 
 const STORY_TTL = 24 * 60 * 60 * 1000; // 24 hours
 
@@ -98,7 +99,7 @@ const StorySeriesDetailPage = () => {
           <div className="md:w-2/3">
             {loading ? (
               <div className="absolute inset-0 bg-black/50 backdrop-blur-[.7px] flex items-center justify-center">
-                <div className="animate-spin h-5 w-5 border-2 border-current border-t-transparent rounded-full"></div>
+                <Spinner />{" "}
               </div>
             ) : (
               <>
