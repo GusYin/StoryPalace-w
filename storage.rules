@@ -21,7 +21,7 @@ service firebase.storage {
           && request.auth.token.email_verified
           && firestore.get(/databases/(default)/documents/users/$(userId)).data.plan == 'premium'
           && firestore.get(/databases/(default)/documents/users/$(userId)).data.stripeSubscriptionStatus == 'active'
-          && request.resource.contentType.matches('audio/(mpeg|wav|mp3|ogg|webm)')
+          && request.resource.contentType.matches('audio/(m4a|mpeg|wav|mp3|ogg|webm)')
           && request.resource.size < 20 * 1024 * 1024;
 
         // Delete permissions
